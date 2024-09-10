@@ -1,62 +1,68 @@
-// src/components/Login.js
-
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './Login.css';
 
 function Login({ onClose, onSwitchToRegister }) {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigate();
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-
-        // Bạn có thể thêm logic kiểm tra thông tin đăng nhập tại đây
-        // Ví dụ: gọi API để xác thực người dùng
-
-        // Sau khi đăng nhập thành công, chuyển hướng đến trang chính
-        navigate("/UIPage");
-    };
-
-    return (
-        <div className="login-overlay show">
-            <div className="login-modal show">
-                <button className="close-btn" onClick={onClose}>×</button>
-                <div className="login-content">
-                    <h2>Đăng Nhập</h2>
-                    <form className="login-form" onSubmit={handleSubmit}>
-                        <label htmlFor="email">Email:</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required 
-                        />
-                        
-                        <label htmlFor="password">Mật Khẩu:</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required 
-                        />
-                        
-                        <a href="#forgot-password" className="forgot-password">Quên Mật Khẩu?</a>
-                        
-                        <button type="submit" className="btn-submit">Đăng Nhập</button>
-                    </form>
-                    <p className="switch-text">
-                        Chưa có tài khoản? <button onClick={onSwitchToRegister} className="btn-switch">Đăng Ký</button>
-                    </p>
-                </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        credentials: 'include' // Bao gồm cookie trong yêu cầu
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        console.log('Đăng nhập thành công');
+        navigate('UIPage'); // Điều hướng sau khi đăng nhập thành công
+      } else {
+        setErrorMessage(data.message || 'Có lỗi xảy ra khi đăng nhập');
+      }
+    } catch (error) {
+      setErrorMessage('Lỗi server');
+    }
+  };
+  return (
+    <div className="login-overlay show">
+      <div className="login-modal show">
+        <button className="close-btn" onClick={onClose}>&times;</button>
+        <div className="login-content">
+          <h2>Đăng Nhập</h2>
+          {errorMessage && <p className="error-message">{errorMessage}</p>}
+          <form className="login-form" onSubmit={handleSubmit}>
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="Nhập email của bạn"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <label>Mật khẩu</label>
+            <input
+              type="password"
+              placeholder="Nhập mật khẩu"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <button type="submit" className="btn-submit">Đăng Nhập</button>
+            <div className="switch-text">
+              <button type="button" className="btn-switch" onClick={onSwitchToRegister}>Chưa có tài khoản? Đăng Ký</button>
             </div>
+          </form>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default Login;
