@@ -46,7 +46,7 @@
     padding: 20px;
     background-color: #fff;
     text-align: center;
-    width: calc(33% - 40px); /* 3 sản phẩm mỗi hàng */
+    /* width: calc(33% - 40px); 3 sản phẩm mỗi hàng */
   }
   
   .product-image {

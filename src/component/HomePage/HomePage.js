@@ -76,7 +76,7 @@ function HomePage() {
             </div>
             <div className="feature-item">
               <h3>ChatBot</h3>
-              <p>Hỗ trợ trực tuyến 24/7 thông qua ChatBot thông minh</p>
+              <p>Hỗ trợ trực tuyến 24/7 </p>
             </div>
           </div>
         </section>

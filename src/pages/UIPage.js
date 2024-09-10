@@ -16,7 +16,8 @@ function UIPage() {
         <nav>
           <a href="/">Trang Chủ</a>
           <a href="/products">Giỏ Hàng</a>
-          <a href="/contact">Liên Hệ</a>
+          {/* <a href="/contact">Liên Hệ</a> */}
+          <a href="/account">Tài Khoản</a>
         </nav>
       </header>
 

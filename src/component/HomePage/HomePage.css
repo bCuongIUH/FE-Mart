@@ -1,4 +1,4 @@
-/* Cấu hình chung cho trang */
+
 .home-container {
     display: flex;
     flex-direction: column;
@@ -43,8 +43,8 @@
   }
   
   .btn-outline:hover {
-    background-color: white; /* Màu nền khi hover */
-    color: #007bff; /* Màu chữ khi hover */
+    background-color: white;
+    color: #007bff; 
   }
   
   /* Nội dung chính */
@@ -60,10 +60,10 @@
   
   /* Phần giới thiệu */
   .intro-section {
-    background-color: #ffffff; /* Nền trắng cho phần giới thiệu */
+    background-color: #ffffff; 
     padding: 40px;
-    border-radius: 8px; /* Bo góc phần giới thiệu */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ để nổi bật */
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   }
   
   .intro-section h2 {
@@ -74,9 +74,9 @@
   
   .intro-section p {
     font-size: 18px;
-    line-height: 1.6; /* Khoảng cách giữa các dòng để văn bản dễ đọc hơn */
-    color: #333; /* Màu chữ tối để dễ đọc */
-    text-align: center; /* Căn giữa văn bản */
+    line-height: 1.6; 
+    color: #333; 
+    text-align: center; 
   }
   
   /* Phần tính năng */
