@@ -25,7 +25,7 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/home" element={<HomePage />} />
+
         </Routes>
       </UserProvider>
     </Router>

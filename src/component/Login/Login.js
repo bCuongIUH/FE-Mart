@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css';
+import './Login.css'; 
 
 function Login({ onClose, onSwitchToRegister }) {
   const [email, setEmail] = useState('');
@@ -15,14 +15,15 @@ function Login({ onClose, onSwitchToRegister }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: 'include' // Bao gồm cookie trong yêu cầu
+        credentials: 'include' 
       });
   
       const data = await response.json();
   
       if (response.ok) {
         console.log('Đăng nhập thành công');
-        navigate('UIPage'); // Điều hướng sau khi đăng nhập thành công
+        localStorage.setItem('token', data.token); // Lưu token vào localStorage
+        navigate('/UIPage'); 
       } else {
         setErrorMessage(data.message || 'Có lỗi xảy ra khi đăng nhập');
       }
@@ -30,6 +31,8 @@ function Login({ onClose, onSwitchToRegister }) {
       setErrorMessage('Lỗi server');
     }
   };
+  
+
   return (
     <div className="login-overlay show">
       <div className="login-modal show">
@@ -56,7 +59,9 @@ function Login({ onClose, onSwitchToRegister }) {
             />
             <button type="submit" className="btn-submit">Đăng Nhập</button>
             <div className="switch-text">
-              <button type="button" className="btn-switch" onClick={onSwitchToRegister}>Chưa có tài khoản? Đăng Ký</button>
+              <button type="button" className="btn-switch" onClick={onSwitchToRegister}>
+                Chưa có tài khoản? Đăng Ký
+              </button>
             </div>
           </form>
         </div>
