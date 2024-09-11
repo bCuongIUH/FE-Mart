@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import '../pages/UIPage.css';
+import { UserContext } from '../untills/context/UserContext';
 
 const products = [
   { id: 1, name: 'Sản phẩm 1', price: '100.000 VNĐ', image: 'path/to/product1.jpg' },
@@ -8,7 +9,9 @@ const products = [
   
 ];
 
+//  console.log(user);
 function UIPage() {
+  
   return (
     <div className="ui-page">
       <header className="header">
