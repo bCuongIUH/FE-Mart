@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css'; 
+import { AuthContext } from '../../untills/context/AuthContext';
+
+import { postLogin } from '../../untills/api';
 
 function Login({ onClose, onSwitchToRegister }) {
+  const { login } = useContext(AuthContext); 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -11,27 +16,30 @@ function Login({ onClose, onSwitchToRegister }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include' 
-      });
-  
-      const data = await response.json();
-  
-      if (response.ok) {
-        console.log('Đăng nhập thành công');
-        localStorage.setItem('token', data.token); // Lưu token vào localStorage
-        navigate('/UIPage'); 
+      const response = await postLogin({ email, password });
+
+      if (response.status === 200) {
+        const data = response.data; // Dữ liệu trả về từ API
+
+        // Lưu token vào localStorage
+        localStorage.setItem('token', data.token);
+        
+        // Lưu thông tin người dùng vào AuthContext
+        login(data.user);
+
+        // Log thông tin người dùng và token
+        console.log('User Data:', data.user);
+        console.log('Token:', localStorage.getItem('token'));
+
+        navigate('/UIPage'); // Điều hướng sau khi đăng nhập thành công
       } else {
-        setErrorMessage(data.message || 'Có lỗi xảy ra khi đăng nhập');
+        setErrorMessage(response.data.message || 'Đăng nhập thất bại');
       }
     } catch (error) {
+      console.error('Lỗi khi đăng nhập:', error);
       setErrorMessage('Lỗi server');
     }
   };
-  
 
   return (
     <div className="login-overlay show">

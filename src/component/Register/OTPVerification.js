@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './OTPVerification.css';
-
+import { verifyOTP } from '../../untills/api';
 function OTPVerification() {
   const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -15,25 +15,18 @@ function OTPVerification() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, otp }),
-      });
+      const response = await verifyOTP({ email, otp });
 
-      const data = await response.json();
-
-      if (response.status === 200) {
-        localStorage.setItem('token', data.token);  // Lưu token vào localStorage
-        navigate('/');  // Điều hướng tới trang chính
+      if (response.status === 200) { // Nếu HTTP status là 200 OK
+        localStorage.setItem('token', response.data.token); // Lưu token vào localStorage
+        navigate('/'); // Điều hướng tới trang chính
       } else {
-        setErrorMessage(data.message || 'Xác minh OTP thất bại');
+        setErrorMessage(response.data.message || 'Xác minh OTP thất bại');
       }
     } catch (error) {
       setErrorMessage('Lỗi server');
     }
   };
-
   return (
     <div className="otp-verification-container">
       <h2>Xác minh OTP</h2>
