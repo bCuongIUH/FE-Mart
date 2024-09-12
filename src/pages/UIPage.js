@@ -1,22 +1,38 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../pages/UIPage.css';
-// import { UserContext } from '../untills/context/UserContext';
- import { AuthContext } from '../untills/context/AuthContext';
-
-
-
-const products = [
-  { id: 1, name: 'Sản phẩm 1', price: '100.000 VNĐ', image: 'path/to/product1.jpg' },
-  { id: 2, name: 'Sản phẩm 2', price: '200.000 VNĐ', image: 'path/to/product2.jpg' },
-  { id: 3, name: 'Sản phẩm 3', price: '300.000 VNĐ', image: 'path/to/product3.jpg' },
-  
-];
+// import { AuthContext } from '../untills/context/AuthContext';
+import { getAllProducts } from '../untills/api'; 
 
 function UIPage() {
 
-  const { user } = useContext(AuthContext);
-console.log('User:', user);
-;
+  const [products, setProducts] = useState([]); 
+  const [error, setError] = useState(null); 
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts(); 
+        setProducts(data); 
+        console.log('Dữ liệu sản phẩm:', data); // xem thông tin sản phẩm ở đây
+      } catch (error) {
+        setError('Lỗi khi lấy dữ liệu sản phẩm');
+        console.error(error);
+      }
+    };
+
+    fetchProducts(); 
+  }, []); 
+
+
+
+  const handleProductClick = (product) => {
+    // Xử lý sản phẩm dc chọn, render ra thong tin của sp blabla
+    console.log('Sản phẩm được chọn:', product);
+  };
+
+
   return (
     <div className="ui-page">
       <header className="header">
@@ -24,21 +40,29 @@ console.log('User:', user);
         <nav>
           <a href="/">Trang Chủ</a>
           <a href="/products">Giỏ Hàng</a>
-          {/* <a href="/contact">Liên Hệ</a> */}
-          <a href="/account">Tài Khoản</a>
+          <a href="/contact">Liên Hệ</a>
+          <a  href="/account">Tài Khoản</a>
         </nav>
       </header>
 
       <main className="main-content">
         <section className="product-list">
-          {products.map(product => (
-            <div key={product.id} className="product-card">
-              <img src={product.image} alt={product.name} className="product-image" />
-              <h2 className="product-name">{product.name}</h2>
-              <p className="product-price">{product.price}</p>
-              <button className="btn-add-to-cart">Thêm Vào Giỏ</button>
-            </div>
-          ))}
+          {error && <p className="error-message">{error}</p>}
+          {products.length > 0 ? (
+            products.map(product => (
+              <button
+                key={product._id}
+                className="product-button"
+                onClick={() => handleProductClick(product)}
+              >
+                <img src={product.image} alt={product.name} className="product-image" />
+                <h2 className="product-name">{product.description}</h2>
+                <p className="product-price" style={ {color:'red', marginTop: 'auto'}}>{product.price} VNĐ</p>
+              </button>
+            ))
+          ) : (
+            <p>Đang tải sản phẩm...</p>
+          )}
         </section>
       </main>
 

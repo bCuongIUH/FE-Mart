@@ -1,0 +1,192 @@
+.manager-page {
+
+  width: 100%; 
+  
+}
+
+/* Header styles */
+.header {
+  display: flex;
+  /* flex-direction: column; */
+  /* gap: 10px; */
+  /* padding: 10px 20px;  */
+  background: linear-gradient(to right, #007bff, #00d084); /* Gradient cho header */
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  width: 100%; /* Đảm bảo header chiếm toàn bộ chiều rộng */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-home {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 5px 10px; /* Giảm padding để nút nhỏ lại */
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px; /* Giảm kích thước chữ */
+  font-weight: bold;
+}
+
+.btn-home:hover {
+  background-color: white;
+  color: #007bff; /* Đổi màu khi hover */
+}
+
+.btn-info,
+.btn-stats,
+.btn-services {
+  background-color: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-info:hover {
+  background-color: white;
+  color: #007bff;
+}
+
+.btn-stats:hover {
+  background-color: white;
+  color: #00d084;
+}
+
+.btn-services:hover {
+  background-color: white;
+  color: #ff7e5f;
+}
+
+/* Form styles */
+.product-form {
+  margin-bottom: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.product-form input,
+.product-form textarea {
+  display: block;
+  width: calc(100% - 20px);
+  margin-bottom: 10px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.product-form button {
+  display: inline-block;
+  padding: 6px 12px; /* Giảm padding để nút nhỏ lại */
+  margin-right: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px; /* Giảm kích thước chữ nút */
+}
+
+.btn-submit {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #5a6268;
+}
+
+/* Product list styles */
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  background-color: #fff;
+  text-align: center;
+  width: calc(20% - 20px); /* 5 sản phẩm mỗi hàng */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.product-info {
+  flex-grow: 1;
+}
+
+.product-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.product-card p {
+  margin: 5px 0;
+}
+
+.product-price {
+  font-size: 14px;
+  color: #007bff;
+}
+
+.product-actions {
+  margin-top: 10px;
+}
+
+.product-actions .btn-edit,
+.product-actions .btn-delete {
+  display: inline-block;
+  padding: 4px 8px; /* Giảm padding để nút nhỏ lại */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px; /* Giảm kích thước chữ nút */
+  margin: 5px;
+}
+
+.btn-edit {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-edit:hover {
+  background-color: #0056b3;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}

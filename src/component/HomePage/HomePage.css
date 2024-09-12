@@ -18,6 +18,8 @@
     background: linear-gradient(135deg, #007bff, #00c851); 
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
     color: white;
+    width: 100vw; /* Chiều rộng 100% của viewport */
+    box-sizing: border-box; /* Đảm bảo padding không gây tràn */
   }
   
   .branding {

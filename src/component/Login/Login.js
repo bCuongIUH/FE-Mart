@@ -13,33 +13,41 @@ function Login({ onClose, onSwitchToRegister }) {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+
+  // nút đăng nhập
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await postLogin({ email, password });
+        const response = await postLogin({ email, password });
 
-      if (response.status === 200) {
-        const data = response.data; // Dữ liệu trả về từ API
+        if (response.status === 200) {
+            const data = response.data; // Dữ liệu trả về từ API
 
-      
-        localStorage.setItem('token', data.token);  
-        console.log('User data:', data.user);  
+            localStorage.setItem('token', data.token);  
+            console.log('User data:', data.user);  
      
-        setUser(data.user); 
-        
-        // Lưu thông tin người dùng vào AuthContext
-        login(data.user);
+            setUser(data.user); 
+            
+            // Lưu thông tin người dùng vào AuthContext
+            login(data.user);
 
-        navigate('/UIPage'); // Điều hướng sau khi đăng nhập thành công
-      } else {
-        setErrorMessage(response.data.message || 'Đăng nhập thất bại');
-      }
+            // Kiểm tra vai trò và điều hướng đến trang tương ứng
+            if (data.user.role === 'admin') {
+                navigate('/UIManager'); // Điều hướng đến trang quản lí 
+            } else {
+                navigate('/UIPage'); // Điều hướng đến trang UIPage của người dùng
+            }
+        } else {
+            setErrorMessage(response.data.message || 'Đăng nhập thất bại');
+        }
     } catch (error) {
-      console.error('Lỗi khi đăng nhập:', error);
-      setErrorMessage('Lỗi server');
+        console.error('Lỗi khi đăng nhập:', error);
+        setErrorMessage('Lỗi server');
     }
-  };
+};
 
+// 
   return (
     <div className="login-overlay show">
       <div className="login-modal show">

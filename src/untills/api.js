@@ -62,3 +62,56 @@ export const postRegister = async (data) => {
       throw error; // Ném lỗi để xử lý bên ngoài
     }
   }
+  // Sản phẩm API
+
+// Tạo sản phẩm mới
+export const createProduct = async (productData) => {
+  try {
+    const response = await axios.post(`${API_URL}/products`, productData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+// Lấy tất cả sản phẩm
+export const getAllProducts = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/products`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Lấy sản phẩm theo ID
+export const getProductById = async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/products/${id}`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Cập nhật sản phẩm
+export const updateProduct = async (id, productData) => {
+  try {
+    const response = await axios.put(`${API_URL}/products/${id}`, productData, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Xóa sản phẩm
+export const deleteProduct = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}/products/${id}`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

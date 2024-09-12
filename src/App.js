@@ -8,7 +8,8 @@ import UIPage from "./pages/UIPage";
 import  RequireAuth from "./component/AuthenticatedRouter";
 import { UserProvider } from './untills/context/UserContext';
 import { AuthProvider } from './untills/context/AuthContext'; 
-
+import UIManager from "./pages/UIManager";
+import ManagerPage from "./pages/ManagerPage";
 function App() {
   return (
     <Router>
@@ -20,6 +21,14 @@ function App() {
             <Route path="/otp-verification" element={<OTPVerification />} />
             <Route path="/login" element={<Login />} />
             <Route
+              path="/UIManager"
+              element={
+                <RequireAuth>
+                  <UIManager />
+                </RequireAuth>
+              }
+            />
+             <Route
               path="/UIPage"
               element={
                 <RequireAuth>
@@ -27,6 +36,7 @@ function App() {
                 </RequireAuth>
               }
             />
+             <Route path="/ManagerPage" element={<ManagerPage />} />
           </Routes>
         </UserProvider>
       </AuthProvider>
