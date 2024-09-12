@@ -12,7 +12,7 @@ function Login({ onClose, onSwitchToRegister }) {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-
+  const [user, setUser] = useState(null);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -21,15 +21,14 @@ function Login({ onClose, onSwitchToRegister }) {
       if (response.status === 200) {
         const data = response.data; // Dữ liệu trả về từ API
 
-        // Lưu token vào localStorage
-        localStorage.setItem('token', data.token);
+      
+        localStorage.setItem('token', data.token);  
+        console.log('User data:', data.user);  
+     
+        setUser(data.user); 
         
         // Lưu thông tin người dùng vào AuthContext
         login(data.user);
-
-        // Log thông tin người dùng và token
-        console.log('User Data:', data.user);
-        console.log('Token:', localStorage.getItem('token'));
 
         navigate('/UIPage'); // Điều hướng sau khi đăng nhập thành công
       } else {

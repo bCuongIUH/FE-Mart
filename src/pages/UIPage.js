@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import '../pages/UIPage.css';
 // import { UserContext } from '../untills/context/UserContext';
-import { AuthContext } from '../untills/context/AuthContext';
+ import { AuthContext } from '../untills/context/AuthContext';
 
 
 
@@ -13,8 +13,10 @@ const products = [
 ];
 
 function UIPage() {
+
   const { user } = useContext(AuthContext);
- console.log(user);
+console.log('User:', user);
+;
   return (
     <div className="ui-page">
       <header className="header">
