@@ -47,7 +47,8 @@ function Login({ onClose, onSwitchToRegister }) {
     }
 };
 
-// 
+
+
   return (
     <div className="login-overlay show">
       <div className="login-modal show">

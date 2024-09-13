@@ -10,6 +10,11 @@ import { UserProvider } from './untills/context/UserContext';
 import { AuthProvider } from './untills/context/AuthContext'; 
 import UIManager from "./pages/UIManager";
 import ManagerPage from "./pages/ManagerPage";
+import Profile from "../src/component/profile/profile";
+import UserInfo from "./component/profile/profile.UserInfo";
+import ChangePassword from "./component/password/ChangePassword";
+
+
 function App() {
   return (
     <Router>
@@ -37,6 +42,10 @@ function App() {
               }
             />
              <Route path="/ManagerPage" element={<ManagerPage />} />
+             <Route path="Profile" element={<Profile />} /> 
+             <Route path="user-info" element={<UserInfo />} /> 
+             <Route path="change-password" element={<ChangePassword />} /> 
+            
           </Routes>
         </UserProvider>
       </AuthProvider>

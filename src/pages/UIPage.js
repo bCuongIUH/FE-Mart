@@ -1,38 +1,42 @@
+
 import React, { useState, useEffect, useContext } from 'react';
 import '../pages/UIPage.css';
-// import { AuthContext } from '../untills/context/AuthContext';
+import { AuthContext } from '../untills/context/AuthContext';
 import { getAllProducts } from '../untills/api'; 
 
 function UIPage() {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
+  const { user, logout } = useContext(AuthContext);
+  const [showDropdown, setShowDropdown] = useState(false); // State for dropdown visibility
 
-  const [products, setProducts] = useState([]); 
-  const [error, setError] = useState(null); 
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await getAllProducts(); 
-        setProducts(data); 
-        console.log('Dữ liệu sản phẩm:', data); // xem thông tin sản phẩm ở đây
+        const data = await getAllProducts();
+        setProducts(data);
       } catch (error) {
         setError('Lỗi khi lấy dữ liệu sản phẩm');
         console.error(error);
       }
     };
 
-    fetchProducts(); 
-  }, []); 
-
-
+    fetchProducts();
+  }, []);
 
   const handleProductClick = (product) => {
-    // Xử lý sản phẩm dc chọn, render ra thong tin của sp blabla
     console.log('Sản phẩm được chọn:', product);
   };
 
-
+  // Toggle dropdown visibility
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+  const handleLogout = () => {
+    logout(); 
+    window.location.href = '/'; 
+  };
+ 
   return (
     <div className="ui-page">
       <header className="header">
@@ -41,7 +45,26 @@ function UIPage() {
           <a href="/">Trang Chủ</a>
           <a href="/products">Giỏ Hàng</a>
           <a href="/contact">Liên Hệ</a>
-          <a  href="/account">Tài Khoản</a>
+
+          {/* Tài Khoản - chọn mở option mở chức năng quản lí của user*/}
+          <div className="account">
+            <img
+              src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg"  // ảnh default
+              alt="User Avatar"
+              className="avatar"
+              onClick={toggleDropdown} 
+            />
+            {showDropdown && (
+              <div className="dropdown">
+                <ul>
+                  <li><a href="/profile">Thông tin</a></li>
+                  <li><a href="/settings">Cài đặt</a></li>
+                  <li><a href="/change-password">Cập nhật mật khẩu</a></li>
+                  <li onClick={handleLogout}>Đăng xuất</li>
+                </ul>
+              </div>
+            )}
+          </div>
         </nav>
       </header>
 

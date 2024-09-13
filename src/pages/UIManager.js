@@ -1,8 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { getAllProducts } from '../untills/api'; // API lấy tất cả sản phẩm
+import React, { useEffect, useState, useContext } from 'react';
+import { getAllProducts } from '../untills/api'; 
 import './UIManager.css'; // File CSS tùy chỉnh
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../untills/context/AuthContext';
+
 const UIManager = () => {
+  const { user } = useContext(AuthContext);
+  console.log('User:', user);
+  
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 

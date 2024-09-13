@@ -20,6 +20,11 @@
   margin: 0;
 }
 
+.header nav {
+  display: flex;
+  align-items: center;
+}
+
 .header nav a {
   color: white;
   margin: 0 10px;
@@ -28,6 +33,76 @@
 
 .header nav a:hover {
   text-decoration: underline;
+}
+
+/* Phần tài khoản - Avatar */
+.account {
+  position: relative; /* Quan trọng để định vị dropdown */
+  display: inline-block;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-left: 10px; /* Khoảng cách giữa nút "Liên Hệ" và avatar */
+  border: 2px solid white;
+}
+
+/* Dropdown menu */
+.dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 200px;
+  padding: 10px 0;
+  border-radius: 8px;
+}
+
+.dropdown ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown ul li {
+  padding: 10px;
+  cursor: pointer;
+  color: #333;
+  text-align: center;
+  font-size: 14px;
+}
+
+.dropdown ul li:hover {
+  text-decoration: none;
+    color: #333;
+}
+
+.dropdown ul li a {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dropdown ul li a:hover {
+  color: #007bff; /* Thay đổi màu chữ khi hover */
+}
+
+
+.dropdown ul li:last-child {
+  /* background-color: #007bff; */
+  /* color: white; */
+  border: none;
+  padding: 12px;
+}
+
+.dropdown ul li:last-child:hover {
+  background-color: #0056b3;
 }
 
 /* Nội dung chính */
@@ -81,11 +156,6 @@
   overflow: hidden; 
   text-overflow: ellipsis; /* Hiển thị dấu ba chấm nếu có chữ bị cắt */
 }
-
-/* .product-price {
-  font-size: 180px;
-  color: #ff0000;
-} */
 
 /* Phần footer */
 .footer {

@@ -1,0 +1,66 @@
+
+.user-info-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+
+.user-info-header {
+  background: linear-gradient(to right, #007bff, #00ffaa); 
+  color: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Nút quay lại */
+.back-button {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 10px;
+  margin-right: auto; 
+  font-weight: 700;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+
+/* .brand-name {
+  font-size: 24px;
+  cursor: pointer;
+} */
+
+
+.user-info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+
+.user-info-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+/* Thông tin người dùng */
+.user-info-details {
+  font-size: 18px;
+}
+
+.user-info-details p {
+  margin: 10px 0;
+}

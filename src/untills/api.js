@@ -38,7 +38,7 @@ export const postRegister = async (data) => {
   //token và session
   export const removeCookie = async () => {
     try {
-      const response = await axios.get(`${API_URL}/users/removeCookie`, config);
+      const response = await axios.get(`${API_URL}/auth/removeCookie`, config);
       return response; // Trả về response nếu thành công
     } catch (error) {
       throw error; // Ném lỗi để xử lý bên ngoài
@@ -47,16 +47,16 @@ export const postRegister = async (data) => {
   
   export const removeToken = async () => {
     try {
-      const response = await axios.get(`${API_URL}/users/removeToken`, config);
+      const response = await axios.get(`${API_URL}/auth/removeToken`, config);
       return response; // Trả về response nếu thành công
     } catch (error) {
       throw error; // Ném lỗi để xử lý bên ngoài
     }
-  }
+  };
   
   export const getToken = async () => {
     try {
-      const response = await axios.get(`${API_URL}/users/getToken`, config);
+      const response = await axios.get(`${API_URL}/auth/getToken`, config);
       return response; // Trả về response nếu thành công
     } catch (error) {
       throw error; // Ném lỗi để xử lý bên ngoài
@@ -110,6 +110,37 @@ export const updateProduct = async (id, productData) => {
 export const deleteProduct = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/products/${id}`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Mật khẩu
+// Gửi yêu cầu quên mật khẩu
+export const forgotPassword = async (email) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/forgot-password`, { email }, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Xác minh OTP và lấy token đặt lại mật khẩu
+export const verifyForgotPasswordOTP = async (email, otp) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/verify-otp`, { email, otp }, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/// Hàm đổi mật khẩu
+export const changePassword = async (userId, oldPassword, newPassword) => {
+  try {
+    const response = await axios.post(`${API_URL}/auth/change-password`, { userId, oldPassword, newPassword }, config);
     return response.data;
   } catch (error) {
     throw error;
