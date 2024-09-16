@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./HomePage.css";
+import styles from "./HomePage.module.css";
 import Login from "../Login/Login";
 import Register from "../Register/Register";
 
@@ -26,29 +26,29 @@ function HomePage() {
   };
 
   return (
-    <div className="home-container">
-      <header className="header">
-        <div className="branding">
+    <div className={styles.homeContainer}>
+      <header className={styles.header}>
+        <div className={styles.branding}>
           <h1>SOPPE</h1>
         </div>
-        <div className="additional-buttons">
-          <button className="btn-outline intro-btn">Giới Thiệu</button>
-          <button className="btn-outline">Thông Báo</button>
-          <button className="btn-outline">Hỗ Trợ</button>
-          <button className="btn-outline">Tiếng Việt</button>
+        <div className={styles.additionalButtons}>
+          <button className={styles.btnOutline}>Giới Thiệu</button>
+          <button className={styles.btnOutline}>Thông Báo</button>
+          <button className={styles.btnOutline}>Hỗ Trợ</button>
+          <button className={styles.btnOutline}>Tiếng Việt</button>
         </div>
-        <div className="button-group">
-          <button className="btn-outline" onClick={handleLoginClick}>
+        <div className={styles.buttonGroup}>
+          <button className={styles.btnOutline} onClick={handleLoginClick}>
             Đăng Nhập
           </button>
-          <button className="btn-outline" onClick={handleRegisterClick}>
+          <button className={styles.btnOutline} onClick={handleRegisterClick}>
             Đăng Ký
           </button>
         </div>
       </header>
 
-      <main className="main-content">
-        <section className="intro-section">
+      <main className={styles.mainContent}>
+        <section className={styles.introSection}>
           <h2>Chào Mừng Đến Với SOPPE!</h2>
           <p>
             Chào mừng bạn đến với SOPPE, điểm đến hoàn hảo cho những tín đồ thời
@@ -58,40 +58,40 @@ function HomePage() {
           </p>
         </section>
 
-        <section className="features-section">
+        <section className={styles.featuresSection}>
           <h2>Tính Năng Nổi Bật</h2>
-          <div className="features">
-            <div className="feature-item">
+          <div className={styles.features}>
+            <div className={styles.featureItem}>
               <h3>Quản Lý Mua Sắm</h3>
               <p>
                 Quản lý và theo dõi đơn hàng mua sắm của bạn một cách dễ dàng
               </p>
             </div>
-            <div className="feature-item">
+            <div className={styles.featureItem}>
               <h3>Hợp Tác</h3>
               <p>
                 Hợp tác với các nhà cung cấp uy tín để cung cấp sản phẩm chất
                 lượng
               </p>
             </div>
-            <div className="feature-item">
+            <div className={styles.featureItem}>
               <h3>ChatBot</h3>
-              <p>Hỗ trợ trực tuyến 24/7 </p>
+              <p>Hỗ trợ trực tuyến 24/7</p>
             </div>
           </div>
         </section>
 
-        <section className="cta-section">
+        <section className={styles.ctaSection}>
           <h2>Tham Gia Ngay Hôm Nay!</h2>
           <p>Đăng ký để trải nghiệm mua sắm trực tuyến tuyệt vời tại SOPPE</p>
-          <button className="btn-cta" onClick={handleRegisterClick}>
+          <button className={styles.btnCta} onClick={handleRegisterClick}>
             Đăng Ký Ngay
           </button>
         </section>
       </main>
 
-      <footer className="footer">
-        <div className="footer-section">
+      <footer className={styles.footer}>
+        <div className={styles.footerSection}>
           <h3>VỀ SOPEE</h3>
           <a href="#gioi-thieu">Giới Thiệu Về Shopee Việt Nam</a>
           <a href="#tuyen-dung">Tuyển Dụng</a>
@@ -104,28 +104,31 @@ function HomePage() {
           <a href="#truyen-thong">Liên Hệ Với Truyền Thông</a>
         </div>
 
-        <div className="footer-section">
+        <div className={styles.footerSection}>
           <h3>THANH TOÁN</h3>
-          <img src="path/to/bank-logo1.png" alt=" " />
-          <img src="path/to/bank-logo2.png" alt=" " />
-          <img src="path/to/bank-logo3.png" alt=" " />
+          <img src="path/to/bank-logo1.png" alt="Bank Logo 1" />
+          <img src="path/to/bank-logo2.png" alt="Bank Logo 2" />
+          <img src="path/to/bank-logo3.png" alt="Bank Logo 3" />
         </div>
 
-        <div className="footer-section ">
-          <h3>THEO DÕI CHÚNG TÔI TRÊN</h3> 
-          <a href="https://facebook.com">
-            <img src="path/to/facebook-logo.png" alt="Facebook" />
+        <div className={styles.footerSection}>
+          <h3>THEO DÕI CHÚNG TÔI TRÊN</h3>
+          <a href="https://www.facebook.com/bachcuong2704">
+            <img
+              style={{ width: "20px", height: "20px" }}
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUcP0ZcWRME2hXax1sPPgNtutzs7H0ZQv2vw&s"
+              alt="Facebook"
+            />
           </a>
-          <a href="https://instagram.com">
+          <a href="https://www.instagram.com/bcuowq._27/">
             <img src="path/to/instagram-logo.png" alt="Instagram" />
           </a>
-          <a href="https://github.com">
+          <a href="https://github.com/bCuongIUH">
             <img src="path/to/github-logo.png" alt="GitHub" />
           </a>
-          
         </div>
 
-        <div className="footer-section">
+        <div className={styles.footerSection}>
           <h3>TẢI ỨNG DỤNG SHOPEE NGAY THÔI</h3>
           <a href="#download-app">Tải Ngay</a>
         </div>

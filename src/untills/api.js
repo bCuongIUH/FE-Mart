@@ -4,11 +4,12 @@ const config = { withCredentials: true };
 const API_URL = "http://localhost:5000/api";
 // đăng nhập / đăng ký / xác thực người dùng
 
-
+//đăng kí
 export const postRegister = async (data) => {
     const res = axios.post(`${API_URL}/auth/register`, data, config)
     return res;
   }
+  //xác minh email
   export const verifyOTP = async (data) => {
   
     return new Promise((reject, resolve) => {
@@ -22,6 +23,16 @@ export const postRegister = async (data) => {
     })
   
   }
+  export const sendOTP = async ({ email }) => {
+    try {
+      const response = await axios.post(`${API_URL}/send-otp`, { email });
+      return response;
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      throw error; // Để các phần khác có thể xử lý lỗi nếu cần
+    }
+  };
+  //đăng nhập
   export const postLogin = async (data) => {
   
     return new Promise((rejects, resolve) => {

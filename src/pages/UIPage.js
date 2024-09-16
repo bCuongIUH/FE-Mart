@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect, useContext } from 'react';
-import '../pages/UIPage.css';
+import styles from './UIPage.module.css'; 
 import { AuthContext } from '../untills/context/AuthContext';
-import { getAllProducts } from '../untills/api'; 
+import { getAllProducts } from '../untills/api';
+import ProductsModal from '../component/products/ProductsModel'
 
 function UIPage() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const { user, logout } = useContext(AuthContext);
-  const [showDropdown, setShowDropdown] = useState(false); // State for dropdown visibility
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,42 +26,57 @@ function UIPage() {
   }, []);
 
   const handleProductClick = (product) => {
-    console.log('Sản phẩm được chọn:', product);
+    setSelectedProduct(product);
   };
 
-  // Toggle dropdown visibility
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
+
+  const handleAddToCart = (product) => {
+    // Implement add to cart logic
+    console.log('bỏ vào giỏ, mua :))', product);
+    handleCloseModal();
+  };
+
+  const handleBuyNow = (product) => {
+    // Implement buy now logic
+    console.log('mua sản phẩm thành công 1:', product);
+    handleCloseModal();
+  };
+
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
+
   const handleLogout = () => {
-    logout(); 
-    window.location.href = '/'; 
+    logout();
+    window.location.href = '/';
   };
- 
+
   return (
-    <div className="ui-page">
-      <header className="header">
+    <div className={styles.uiPage}>
+      <header className={styles.header}>
         <h1>SOPPE</h1>
-        <nav>
+        <nav className={styles.headerNav}>
           <a href="/">Trang Chủ</a>
           <a href="/products">Giỏ Hàng</a>
           <a href="/contact">Liên Hệ</a>
 
-          {/* Tài Khoản - chọn mở option mở chức năng quản lí của user*/}
-          <div className="account">
+          <div className={styles.account}>
             <img
-              src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg"  // ảnh default
+              src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" // ảnh default
               alt="User Avatar"
-              className="avatar"
-              onClick={toggleDropdown} 
+              className={styles.avatar}
+              onClick={toggleDropdown}
             />
             {showDropdown && (
-              <div className="dropdown">
-                <ul>
-                  <li><a href="/profile">Thông tin</a></li>
-                  <li><a href="/settings">Cài đặt</a></li>
-                  <li><a href="/change-password">Cập nhật mật khẩu</a></li>
-                  <li onClick={handleLogout}>Đăng xuất</li>
+              <div className={styles.dropdown}>
+                <ul className={styles.dropdownList}>
+                  <li className={styles.dropdownItem}><a href="/profile">Thông tin</a></li>
+                  <li className={styles.dropdownItem}><a href="/settings">Cài đặt</a></li>
+                  <li className={styles.dropdownItem}><a href="/change-password">Cập nhật mật khẩu</a></li>
+                  <li className={styles.dropdownLogout} onClick={handleLogout}>Đăng xuất</li>
                 </ul>
               </div>
             )}
@@ -68,19 +84,19 @@ function UIPage() {
         </nav>
       </header>
 
-      <main className="main-content">
-        <section className="product-list">
-          {error && <p className="error-message">{error}</p>}
+      <main className={styles.mainContent}>
+        <section className={styles.productList}>
+          {error && <p className={styles.errorMessage}>{error}</p>}
           {products.length > 0 ? (
             products.map(product => (
               <button
                 key={product._id}
-                className="product-button"
+                className={styles.productButton}
                 onClick={() => handleProductClick(product)}
               >
-                <img src={product.image} alt={product.name} className="product-image" />
-                <h2 className="product-name">{product.description}</h2>
-                <p className="product-price" style={ {color:'red', marginTop: 'auto'}}>{product.price} VNĐ</p>
+                <img src={product.image} alt={product.name} className={styles.productImage} />
+                <h2 className={styles.productName}>{product.description}</h2>
+                <p className={styles.productPrice} style={{color: 'red', marginTop: 'auto'}}>{product.price} VNĐ</p>
               </button>
             ))
           ) : (
@@ -89,15 +105,24 @@ function UIPage() {
         </section>
       </main>
 
-      <footer className="footer">
+      <footer className={styles.footer}>
         <p>&copy; 2024 Shop Online. All rights reserved.</p>
-        <div className="footer-links">
+        <div className={styles.footerLinks}>
           <a href="/">Trang Chủ</a>
           <a href="/products">Sản Phẩm</a>
           <a href="/contact">Liên Hệ</a>
           <a href="/about">Giới Thiệu</a>
         </div>
       </footer>
+
+      {selectedProduct && (
+        <ProductsModal 
+          product={selectedProduct} 
+          onClose={handleCloseModal} 
+          onAddToCart={handleAddToCart} 
+          onBuyNow={handleBuyNow} 
+        />
+      )}
     </div>
   );
 }

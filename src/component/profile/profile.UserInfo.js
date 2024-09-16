@@ -14,6 +14,7 @@ const UserInfo = () => {
     if (!user) {
         return <p>Loading...</p>; 
     }
+console.log(user);
 
     return (
         <div className="user-info-page">
@@ -33,7 +34,7 @@ const UserInfo = () => {
                 <div className="user-info-details">
                     <p><strong>Họ và Tên:</strong> {user.name}</p>
                     <p><strong>Email:</strong> {user.email}</p>
-                    <p><strong>Số Điện Thoại:</strong> {user.sdt}</p>
+                    <p><strong>Số Điện Thoại:</strong> {user.phoneNumber}</p>
                 </div>
             </main>
         </div>

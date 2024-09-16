@@ -1,81 +1,72 @@
-
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css'; 
+import styles from './login.module.css'; 
 import { AuthContext } from '../../untills/context/AuthContext';
-
 import { postLogin } from '../../untills/api';
 
 function Login({ onClose, onSwitchToRegister }) {
-  const { login } = useContext(AuthContext); 
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // nút đăng nhập
-  
+
+  //nút đăng nhập
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        const response = await postLogin({ email, password });
+      const response = await postLogin({ email, password });
 
-        if (response.status === 200) {
-            const data = response.data; // Dữ liệu trả về từ API
+      if (response.status === 200) {
+        const data = response.data;
+        localStorage.setItem('token', data.token);
+        setUser(data.user);
+        login(data.user);
 
-            localStorage.setItem('token', data.token);  
-            console.log('User data:', data.user);  
-     
-            setUser(data.user); 
-            
-            // Lưu thông tin người dùng vào AuthContext
-            login(data.user);
-
-            // Kiểm tra vai trò và điều hướng đến trang tương ứng
-            if (data.user.role === 'admin') {
-                navigate('/UIManager'); // Điều hướng đến trang quản lí 
-            } else {
-                navigate('/UIPage'); // Điều hướng đến trang UIPage của người dùng
-            }
+        if (data.user.role === 'admin') {
+          navigate('/UIManager');
         } else {
-            setErrorMessage(response.data.message || 'Đăng nhập thất bại');
+          navigate('/UIPage');
         }
+      } else {
+        setErrorMessage(response.data.message || 'Đăng nhập thất bại');
+      }
     } catch (error) {
-        console.error('Lỗi khi đăng nhập:', error);
-        setErrorMessage('Lỗi server');
+      console.error('Lỗi khi đăng nhập:', error);
+      setErrorMessage('Lỗi server');
     }
-};
-
-
+  };
 
   return (
-    <div className="login-overlay show">
-      <div className="login-modal show">
-        <button className="close-btn" onClick={onClose}>&times;</button>
-        <div className="login-content">
-          <h2>Đăng Nhập</h2>
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-          <form className="login-form" onSubmit={handleSubmit}>
-            <label>Email</label>
+    <div className={styles.overlay + ' ' + styles.overlayShow}>
+      <div className={styles.modal + ' ' + styles.modalShow}>
+        <div className={styles.content}>
+          <h2 className={styles.title}>Đăng Nhập</h2>
+          {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+          <form className={styles.form} onSubmit={handleSubmit}>
+            <label className={styles.label}>Email</label>
             <input
               type="email"
+              className={styles.input}
               placeholder="Nhập email của bạn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-            <label>Mật khẩu</label>
+            <label className={styles.label}>Mật khẩu</label>
             <input
               type="password"
+              className={styles.input}
               placeholder="Nhập mật khẩu"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <button type="submit" className="btn-submit">Đăng Nhập</button>
-            <div className="switch-text">
-              <button type="button" className="btn-switch" onClick={onSwitchToRegister}>
+            <button type="submit" className={styles.btnSubmit}>Đăng Nhập</button>
+            <div className={styles.switchText}>
+              <button type="button" className={styles.btnSwitch} onClick={onSwitchToRegister}>
                 Chưa có tài khoản? Đăng Ký
               </button>
             </div>

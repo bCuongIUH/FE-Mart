@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom'; // Thêm vào để chuyển hướng
+import { useNavigate } from 'react-router-dom';
 import { changePassword, removeToken } from '../../untills/api'; 
 import './ChangePassword.css'; 
 import { AuthContext } from '../../untills/context/AuthContext';
@@ -11,7 +11,7 @@ const ChangePassword = () => {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const { user } = useContext(AuthContext);
-    const navigate = useNavigate(); // Khai báo useNavigate để chuyển hướng
+    const navigate = useNavigate(); 
 
     const handleSubmit = async (e) => {
       e.preventDefault();
@@ -21,13 +21,13 @@ const ChangePassword = () => {
       }
   
       try {
-        if (!user || !user.id) {
+        if (!user || !user._id) {
           setError('Không thể xác định người dùng');
           return;
         }
 
         // Gọi API đổi mật khẩu
-        const response = await changePassword(user.id, oldPassword, newPassword);
+        const response = await changePassword(user._id, oldPassword, newPassword);
         setSuccess(response.message);
 
         // Xóa token và chuyển hướng đến trang đăng nhập

@@ -1,31 +1,51 @@
-import React, { createContext, useState, useEffect } from 'react';
 
+import React, { createContext, useState, useEffect } from 'react';
+import CryptoJS from 'crypto-js';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
+const SECRET_KEY = 'GvN1uJzWc3bIx8v5fA0KHQkY5+FZ3RkZ+oqFjTo6F0='; 
 
-  
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser)); // Khôi phục thông tin người dùng
+    const encryptedUser = localStorage.getItem('user');
+    const encryptedToken = localStorage.getItem('token');
+    if (encryptedUser && encryptedToken) {
+      try {
+        // Giải mã thông tin người dùng và token
+        const bytesUser = CryptoJS.AES.decrypt(encryptedUser, SECRET_KEY);
+        const decryptedUser = JSON.parse(bytesUser.toString(CryptoJS.enc.Utf8));
+        
+        const bytesToken = CryptoJS.AES.decrypt(encryptedToken, SECRET_KEY);
+        const decryptedToken = bytesToken.toString(CryptoJS.enc.Utf8);
+        
+        setUser({ ...decryptedUser, token: decryptedToken });
+      } catch (error) {
+        console.error('Error decrypting user data:', error);
+      }
     }
   }, []);
 
-  // Hàm login, lưu thông tin người dùng vào state và localStorage
   const login = (userData) => {
-    setUser(userData); // Cập nhật trạng thái người dùng
-    localStorage.setItem('user', JSON.stringify(userData)); // Lưu thông tin người dùng vào localStorage
-    localStorage.setItem('token', userData.token); // Lưu token (nếu có) vào localStorage
+    try {
+      // Mã hóa thông tin người dùng và token
+      const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(userData), SECRET_KEY).toString();
+      const encryptedToken = CryptoJS.AES.encrypt(userData.token, SECRET_KEY).toString();
+
+      setUser(userData);
+      localStorage.setItem('user', encryptedUser);
+      localStorage.setItem('token', encryptedToken);
+    } catch (error) {
+      console.error('Error encrypting user data:', error);
+    }
   };
 
-  // Hàm logout, xóa thông tin người dùng khỏi state và localStorage
   const logout = () => {
-    setUser(null); // Xóa thông tin người dùng
+    setUser(null);
     localStorage.removeItem('user');
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('token');
   };
 
   return (

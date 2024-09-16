@@ -24,7 +24,9 @@ const Profile = () => {
     if (!user) {
         return <p>Loading...</p>; 
     }
-
+console.log('====================================');
+console.log(user);
+console.log('====================================');
     return (
         <div className="profile-page">
             <header className="profile-header">

@@ -1,17 +1,18 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Register.css';
+import styles from './Register.module.css'; // Import the CSS Module
 import { postRegister } from '../../untills/api';
+
 function Register({ onClose, onSwitchToLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
+  // Nut dang ky
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -21,11 +22,10 @@ function Register({ onClose, onSwitchToLogin }) {
     }
 
     try {
-      const response = await postRegister({ email, password, name, phoneNumber });
+      const response = await postRegister({ email, password, fullName, phoneNumber });
 
-      if (response.status === 201) { // Nếu HTTP status là 201 Created
+      if (response.status === 201) {
         console.log('Đăng ký thành công');
-        // Điều hướng tới trang xác minh OTP và truyền email qua state
         navigate('/otp-verification', { state: { email } });
       } else {
         setErrorMessage(response.data.message || 'Có lỗi xảy ra khi đăng ký');
@@ -36,56 +36,60 @@ function Register({ onClose, onSwitchToLogin }) {
   };
 
   return (
-    <div className="register-overlay show">
-      <div className="register-modal show">
-        <button className="close-btn" onClick={onClose}>&times;</button>
-        <div className="register-content">
-          <h2>Đăng Ký</h2>
-          {errorMessage && <p className="error-message">{errorMessage}</p>}
-          <form className="register-form" onSubmit={handleSubmit}>
-            <label>Họ tên</label>
+    <div className={`${styles.registerOverlay} ${styles.registerOverlayShow}`}>
+      <div className={`${styles.registerModal} ${styles.registerModalShow}`}>
+        <div className={styles.registerContent}>
+          <h2 className={styles.registerModalHeading}>Đăng Ký</h2>
+          {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+          <form className={styles.registerForm} onSubmit={handleSubmit}>
+            <label className={styles.registerFormLabel}>Họ tên</label>
             <input
               type="text"
               placeholder="Nhập họ tên của bạn"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               required
+              className={styles.registerFormInput}
             />
-            <label>Email</label>
+            <label className={styles.registerFormLabel}>Email</label>
             <input
               type="email"
               placeholder="Nhập email của bạn"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className={styles.registerFormInput}
             />
-            <label>Số điện thoại</label>
+            <label className={styles.registerFormLabel}>Số điện thoại</label>
             <input
               type="text"
               placeholder="Nhập số điện thoại của bạn"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
+              className={styles.registerFormInput}
             />
-            <label>Mật khẩu</label>
+            <label className={styles.registerFormLabel}>Mật khẩu</label>
             <input
               type="password"
               placeholder="Nhập mật khẩu"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className={styles.registerFormInput}
             />
-            <label>Xác nhận mật khẩu</label>
+            <label className={styles.registerFormLabel}>Xác nhận mật khẩu</label>
             <input
               type="password"
               placeholder="Nhập lại mật khẩu"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              className={styles.registerFormInput}
             />
-            <button type="submit" className="btn-submit">Đăng Ký</button>
-            <div className="switch-text">
-              <button type="button" className="btn-switch" onClick={onSwitchToLogin}>Đã có tài khoản? Đăng Nhập</button>
+            <button type="submit" className={styles.btnSubmit}>Đăng Ký</button>
+            <div className={styles.switchText}>
+              <button type="button" className={styles.btnSwitch} onClick={onSwitchToLogin}>Đã có tài khoản? Đăng Nhập</button>
             </div>
           </form>
         </div>

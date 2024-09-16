@@ -19,7 +19,7 @@ function App() {
   return (
     <Router>
       <AuthProvider> 
-        <UserProvider> 
+     
           <Routes>
             <Route path="/" element={<HomePage />} /> 
             <Route path="/register" element={<Register />} />
@@ -42,12 +42,12 @@ function App() {
               }
             />
              <Route path="/ManagerPage" element={<ManagerPage />} />
-             <Route path="Profile" element={<Profile />} /> 
-             <Route path="user-info" element={<UserInfo />} /> 
-             <Route path="change-password" element={<ChangePassword />} /> 
+             <Route path="/Profile" element={<Profile />} /> 
+             <Route path="/user-info" element={<UserInfo />} /> 
+             <Route path="/change-password" element={<ChangePassword />} /> 
             
           </Routes>
-        </UserProvider>
+        
       </AuthProvider>
     </Router>
   );

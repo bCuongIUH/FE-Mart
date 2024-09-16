@@ -1,0 +1,110 @@
+/* Overlay nền mờ */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.overlayShow {
+  opacity: 1;
+}
+
+/* Modal chứa form đăng nhập */
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 30px;
+  width: 400px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(20px);
+  opacity: 0;
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.modalShow {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Nội dung của modal */
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin-top: 0;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Form đăng nhập */
+.form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.label {
+  margin: 10px 0 5px;
+  font-weight: 500;
+}
+
+.input {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Nút button với gradient */
+.btnSubmit, .btnSwitch {
+  background: linear-gradient(135deg, #007bff, #00c851); 
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.btnSubmit:hover {
+  background: linear-gradient(135deg, #0056b3, #009688);
+}
+
+.switchText {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.btnSwitch {
+  background: transparent;
+  color: #007bff;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btnSwitch:hover {
+  text-decoration: underline;
+}
