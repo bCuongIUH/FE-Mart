@@ -13,6 +13,7 @@ import ManagerPage from "./pages/ManagerPage";
 import Profile from "../src/component/profile/profile";
 import UserInfo from "./component/profile/profile.UserInfo";
 import ChangePassword from "./component/password/ChangePassword";
+import ManageEmployees from './component/employees/ManageEmployees';
 
 
 function App() {
@@ -45,7 +46,7 @@ function App() {
              <Route path="/Profile" element={<Profile />} /> 
              <Route path="/user-info" element={<UserInfo />} /> 
              <Route path="/change-password" element={<ChangePassword />} /> 
-            
+             <Route path="/ManageEmployees" element={<ManageEmployees />} />
           </Routes>
         
       </AuthProvider>

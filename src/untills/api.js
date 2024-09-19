@@ -157,3 +157,23 @@ export const changePassword = async (userId, oldPassword, newPassword) => {
     throw error;
   }
 };
+// Lấy toàn bộ người dùng
+export const getAllUsers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/auth/all-user`, config);
+    return response.data.users; // Trả về mảng người dùng
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách người dùng:', error);
+    throw error; // Ném lỗi để xử lý ở nơi khác
+  }
+};
+// Cập nhật vai trò người dùng
+export const updateUserRole = async (userId, newRole) => {
+  try {
+    const response = await axios.patch(`${API_URL}/auth/users/update-role/${userId}`, { role: newRole });
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi cập nhật vai trò:', error);
+    throw error;
+  }
+};

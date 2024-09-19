@@ -10,7 +10,9 @@ function UIPage() {
   const { user, logout } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+console.log('====================================');
+console.log(user);
+console.log('====================================');
   useEffect(() => {
     const fetchProducts = async () => {
       try {
