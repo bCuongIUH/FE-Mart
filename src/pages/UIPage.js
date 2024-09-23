@@ -11,7 +11,7 @@ function UIPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 console.log('====================================');
-console.log(user);
+console.log(products);
 console.log('====================================');
   useEffect(() => {
     const fetchProducts = async () => {

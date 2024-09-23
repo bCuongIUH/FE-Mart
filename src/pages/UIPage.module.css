@@ -111,10 +111,12 @@
 .dropdownLogout {
   border: none;
   padding: 12px;
+  color: #333;
+  text-align: center;
 }
 
 .dropdownLogout:hover {
-  background-color: #0056b3;
+  /* background-color: #0056b3; */
 }
 
 /* Nội dung chính */
@@ -239,12 +241,16 @@
   .dropdownLogout {
     border: none;
     padding: 12px;
+    color: #333;
+    text-align: center;
   }
   
   .dropdownLogout:hover {
     background-color: #0056b3;
   }
-  
+  .dropdownLogout a:hover {
+    color: white;
+  }
   /* Nội dung chính */
   .mainContent {
     flex: 1;

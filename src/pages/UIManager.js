@@ -59,7 +59,7 @@ console.log(user);
       <div className={styles.mainContent}>
         <aside className={styles.sidebar}>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/manage-products')}>Quản lí sản phẩm</button>
-          <button className={styles.sidebarButton} onClick={() => handleNavigate('/manage-stock')}>Quản lí kho</button>
+          <button className={styles.sidebarButton} onClick={() => handleNavigate('/WarehouseManager')}>Quản lí kho</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManageEmployees')}>Quản lí nhân viên</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/manage-vouchers')}>Quản lí voucher</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/khuyen-mai')}>Chương trình khuyến mãi</button>
@@ -67,7 +67,7 @@ console.log(user);
 
 
         </aside>
-        <main className={styles.productList}>
+        {/* <main className={styles.productList}>
           {products.map((product) => (
             <div className={styles.productCard} key={product.id}>
               <img src={product.image} alt={product.name} className={styles.productImage} />
@@ -78,7 +78,10 @@ console.log(user);
               </div>
             </div>
           ))}
-        </main>
+        </main> */}
+      <div>
+       code phần giao diện 
+      </div>
       </div>
     </div>
   );

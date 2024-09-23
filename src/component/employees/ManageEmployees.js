@@ -42,7 +42,7 @@ function ManageEmployees() {
 
   return (
     <div className={styles.manageEmployeesContainer}>
-      <h1>Quản lí nhân viên</h1>
+      <h1 className={styles.managerName}>Quản lí nhân viên</h1>
       <button onClick={() => navigate(-1)} className={styles.backButton}>
         Quay lại
       </button>
