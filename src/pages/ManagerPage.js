@@ -62,54 +62,13 @@ const ManagerPage = () => {
         <div className="header-left">
           <button className="btn-home" onClick={goBack}>quay lại</button>
         </div>
-        <div className="header-right">
+        {/* <div className="header-right">
           <button className="btn-info">Thông Tin</button>
           <button className="btn-stats">Thống Kê</button>
           <button className="btn-services">Dịch Vụ</button>
-        </div>
+        </div> */}
       </header>
-      <section className="product-form">
-        <form onSubmit={newProduct._id ? handleUpdateProduct : handleCreateProduct}>
-          <input
-            type="text"
-            placeholder="Tên sản phẩm"
-            value={newProduct.name}
-            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            required
-          />
-          <input
-            type="number"
-            placeholder="Giá"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
-            required
-          />
-          <textarea
-            placeholder="Mô tả"
-            value={newProduct.description}
-            onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setNewProduct({ ...newProduct, image: URL.createObjectURL(e.target.files[0]) })}
-          />
-          <input
-            type="date"
-            placeholder="Ngày bắt đầu khuyến mãi"
-            value={newProduct.saleStartDate}
-            onChange={(e) => setNewProduct({ ...newProduct, saleStartDate: e.target.value })}
-          />
-          <input
-            type="date"
-            placeholder="Ngày kết thúc khuyến mãi"
-            value={newProduct.saleEndDate}
-            onChange={(e) => setNewProduct({ ...newProduct, saleEndDate: e.target.value })}
-          />
-          <button className="btn-submit" type="submit">{newProduct._id ? 'Cập Nhật' : 'Thêm Sản Phẩm'}</button>
-          {newProduct._id && <button className="btn-cancel" onClick={() => setEditingProduct(null)}>Hủy</button>}
-        </form>
-      </section>
+   
       <section className="product-list">
         {products.map(product => (
           <div className="product-card" key={product._id}>

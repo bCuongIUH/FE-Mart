@@ -12,9 +12,10 @@
   /* padding: 10px 20px;  */
   background: linear-gradient(to right, #007bff, #00d084); /* Gradient cho header */
   color: white;
-  border-radius: 8px;
+
   margin-bottom: 20px;
-  width: 100%; /* Đảm bảo header chiếm toàn bộ chiều rộng */
+  width: 100%; 
+  height: 80px;
 }
 
 .header-left {
@@ -36,6 +37,7 @@
   cursor: pointer;
   font-size: 12px; /* Giảm kích thước chữ */
   font-weight: bold;
+  margin-left: 30px;
 }
 
 .btn-home:hover {

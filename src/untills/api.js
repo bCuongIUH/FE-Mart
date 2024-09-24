@@ -177,3 +177,25 @@ export const updateUserRole = async (userId, newRole) => {
     throw error;
   }
 };
+// nhà cung cấp
+// Tạo sản phẩm mới
+export const createSuppliers = async (suppliersData) => {
+  try {
+    const response = await axios.post(`${API_URL}/suppliers/add`, suppliersData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+// Lấy tất cả sản phẩm
+export const getAllSuppliers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/suppliers`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

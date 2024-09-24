@@ -58,10 +58,11 @@ console.log(user);
       
       <div className={styles.mainContent}>
         <aside className={styles.sidebar}>
-          <button className={styles.sidebarButton} onClick={() => handleNavigate('/manage-products')}>Quản lí sản phẩm</button>
+          <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManagerPage')}>Quản lí sản phẩm</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/WarehouseManager')}>Quản lí kho</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManageEmployees')}>Quản lí nhân viên</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/manage-vouchers')}>Quản lí voucher</button>
+          <button className={styles.sidebarButton} onClick={() => handleNavigate('/suppliers')}>Nhà cung cấp</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/khuyen-mai')}>Chương trình khuyến mãi</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/statistics')}>Thống kê</button>
 
