@@ -199,3 +199,13 @@ export const getAllSuppliers = async () => {
     throw error;
   }
 };
+
+//lấy tất cả ds sp trong kho
+export const getAllWarehouse = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/warehouses`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

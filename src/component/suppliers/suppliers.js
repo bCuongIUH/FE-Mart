@@ -3,6 +3,7 @@ import styles from './suppliers.module.css';
 import { AuthContext } from '../../untills/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import Suppliersimport from './item/suppliersImport';
+import SuppliersInfo from './item/suppliersInfo';
 
 
 function Suppliers() {
@@ -18,7 +19,7 @@ function Suppliers() {
     {
       name: 'Quản lý nhà cung cấp',
       subcategories: [
-        { name: 'Danh sách nhà cung cấp', component: <div>lấy ds nhà cung cấp</div> },
+        { name: 'Danh sách nhà cung cấp', component: <SuppliersInfo/> },
       
         { name: 'Quản lý nhà cung cấp', component: <Suppliersimport /> }, 
        
