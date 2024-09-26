@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
 import { postRegister } from '../../untills/api';
@@ -11,8 +11,9 @@ function Register({ onClose, onSwitchToLogin }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
+  const modalRef = useRef(null); 
 
-  // Nut dang ky
+//nút đăng kí
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,9 +36,28 @@ function Register({ onClose, onSwitchToLogin }) {
     }
   };
 
+  const handleClose = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleClickOutside = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      handleClose();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={`${styles.registerOverlay} ${styles.registerOverlayShow}`}>
-      <div className={`${styles.registerModal} ${styles.registerModalShow}`}>
+      <div ref={modalRef} className={`${styles.registerModal} ${styles.registerModalShow}`}>
         <div className={styles.registerContent}>
           <h2 className={styles.registerModalHeading}>Đăng Ký</h2>
           {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}

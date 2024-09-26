@@ -177,8 +177,8 @@ export const updateUserRole = async (userId, newRole) => {
     throw error;
   }
 };
-// nhà cung cấp
-// Tạo sản phẩm mới
+
+// Tạo mới ncc
 export const createSuppliers = async (suppliersData) => {
   try {
     const response = await axios.post(`${API_URL}/suppliers/add`, suppliersData, config);
@@ -206,6 +206,37 @@ export const getAllWarehouse = async () => {
     const response = await axios.get(`${API_URL}/warehouses`, config);
     return response.data;
   } catch (error) {
+    throw error;
+  }
+};
+// Tạo mới ncc
+export const createCart = async (suppliersData) => {
+  try {
+    const response = await axios.post(`${API_URL}/cart/add`, suppliersData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm vào giỏ hàng:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+// Lấy tất cả sản phẩm
+export const getAllCart = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/cart`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+// Hàm cập nhật giỏ hàng
+export const updateCart = async (cartId, status) => {
+  try {
+    const response = await axios.patch(`${API_URL}/cart/update`, { cartId, status });
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi cập nhật giỏ hàng:', error);
     throw error;
   }
 };

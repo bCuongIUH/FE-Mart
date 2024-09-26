@@ -70,7 +70,7 @@ function WarehouseManager() {
 
   // Hàm xử lý khi nhấn vào subcategory
   const handleSubcategoryClick = (component) => {
-    setSelectedComponent(component); // Cập nhật component được chọn
+    setSelectedComponent(component); 
   };
 
   return (
@@ -115,7 +115,7 @@ function WarehouseManager() {
                     <li 
                       key={idx} 
                       className={styles.subcategoryItem}
-                      onClick={() => handleSubcategoryClick(subcategory.component)} // Xử lý hiển thị component tương ứng
+                      onClick={() => handleSubcategoryClick(subcategory.component)} 
                     >
                       {subcategory.name}
                     </li>

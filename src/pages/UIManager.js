@@ -70,12 +70,12 @@ console.log(user);
         </aside>
         {/* <main className={styles.productList}>
           {products.map((product) => (
-            <div className={styles.productCard} key={product.id}>
+            <div className={styles.productCard} key={product._id}>
               <img src={product.image} alt={product.name} className={styles.productImage} />
               <div className={styles.productInfo}>
                 <h3>{product.name}</h3>
                 <p>{product.description}</p>
-                <p className={styles.productPrice}>{product.price} VND</p>
+                <p className={styles.productPrice}>{product.lines.unitPrice} VND</p>
               </div>
             </div>
           ))}

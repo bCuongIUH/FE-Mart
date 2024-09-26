@@ -86,6 +86,7 @@ console.log('====================================');
         </nav>
       </header>
 
+            {/* thông tin  sản phẩm */}
       <main className={styles.mainContent}>
         <section className={styles.productList}>
           {error && <p className={styles.errorMessage}>{error}</p>}
@@ -98,7 +99,7 @@ console.log('====================================');
               >
                 <img src={product.image} alt={product.name} className={styles.productImage} />
                 <h2 className={styles.productName}>{product.description}</h2>
-                <p className={styles.productPrice} style={{color: 'red', marginTop: 'auto'}}>{product.price} VNĐ</p>
+                <p className={styles.productPrice} style={{color: 'red', marginTop: 'auto'}}>{product.lines[0]?.unitPrice} VNĐ</p>
               </button>
             ))
           ) : (

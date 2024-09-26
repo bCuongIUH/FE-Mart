@@ -16,6 +16,7 @@ import ChangePassword from "./component/password/ChangePassword";
 import ManageEmployees from './component/employees/ManageEmployees';
 import WarehouseManager from "./component/warehouseManager/WarehouseManager";
 import Suppliers from "./component/suppliers/suppliers";
+import ShoppingCart from "./component/shopping/shoppingCart";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
              <Route path="/ManageEmployees" element={<ManageEmployees />} />
              <Route path="/WarehouseManager" element={<WarehouseManager />} />
              <Route path="/Suppliers" element={<Suppliers />} />
+             <Route path="/ShoppingCart" element={<ShoppingCart />} />
           </Routes>
         
       </AuthProvider>

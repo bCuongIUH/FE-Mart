@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './login.module.css'; 
 import { AuthContext } from '../../untills/context/AuthContext';
@@ -10,10 +10,8 @@ function Login({ onClose, onSwitchToRegister }) {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const modalRef = useRef(null); 
 
-
-  //nút đăng nhập
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -22,9 +20,10 @@ function Login({ onClose, onSwitchToRegister }) {
       if (response.status === 200) {
         const data = response.data;
         localStorage.setItem('token', data.token);
-        setUser(data.user);
+        const token = localStorage.getItem('token');
+        console.log('Token from localStorage:', token); 
+        
         login(data.user);
-
         if (data.user.role === 'admin') {
           navigate('/UIManager');
         } else {
@@ -39,9 +38,33 @@ function Login({ onClose, onSwitchToRegister }) {
     }
   };
 
+  const handleClose = () => {
+    // Gọi hàm onClose khi đóng modal
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  // Xử lý nhấn ra ngoài modal
+  const handleClickOutside = (e) => {
+    if (modalRef.current && !modalRef.current.contains(e.target)) {
+      handleClose();
+    }
+  };
+
+  useEffect(() => {
+    // Thêm event listener để đóng modal khi nhấn ra ngoài
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    // Dọn dẹp event listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={styles.overlay + ' ' + styles.overlayShow}>
-      <div className={styles.modal + ' ' + styles.modalShow}>
+      <div className={styles.modal + ' ' + styles.modalShow} ref={modalRef}>
         <div className={styles.content}>
           <h2 className={styles.title}>Đăng Nhập</h2>
           {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
