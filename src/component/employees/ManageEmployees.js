@@ -16,6 +16,8 @@ function ManageEmployees() {
       try {
         const allUsers = await getAllUsers();
         setUsers(allUsers);
+        console.log(users);
+        
       } catch (error) {
         console.error("Lỗi khi lấy người dùng:", error);
       } finally {
@@ -24,6 +26,7 @@ function ManageEmployees() {
     };
     getUsers();
   }, []);
+console.log(user);
 
   // Hàm xử lý khi thay đổi vai trò của người dùng
   const handleRoleChange = async (userId, currentRole) => {

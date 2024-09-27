@@ -66,23 +66,25 @@ const UIManager = () => {
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/statistics')}>Thống kê</button>
         </aside>
         <main className={styles.productList}>
-  <div className={styles.userInfo}>
-    <h2>Thông tin người dùng</h2>
-    <div className={styles.userRow}>
-      <div className={styles.userColumn}>
-        <p><strong>Tên:</strong> {user.fullName}</p>
-        <p><strong>Số điện thoại:</strong> {user.phoneNumber}</p>
-      </div>
-      <div className={styles.userColumn}>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Địa chỉ:</strong> 123 Đường ABC, Quận Cam</p>
-      </div>
-    </div>
-  </div>
-</main>
-
-
-
+          <div className={styles.userInfo}>
+            <h2>Thông tin người dùng</h2>
+            {/* Kiểm tra xem user có hợp lệ không */}
+            {user ? (
+              <div className={styles.userRow}>
+                <div className={styles.userColumn}>
+                  <p><strong>Tên:</strong> {user.fullName}</p>
+                  <p><strong>Số điện thoại:</strong> {user.phoneNumber}</p>
+                </div>
+                <div className={styles.userColumn}>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Địa chỉ:</strong> 123 Đường ABC, Quận Cam</p>
+                </div>
+              </div>
+            ) : (
+              <p>Loading user information...</p> // Thông báo khi chưa có thông tin người dùng
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );

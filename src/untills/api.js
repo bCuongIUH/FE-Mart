@@ -1,6 +1,9 @@
 import axios from "axios";
 const config = {
   withCredentials: true,
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
+  },
 };
 
 // const API_URL = "http://172.28.117.95:3050/api"; 
@@ -161,10 +164,26 @@ export const changePassword = async (userId, oldPassword, newPassword) => {
   }
 };
 // Lấy toàn bộ người dùng
+// export const getAllUsers = async () => {
+//   try {
+//     const response = await axios.get(`${API_URL}/auth/all-user`, config);
+//     return response.data.users; 
+//   } catch (error) {
+//     console.error('Lỗi khi lấy danh sách người dùng:', error);
+//     throw error; // Ném lỗi để xử lý ở nơi khác
+//   }
+// };
 export const getAllUsers = async () => {
   try {
+    const config = {
+      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
+      },
+    };
+
     const response = await axios.get(`${API_URL}/auth/all-user`, config);
-    return response.data.users; // Trả về mảng người dùng
+    return response.data.users; 
   } catch (error) {
     console.error('Lỗi khi lấy danh sách người dùng:', error);
     throw error; // Ném lỗi để xử lý ở nơi khác
@@ -222,11 +241,25 @@ export const createCart = async (suppliersData) => {
     throw error;
   }
 };
+// Hàm thêm sản phẩm vào giỏ hàng
+export const getAddToCart = async (userId, productId, quantity) => {
+  try {
+    const response = await axios.post(`${API_URL}/cart/add`, {
+      userId,
+      productId,
+      quantity
+    });
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', error);
+    throw error;
+  }
+};
 
 // Lấy tất cả sản phẩm
 export const getAllCart = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/cart?userId=${userId}`, config); // Sử dụng query string
+    const response = await axios.get(`${API_URL}/cart?userId=${userId}`, config); 
     return response.data;
   } catch (error) {
     throw error;

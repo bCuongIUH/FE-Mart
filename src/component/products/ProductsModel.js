@@ -1,37 +1,39 @@
+import { useContext, useState } from 'react';
 
+import { getAddToCart } from '../../untills/api'; 
 import styles from './ProductsModel.module.css';
-import React, { useState } from 'react';
+import { AuthContext } from '../../untills/context/AuthContext';
+
 function ProductsModal({ product, onClose, onBuyNow }) {
+  const { user } = useContext(AuthContext); 
   const [quantity, setQuantity] = useState(1); 
   const maxQuantity = product.lines[0]?.quantity || 0; 
   const [cart, setCart] = useState([]);
+
   const handleClickOutside = (e) => {
     if (e.target.classList.contains(styles.modalOverlay)) {
       onClose();
     }
   };
 
-  // const onAddToCart = () => {
-  //   console.log(`Thêm vào giỏ hàng: ${product.name}, số lượng: ${quantity}`);
-   
-  // };
-  const onAddToCart = (product, quantity) => {
-    // Kiểm tra xem sản phẩm đã có trong giỏ hàng hay chưa
-    const existingProductIndex = cart.findIndex(item => item._id === product._id);
+  const onAddToCart = async () => {
+    try {
+      if (!user || !user._id) {
+        return console.error('User chưa đăng nhập');
+      }
 
-    if (existingProductIndex !== -1) {
-      // Nếu sản phẩm đã có, tăng số lượng
-      const updatedCart = [...cart];
-      updatedCart[existingProductIndex].quantity += quantity;
-      setCart(updatedCart);
-    } else {
-     
-      setCart([...cart, { ...product, quantity }]);
+      if (!product || !product._id) {
+        return console.error('Sản phẩm không hợp lệ');
+      }
+      const cartData = await getAddToCart(user._id, product._id, quantity);
+
+      setCart(cartData.items);
+      console.log('Sản phẩm đã thêm vào giỏ hàng:', cartData);
+
+    } catch (error) {
+      console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', error);
     }
-
-    console.log('Sản phẩm đã thêm vào giỏ hàng:', cart);
   };
-
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -51,10 +53,6 @@ function ProductsModal({ product, onClose, onBuyNow }) {
       setQuantity(prev => prev - 1);
     }
   };
-  console.log("ở đây 1", product);
-  
-  console.log("ở đây",product.lines);
-  
 
   return (
     <div className={styles.modalOverlay} onClick={handleClickOutside}>

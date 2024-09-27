@@ -33,15 +33,20 @@ export const AuthProvider = ({ children }) => {
       // Mã hóa thông tin người dùng và token
       const encryptedUser = CryptoJS.AES.encrypt(JSON.stringify(userData), SECRET_KEY).toString();
       const encryptedToken = CryptoJS.AES.encrypt(userData.token, SECRET_KEY).toString();
-
+   
+      
       setUser(userData);
       localStorage.setItem('user', encryptedUser);
       localStorage.setItem('token', encryptedToken);
+   
     } catch (error) {
       console.error('Error encrypting user data:', error);
     }
   };
+  
+  
 
+  
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
