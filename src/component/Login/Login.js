@@ -53,10 +53,10 @@ function Login({ onClose, onSwitchToRegister }) {
   };
 
   useEffect(() => {
-    // Thêm event listener để đóng modal khi nhấn ra ngoài
+   
     document.addEventListener('mousedown', handleClickOutside);
     
-    // Dọn dẹp event listener
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };

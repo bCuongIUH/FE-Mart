@@ -32,7 +32,7 @@ console.log(user);
                 </div>
 
                 <div className="user-info-details">
-                    <p><strong>Họ và Tên:</strong> {user.name}</p>
+                    <p><strong>Họ và Tên:</strong> {user.fullName}</p>
                     <p><strong>Email:</strong> {user.email}</p>
                     <p><strong>Số Điện Thoại:</strong> {user.phoneNumber}</p>
                 </div>

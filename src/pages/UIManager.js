@@ -9,7 +9,6 @@ const UIManager = () => {
   const [products, setProducts] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
-console.log(user);
 
   const handleNavigate = (path) => {
     navigate(path); 
@@ -65,24 +64,25 @@ console.log(user);
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/suppliers')}>Nhà cung cấp</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/khuyen-mai')}>Chương trình khuyến mãi</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/statistics')}>Thống kê</button>
-
-
         </aside>
-        {/* <main className={styles.productList}>
-          {products.map((product) => (
-            <div className={styles.productCard} key={product._id}>
-              <img src={product.image} alt={product.name} className={styles.productImage} />
-              <div className={styles.productInfo}>
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <p className={styles.productPrice}>{product.lines.unitPrice} VND</p>
-              </div>
-            </div>
-          ))}
-        </main> */}
-      <div>
-       code phần giao diện 
+        <main className={styles.productList}>
+  <div className={styles.userInfo}>
+    <h2>Thông tin người dùng</h2>
+    <div className={styles.userRow}>
+      <div className={styles.userColumn}>
+        <p><strong>Tên:</strong> {user.fullName}</p>
+        <p><strong>Số điện thoại:</strong> {user.phoneNumber}</p>
       </div>
+      <div className={styles.userColumn}>
+        <p><strong>Email:</strong> {user.email}</p>
+        <p><strong>Địa chỉ:</strong> 123 Đường ABC, Quận Cam</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+
       </div>
     </div>
   );

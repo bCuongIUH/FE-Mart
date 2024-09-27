@@ -16,6 +16,8 @@ const [warehouses, setWarehouse] = useState([])
   }
    fetchWarehouse();
  }, []);
+ console.log("dâyy",warehouses);
+ 
   return (
     <div>
       <h1>danh sách sản phẩm trong kho</h1>

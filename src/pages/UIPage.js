@@ -10,9 +10,9 @@ function UIPage() {
   const { user, logout } = useContext(AuthContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-console.log('====================================');
-console.log(products);
-console.log('====================================');
+
+
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -62,7 +62,7 @@ console.log('====================================');
         <h1>SOPPE</h1>
         <nav className={styles.headerNav}>
           <a href="/">Trang Chủ</a>
-          <a href="/products">Giỏ Hàng</a>
+          <a href="/shoppingCart">Giỏ Hàng</a>
           <a href="/contact">Liên Hệ</a>
 
           <div className={styles.account}>

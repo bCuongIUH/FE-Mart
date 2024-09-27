@@ -2,6 +2,17 @@ import React from 'react';
 import styles from './WarehouseImport.module.css'
 
 function WarehouseImport() {
+
+
+
+//   {
+//     "sellingPrice": 5555,
+//     "status": "on sale",
+//     "quantityToTake": 20,
+//     "description": "Mô tả mới",
+//     "image": "URL_hình_ảnh_mới"
+// }
+
   return (
     <div className={styles.warehouseImport}>
       <h2>Quản lý nhập kho</h2>

@@ -156,3 +156,33 @@
   color: #007bff;
   font-weight: bold;
 }
+.userInfo {
+  background: #f9f9f9;
+  padding: 30px; /* Giảm padding để tiết kiệm không gian */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  width: calc(100% - 40px);
+  display: flex; 
+  flex-wrap: wrap; 
+}
+
+.userRow {
+  display: flex;
+  justify-content: space-between; 
+  width: 100%; 
+  margin-bottom: 10px; 
+}
+
+.userColumn {
+  flex: 1; 
+  margin-right: 10px; 
+}
+
+.userColumn:last-child {
+  margin-right: 0; 
+}
+
+h2 {
+  margin: 0 0 20px 0; 
+}

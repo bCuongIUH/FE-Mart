@@ -17,13 +17,14 @@ import ManageEmployees from './component/employees/ManageEmployees';
 import WarehouseManager from "./component/warehouseManager/WarehouseManager";
 import Suppliers from "./component/suppliers/suppliers";
 import ShoppingCart from "./component/shopping/shoppingCart";
+import SignupContext from "./untills/context/SignupContext";
 
 
 function App() {
   return (
     <Router>
       <AuthProvider> 
-     
+      <SignupContext>
           <Routes>
             <Route path="/" element={<HomePage />} /> 
             <Route path="/register" element={<Register />} />
@@ -53,8 +54,9 @@ function App() {
              <Route path="/WarehouseManager" element={<WarehouseManager />} />
              <Route path="/Suppliers" element={<Suppliers />} />
              <Route path="/ShoppingCart" element={<ShoppingCart />} />
+         
           </Routes>
-        
+          </SignupContext>
       </AuthProvider>
     </Router>
   );

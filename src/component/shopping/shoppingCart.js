@@ -2,12 +2,15 @@ import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../untills/context/AuthContext';
 import './shoppingCart.module.css'; 
+import AllCart from './item/AllCart';
 
 const ShoppingCart = () => {
     const { user, logout } = useContext(AuthContext);  
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
-
+    const [activeComponent, setActiveComponent] = useState('all'); 
+    console.log(user);
+    
     const handleGoBack = () => {
         navigate(-1); 
     };
@@ -24,9 +27,16 @@ const ShoppingCart = () => {
     if (!user) {
         return <p>Loading...</p>; 
     }
-console.log('====================================');
-console.log(user);
-console.log('====================================');
+
+    const handleComponentChange = (component) => {
+        setActiveComponent(component); 
+    };
+// //mua sp theo số lượng
+// // {
+// //     "userId" :"66ec5996073fa0a23b3c2834",
+// //     "productId" : "66f1dae68412a467ee5fc772",
+// //     "quantity" :15
+// // }
     return (
         <div className="profile-page">
             <header className="profile-header">
@@ -74,18 +84,22 @@ console.log('====================================');
                 <section className="profile-main">
                     <header className="main-header">
                         <nav className="info-options">
-                            <a href="/info1">Tất Cả</a>
-                            <a href="/info2">Chờ thanh toán</a>
-                            <a href="/info3">Chờ vận chuyển</a>
-                            <a href="/info4">Hoàn thành</a>
-                            <a href="/info5">Hoàn trả</a>
+                            <a href="#" onClick={() => handleComponentChange('all')}>Tất Cả</a>
+                            <a href="#" onClick={() => handleComponentChange('pending')}>Chờ thanh toán</a>
+                            <a href="#" onClick={() => handleComponentChange('shipping')}>Chờ vận chuyển</a>
+                            <a href="#" onClick={() => handleComponentChange('completed')}>Hoàn thành</a>
+                            <a href="#" onClick={() => handleComponentChange('refund')}>Hoàn trả</a>
                         </nav>
                         <div className="search-bar">
                             <input type="text" placeholder="Tìm kiếm..." />
                         </div>
                     </header>
                     <section className="placed-products">
-                       <p>Đơn hàng code nằm ở đâyyyyyyyyy plz</p>
+                        {activeComponent === 'all' && <AllCart/>}
+                        {activeComponent === 'pending' && <div>Đây là sản phẩm chờ thanh toán</div>}
+                        {activeComponent === 'shipping' && <div>Đây là sản phẩm chờ vận chuyển</div>}
+                        {activeComponent === 'completed' && <div>Đây là sản phẩm đã hoàn thành</div>}
+                        {activeComponent === 'refund' && <div>Đây là sản phẩm đã hoàn trả</div>}
                     </section>
                 </section>
             </main>
