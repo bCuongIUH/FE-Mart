@@ -56,27 +56,27 @@ export const postRegister = async (data) => {
   export const removeCookie = async () => {
     try {
       const response = await axios.get(`${API_URL}/auth/removeCookie`, config);
-      return response; // Trả về response nếu thành công
+      return response; 
     } catch (error) {
-      throw error; // Ném lỗi để xử lý bên ngoài
+      throw error; 
     }
   }
   
   export const removeToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/auth/removeToken`, config);
-      return response; // Trả về response nếu thành công
+      return response; 
     } catch (error) {
-      throw error; // Ném lỗi để xử lý bên ngoài
+      throw error; 
     }
   };
   
   export const getToken = async () => {
     try {
       const response = await axios.get(`${API_URL}/auth/getToken`, config);
-      return response; // Trả về response nếu thành công
+      return response; 
     } catch (error) {
-      throw error; // Ném lỗi để xử lý bên ngoài
+      throw error; 
     }
   }
   // Sản phẩm API
@@ -212,7 +212,7 @@ export const createSuppliers = async (suppliersData) => {
 };
 
 
-// Lấy tất cả sản phẩm
+// Lấy tất cả ncc
 export const getAllSuppliers = async () => {
   try {
     const response = await axios.get(`${API_URL}/suppliers`, config);
@@ -312,15 +312,19 @@ export const updateCart = async (cartId, status, adminId) => {
 };
 
 // Hàm xóa sản phẩm khỏi giỏ hàng
-export const removeFromCart = async (cartId) => {
+export const removeFromCart = async (cartId, productId) => {
   try {
-    const response = await axios.post(`${API_URL}/cart/remove`, { cartId }, config);
+    const response = await axios.delete(`${API_URL}/cart/remove`, {
+      data: { cartId, productId }, 
+      ...config
+    });
     return response.data;
   } catch (error) {
     console.error('Lỗi khi xóa sản phẩm khỏi giỏ hàng:', error);
     throw error;
   }
 };
+
 // Hàm lấy toàn bộ giỏ hàng của admin
 export const getAllCartsForAdmin = async () => {
   try {

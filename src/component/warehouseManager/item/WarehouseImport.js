@@ -11,6 +11,7 @@ function WarehouseImport() {
 //     "quantityToTake": 20,
 //     "description": "Mô tả mới",
 //     "image": "URL_hình_ảnh_mới"
+//      items :{id} _ id tương đương loại sp nào
 // }
 
   return (

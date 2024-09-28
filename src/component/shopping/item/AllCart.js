@@ -59,32 +59,36 @@ function AllCart() {
         <p>Giỏ hàng trống.</p>
       ) : (
         <ul>
-        {cart && cart.items && cart.items.map((item) => (
-          <li key={item._id} className={styles.cartItem}>
-            <img src={item.product.image} alt={item.product.name} className={styles.cartItemImage} />
-            <div className={styles.productDetails}>
-              <span 
-                className={styles.productName} 
-                onClick={() => handleProductClick(item)} 
-              >
-                {item.product.name}
-              </span>
-              <p className={styles.productDescription}>{item.product.description}</p>
-              <p className={styles.quantity}>SL: {item.quantity}</p> 
-            </div>
-            <p className={styles.price}>Thành giá: {item.totalPrice} VND</p> 
-            <input 
-              type="checkbox" 
-              checked={selectedItems.includes(item._id)} 
-              onChange={() => handleCheckboxChange(item._id)} 
-              className={styles.checkbox} 
-            />
-          </li>
-        ))}
-      </ul>
-      
-
-      
+          {cart && cart.items && cart.items.map((item) => (
+            <li key={item._id} className={styles.cartItem}>
+              {/* Kiểm tra item.product trước khi truy cập thuộc tính image */}
+              {item.product ? (
+                <>
+                  <img src={item.product.image} alt={item.product.name} className={styles.cartItemImage} />
+                  <div className={styles.productDetails}>
+                    <span 
+                      className={styles.productName} 
+                      onClick={() => handleProductClick(item)} 
+                    >
+                      {item.product.name}
+                    </span>
+                    <p className={styles.productDescription}>{item.product.description}</p>
+                    <p className={styles.quantity}>SL: {item.quantity}</p> 
+                  </div>
+                  <p className={styles.price}>Thành giá: {item.totalPrice} VND</p> 
+                  <input 
+                    type="checkbox" 
+                    checked={selectedItems.includes(item._id)} 
+                    onChange={() => handleCheckboxChange(item._id)} 
+                    className={styles.checkbox} 
+                  />
+                </>
+              ) : (
+                <p>Thông tin sản phẩm không khả dụng.</p>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
       {selectedItems.length > 0 && (
         <div className={styles.checkout}>
@@ -92,18 +96,24 @@ function AllCart() {
           <button onClick={handleCheckout}>Thanh toán</button>
         </div>
       )}
-      
       {selectedProduct && (
         <div className={styles.modal} onClick={closeModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <span className={styles.close} onClick={closeModal}>&times;</span>
             <h2>Chi tiết sản phẩm</h2>
-            <img src={selectedProduct.product.image} alt={selectedProduct.product.name} className={styles.modalImage} />
-            <p>Tên: {selectedProduct.product.name}</p>
-            <p>Mô tả: {selectedProduct.product.description}</p>
-            <p>Giá: {selectedProduct.unitPrice} VND</p>
-            <p>Số lượng: {selectedProduct.quantity}</p>
-            <p>Tổng giá: {selectedProduct.totalPrice} VND</p>
+            
+            {selectedProduct.product ? (
+              <>
+                <img src={selectedProduct.product.image} alt={selectedProduct.product.name} className={styles.modalImage} />
+                <p>Tên: {selectedProduct.product.name}</p>
+                <p>Mô tả: {selectedProduct.product.description}</p>
+                <p>Giá: {selectedProduct.unitPrice} VND</p>
+                <p>Số lượng: {selectedProduct.quantity}</p>
+                <p>Tổng giá: {selectedProduct.totalPrice} VND</p>
+              </>
+            ) : (
+              <p>Thông tin sản phẩm không khả dụng.</p>
+            )}
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, BrowserRouter } from "react-router-dom";
 import Login from "./component/Login/Login";
 import Register from "./component/Register/Register";
 import HomePage from "./component/HomePage/HomePage";
@@ -22,6 +22,7 @@ import SignupContext from "./untills/context/SignupContext";
 
 function App() {
   return (
+    
     <Router>
       <AuthProvider> 
       <SignupContext>

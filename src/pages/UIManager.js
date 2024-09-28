@@ -37,7 +37,7 @@ const UIManager = () => {
         <h1 className={styles.headerTitle}>Quản lí siêu thị</h1>
         <div className={styles.headerRight}>
           <img
-            src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" // default avatar image
+            src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" 
             alt="User Avatar"
             className={styles.avatar}
             onClick={() => setShowDropdown(!showDropdown)}
