@@ -20,7 +20,7 @@ function SuppliersInfo() {
       console.log(suppliers);
 
       const handleSupplierClick =(item)=>{
-        // console.log("id ncc", item._id);
+        console.log("id ncc", item._id);
         // console.log("ten", item.name);
         
        setnameSuppliers(item)

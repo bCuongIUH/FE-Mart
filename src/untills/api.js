@@ -2,11 +2,11 @@ import axios from "axios";
 const config = {
   withCredentials: true,
   headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
+    Authorization: `Bearer ${localStorage.getItem('token')}`, 
   },
 };
 
-// const API_URL = "http://172.28.117.95:3050/api"; 
+// const API_URL = "http://172.28.117.95:5000/api"; 
 const API_URL = "http://localhost:5000/api";
 // đăng nhập / đăng ký / xác thực người dùng
 
@@ -221,7 +221,16 @@ export const getAllSuppliers = async () => {
     throw error;
   }
 };
-
+//thêm sp vào kho
+export const addProductToWarehouse = async (warehouseData) => {
+  try {
+    const response = await axios.post(`${API_URL}/warehouses/add`, warehouseData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm vào kho:', error.response?.data || error.message);
+    throw error;
+  }
+};
 //lấy tất cả ds sp trong kho
 export const getAllWarehouse = async () => {
   try {
@@ -231,6 +240,18 @@ export const getAllWarehouse = async () => {
     throw error;
   }
 };
+// xóa phiếu nhập kho
+export const deleteProductWarehouse = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}/warehouses/delete/${id}`);
+    console.log(response.data);
+    return response.data; 
+  } catch (error) {
+    console.error("Lỗi khi xóa sản phẩm:", error);
+    throw error; 
+  }
+};
+
 // Tạo mới ncc
 export const createCart = async (suppliersData) => {
   try {
