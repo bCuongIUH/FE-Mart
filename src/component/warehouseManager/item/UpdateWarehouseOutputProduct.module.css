@@ -1,0 +1,128 @@
+.container {
+    padding: 20px;
+}
+
+.warehouseList {
+    display: flex;
+    flex-direction: column;
+}
+
+.warehouseItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+}
+
+.warehouseItem:hover {
+    background-color: #f1f1f1; 
+}
+
+.productName, .productQuantity, .productPrice {
+    flex: 1; 
+    margin-right: 20px; 
+}
+
+.exportButton {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.exportButton:hover {
+    background-color: #45a049; 
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px; 
+    width: 600px;
+    max-width: 90%; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+}
+
+h3 {
+    margin-bottom: 20px; 
+    color: #333; 
+}
+
+form {
+    display: flex;
+    flex-direction: column; 
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold; 
+    color: #555; 
+}
+
+input[type="number"], textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%; 
+}
+
+textarea {
+    resize: vertical;
+}
+
+.modalButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px; 
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[type="submit"] {
+    background-color: #007BFF; 
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3; 
+}
+
+button[type="button"] {
+    background-color: #6c757d; 
+    color: white;
+}
+
+button[type="button"]:hover {
+    background-color: #5a6268; 
+}

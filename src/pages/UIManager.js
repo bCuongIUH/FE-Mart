@@ -57,6 +57,7 @@ const UIManager = () => {
       
       <div className={styles.mainContent}>
         <aside className={styles.sidebar}>
+        <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManagerSales')}>Quản lí bán hàng </button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManagerPage')}>Quản lí sản phẩm</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/WarehouseManager')}>Quản lí kho</button>
           <button className={styles.sidebarButton} onClick={() => handleNavigate('/ManageEmployees')}>Quản lí nhân viên</button>

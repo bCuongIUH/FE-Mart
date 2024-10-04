@@ -240,6 +240,17 @@ export const getAllWarehouse = async () => {
     throw error;
   }
 };
+
+//update sp -> lấy từ kho ra product
+export const updateWarehouseEntry = async (id, warehouseData) => {
+  try {
+      const response = await axios.put(`${API_URL}/warehouses/update/${id}`, warehouseData);
+      return response.data;
+  } catch (error) {
+      console.error('Lỗi khi cập nhật phiếu nhập kho:', error.response?.data || error.message);
+      throw error;
+  }
+};
 // xóa phiếu nhập kho
 export const deleteProductWarehouse = async (id) => {
   try {
@@ -289,9 +300,9 @@ export const getAllCart = async (userId) => {
 
 
 // Hàm lấy giỏ hàng trạng thái 'Shipper'
-export const getShipperCart = async () => {
+export const getShipperCart = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/cart/shipper`, config);
+    const response = await axios.get(`${API_URL}/cart/shipper?userId=${userId}`, config);
     return response.data;
   } catch (error) {
     console.error('Lỗi khi lấy giỏ hàng của shipper:', error);
@@ -300,9 +311,9 @@ export const getShipperCart = async () => {
 };
 
 // Hàm lấy giỏ hàng trạng thái 'Đã Mua'
-export const getDamuaCart = async () => {
+export const getDamuaCart = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/cart/damua`, config);
+    const response = await axios.get(`${API_URL}/cart/damua?userId=${userId}`, config);
     return response.data;
   } catch (error) {
     console.error('Lỗi khi lấy giỏ hàng đã mua:', error);
@@ -311,9 +322,9 @@ export const getDamuaCart = async () => {
 };
 
 // Hàm lấy giỏ hàng trạng thái 'Hoàn Trả'
-export const getHoanTraCart = async () => {
+export const getHoanTraCart = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/cart/hoantra`, config);
+    const response = await axios.get(`${API_URL}/cart/hoantra?userId=${userId}`, config);
     return response.data;
   } catch (error) {
     console.error('Lỗi khi lấy giỏ hàng hoàn trả:', error);
@@ -356,4 +367,47 @@ export const getAllCartsForAdmin = async () => {
     throw error;
   }
 };
+// BILL--------------------------
+// Tạo hóa đơn
+export const createBill = async (userId, paymentMethod) => {
+  try {
+    const response = await axios.post(`${API_URL}/bill/create`, { userId, paymentMethod });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tạo hóa đơn:', error);
+    throw error;
+  }
+};
 
+// Lấy danh sách hóa đơn theo người dùng
+export const getBillsByUser = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/bill/user`, { params: { userId } });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy hóa đơn:', error);
+    throw error;
+  }
+};
+
+// Lấy danh sách hóa đơn theo trạng thái
+export const getBillsByStatus = async (status) => {
+  try {
+    const response = await axios.get(`${API_URL}/bill/status`, { params: { status } });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy hóa đơn theo trạng thái:', error);
+    throw error;
+  }
+};
+
+// Cập nhật trạng thái hóa đơn
+export const updateBillStatus = async (billId, status) => {
+  try {
+    const response = await axios.patch(`${API_URL}/bill/update`, { billId, status });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi cập nhật trạng thái hóa đơn:', error);
+    throw error;
+  }
+};

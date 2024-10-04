@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../untills/context/AuthContext';
 import './shoppingCart.module.css'; 
 import AllCart from './item/AllCart';
+import ShipperCart from './item/ShipperCart';
+import CompletedCart from './item/completedCart';
+import ReturnedCart from './item/ReturnedCart';
 
 const ShoppingCart = () => {
     const { user, logout } = useContext(AuthContext);  
@@ -97,9 +100,9 @@ const ShoppingCart = () => {
                     <section className="placed-products">
                         {activeComponent === 'all' && <AllCart/>}
                         {activeComponent === 'pending' && <div>Đây là sản phẩm chờ thanh toán</div>}
-                        {activeComponent === 'shipping' && <div>Đây là sản phẩm chờ vận chuyển</div>}
-                        {activeComponent === 'completed' && <div>Đây là sản phẩm đã hoàn thành</div>}
-                        {activeComponent === 'refund' && <div>Đây là sản phẩm đã hoàn trả</div>}
+                        {activeComponent === 'shipping' && <ShipperCart/>}
+                        {activeComponent === 'completed' && <CompletedCart/>}
+                        {activeComponent === 'refund' && <ReturnedCart/>}
                     </section>
                 </section>
             </main>

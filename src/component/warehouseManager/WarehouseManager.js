@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import AllProductsWarehouse from './item/AllProductsWarehouse';
 import WarehouseImport from './item/WarehouseImport';
+import ExportProduct from './item/UpdateWarehouseOutputProduct';
 
 function WarehouseManager() {
   const [selectedComponent, setSelectedComponent] = useState(null);
@@ -28,7 +29,7 @@ function WarehouseManager() {
     {
       name: 'Quản lý xuất kho',
       subcategories: [
-        { name: 'Tạo phiếu xuất kho', component: <div>Tạo phiếu xuất kho component</div> },
+        { name: 'Tạo phiếu xuất kho', component: <ExportProduct/>},
         { name: 'Quản lý đơn vị vận chuyển', component: <div>Quản lý đơn vị vận chuyển component</div> }, 
         { name: 'Xem lịch sử xuất kho', component: <div>Lịch sử xuất kho component</div> },
       ],

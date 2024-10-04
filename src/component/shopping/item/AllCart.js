@@ -22,8 +22,8 @@ function AllCart() {
         setCart(data);
         console.log('Dữ liệu giỏ hàng:', data); 
       } catch (error) {
-        setError('Lỗi khi lấy dữ liệu giỏ hàng');
-        console.error(error);
+        setError("giỏ hàng trống");
+        // console.error(error);
       }
     };
     fetchGioHang();

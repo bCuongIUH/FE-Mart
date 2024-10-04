@@ -1,0 +1,83 @@
+/* CompletedCart.module.css */
+
+.orderItem {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .orderItem:hover {
+    background-color: #e0f7fa; /* Thay đổi màu khi hover */
+  }
+  
+  .productItem {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  
+  .productDetails {
+    display: flex;
+    align-items: center;
+  }
+  
+  .productImage {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .productInfo {
+    flex-grow: 1;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 400px; 
+  }
+  
+  .close {
+    cursor: pointer;
+    font-size: 20px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+  
+  h2 {
+    margin-top: 0;
+  }
+  
+  h3 {
+    margin: 10px 0 5px;
+  }
+  
+  p {
+    margin: 5px 0;
+  }
+  

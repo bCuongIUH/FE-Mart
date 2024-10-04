@@ -1,5 +1,4 @@
 import { useContext, useState } from 'react';
-
 import { getAddToCart } from '../../untills/api'; 
 import styles from './ProductsModel.module.css';
 import { AuthContext } from '../../untills/context/AuthContext';
@@ -58,34 +57,36 @@ function ProductsModal({ product, onClose, onBuyNow }) {
     <div className={styles.modalOverlay} onClick={handleClickOutside}>
       <div className={styles.modalContent}>
         <button className={styles.closeButton} onClick={onClose}>&times;</button>
-        <h2 className={styles.modalTitle}>{product.name}</h2>
-        <img src={product.image} alt={product.name} className={styles.modalImage} />
-        <p className={styles.modalDescription}>{product.description}</p>
-        <p className={styles.modalPrice}>{product.lines[0]?.unitPrice} VNĐ</p>
-
-        <div className={styles.quantityControl}>
-          <p><strong>Số lượng có sẵn:</strong> {maxQuantity}</p>
-          <div className={styles.quantityButtons}>
-            <button onClick={decrementQuantity} disabled={quantity <= 1}>-</button>
-            <input
-              type="number"
-              value={quantity}
-              onChange={handleQuantityChange}
-              min="1"
-              max={maxQuantity}
-              className={styles.quantityInput}
-            />
-            <button onClick={incrementQuantity} disabled={quantity >= maxQuantity}>+</button>
+        <div className={styles.modalBody}>
+          <img src={product.image} alt={product.name} className={styles.modalImage} />
+          <div className={styles.modalDetails}>
+            <h2 className={styles.modalTitle}>{product.name}</h2>
+            <p className={styles.modalDescription}>{product.description}</p>
+            <p className={styles.modalPrice}>{product.lines[0]?.unitPrice} VNĐ</p>
+            <div className={styles.quantityControl}>
+              <p><strong>Số lượng có sẵn:</strong> {maxQuantity}</p>
+              <div className={styles.quantityButtons}>
+                <button onClick={decrementQuantity} disabled={quantity <= 1}>-</button>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={handleQuantityChange}
+                  min="1"
+                  max={maxQuantity}
+                  className={styles.quantityInput}
+                />
+                <button onClick={incrementQuantity} disabled={quantity >= maxQuantity}>+</button>
+              </div>
+            </div>
+            <div className={styles.modalActions}>
+              <button className={styles.addToCartButton} onClick={onAddToCart}>
+                Thêm vào giỏ hàng
+              </button>
+              <button className={styles.buyNowButton} onClick={() => onBuyNow(product)}>
+                Mua Ngay
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className={styles.modalActions}>
-          <button className={styles.addToCartButton} onClick={onAddToCart}>
-            Thêm vào giỏ hàng
-          </button>
-          <button className={styles.buyNowButton} onClick={() => onBuyNow(product)}>
-            Mua Ngay
-          </button>
         </div>
       </div>
     </div>
