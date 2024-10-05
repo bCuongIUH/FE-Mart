@@ -1,5 +1,3 @@
-/* CompletedCart.module.css */
-
 .orderItem {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -11,7 +9,7 @@
   }
   
   .orderItem:hover {
-    background-color: #e0f7fa; /* Thay đổi màu khi hover */
+    background-color: #e0f7fa;
   }
   
   .productItem {

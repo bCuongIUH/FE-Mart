@@ -1,0 +1,167 @@
+.sell-container {
+    padding-top: 80px; 
+    display: flex; 
+    height: 100%; 
+}
+  
+.sell-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to right, #007bff, #00d084); 
+    color: white;
+    text-align: center;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+  
+.sell-header button {
+    position: absolute;
+    left: 20px;
+    background-color: white;
+    color: #4CAF50;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+  
+.sell-header button:hover {
+    background-color: #45a049;
+}
+  
+.sell-content {
+    display: flex;
+    flex: 1; 
+    margin-top: 60px; 
+}
+  
+.sell-product-list {
+    flex: 1; 
+    display: flex;
+    flex-direction: column; 
+    padding: 20px;
+    height: 100%; 
+    overflow-y: auto; 
+    border-right: 1px solid #ccc; 
+}
+  
+.sell-product-grid {
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px; 
+}
+  
+.sell-product-item {
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+  
+.sell-product-item button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+  
+.sell-product-item button:hover {
+    background-color: #45a049;
+}
+  
+.sell-cart {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto; 
+    min-height: 300px;
+}
+  
+.sell-cart-list {
+    max-height: 300px; 
+    overflow-y: auto; 
+}
+  
+.sell-cart-item {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+  
+.remove-item {
+    background: none; 
+    color: #ff0000; 
+    border: none; 
+    cursor: pointer; 
+    font-size: 20px; 
+}
+  
+.remove-item:hover {
+    text-decoration: underline; 
+}
+  
+.sell-checkout {
+    position: sticky; 
+    bottom: 0; 
+    background-color: #ffffff; 
+    padding: 20px;
+    box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+    top :300px;
+}
+  
+.sell-checkout h3 {
+    margin: 0; 
+}
+  
+.sell-checkout button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+  
+.sell-checkout button:hover {
+    background-color: #45a049;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 300px; /* Set a width for the modal */
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-content button {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+.modal-content button:hover {
+    background-color: #45a049;
+}

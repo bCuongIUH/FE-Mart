@@ -5,7 +5,7 @@ import Register from "./component/Register/Register";
 import HomePage from "./component/HomePage/HomePage";
 import OTPVerification from "./component/Register/OTPVerification";
 import UIPage from "./pages/UIPage";
-import  RequireAuth from "./component/AuthenticatedRouter";
+import  RequireAuth from "./untills/context/AuthenticatedRouter";
 import { UserProvider } from './untills/context/UserContext';
 import { AuthProvider } from './untills/context/AuthContext'; 
 import UIManager from "./pages/UIManager";
@@ -18,6 +18,9 @@ import WarehouseManager from "./component/warehouseManager/WarehouseManager";
 import Suppliers from "./component/suppliers/suppliers";
 import ShoppingCart from "./component/shopping/shoppingCart";
 import SignupContext from "./untills/context/SignupContext";
+import SellPage from './component/sell/SellPage';
+
+
 
 
 function App() {
@@ -55,7 +58,8 @@ function App() {
              <Route path="/WarehouseManager" element={<WarehouseManager />} />
              <Route path="/Suppliers" element={<Suppliers />} />
              <Route path="/ShoppingCart" element={<ShoppingCart />} />
-         
+             <Route path="/ManagerSales" element={<SellPage />} />
+           
           </Routes>
           </SignupContext>
       </AuthProvider>

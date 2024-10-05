@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { getAllSuppliers } from '../../../untills/api';
 import styles from './suppliersInfo.module.css';

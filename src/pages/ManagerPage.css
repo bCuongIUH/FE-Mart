@@ -10,7 +10,7 @@
   /* flex-direction: column; */
   /* gap: 10px; */
   /* padding: 10px 20px;  */
-  background: linear-gradient(to right, #007bff, #00d084); /* Gradient cho header */
+  background: linear-gradient(to right, #007bff, #00d084); 
   color: white;
 
   margin-bottom: 20px;

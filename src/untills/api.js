@@ -378,7 +378,16 @@ export const createBill = async (userId, paymentMethod) => {
     throw error;
   }
 };
-
+//tạo hóa đơn trực tiếp
+export const createDirectSaleBill = async (paymentMethod, items) => {
+  try {
+    const response = await axios.post(`${API_URL}/bill/create-buy-directly`, { paymentMethod, items });
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tạo hóa đơn bán hàng trực tiếp:', error);
+    throw error;
+  }
+};
 // Lấy danh sách hóa đơn theo người dùng
 export const getBillsByUser = async (userId) => {
   try {
