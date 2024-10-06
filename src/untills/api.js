@@ -241,7 +241,7 @@ export const getAllWarehouse = async () => {
   }
 };
 
-//update sp -> lấy từ kho ra product
+// update sp -> lấy từ kho ra product
 export const updateWarehouseEntry = async (id, warehouseData) => {
   try {
       const response = await axios.put(`${API_URL}/warehouses/update/${id}`, warehouseData);
@@ -251,6 +251,31 @@ export const updateWarehouseEntry = async (id, warehouseData) => {
       throw error;
   }
 };
+// export const updateWarehouseEntry = async (id, warehouseData, imageFile) => {
+//   try {
+//       // Tạo đối tượng FormData
+//       const formData = new FormData();
+      
+//       // Thêm các trường dữ liệu vào FormData
+//       Object.entries(warehouseData).forEach(([key, value]) => {
+//           formData.append(key, value);
+//       });
+
+//       // Thêm file hình ảnh nếu có
+//       if (imageFile) {
+//           formData.append('image', imageFile);
+//       }
+
+//       // Gửi yêu cầu PUT đến backend
+//       const response = await axios.put(`${API_URL}/warehouses/update/${id}`, formData); // Có thể thêm config nếu cần
+
+//       return response.data; // Trả về dữ liệu nhận được từ server
+//   } catch (error) {
+//       console.error('Lỗi khi cập nhật phiếu nhập kho:', error.response?.data || error.message);
+//       throw error; // Ném lỗi nếu có
+//   }
+// };
+
 // xóa phiếu nhập kho
 export const deleteProductWarehouse = async (id) => {
   try {
