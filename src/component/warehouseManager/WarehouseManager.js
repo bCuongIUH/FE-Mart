@@ -15,7 +15,7 @@ function WarehouseManager() {
 
   const navigate = useNavigate();
 
-  // Cập nhật danh sách categories với component tương ứng cho từng subcategory
+  
   const categories = [
     {
       name: 'Quản lý nhập kho',

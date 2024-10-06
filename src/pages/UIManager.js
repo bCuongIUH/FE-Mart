@@ -1,12 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { getAllProducts } from '../untills/api'; 
 import styles from './UIManager.module.css'; 
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../untills/context/AuthContext';
 
 const UIManager = () => {
   const { user, logout } = useContext(AuthContext);
-  const [products, setProducts] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
@@ -18,23 +16,10 @@ const UIManager = () => {
     logout();
     navigate('/');
   };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const productList = await getAllProducts();
-        setProducts(productList);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    fetchProducts();
-  }, []);
-
   return (
     <div className={styles.uiManager}>
       <header className={styles.header}>
-        <h1 className={styles.headerTitle}>Quản lí siêu thị</h1>
+        <h1 className={styles.headerTitle}>C'Mart</h1>
         <div className={styles.headerRight}>
           <img
             src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" 
@@ -82,7 +67,7 @@ const UIManager = () => {
                 </div>
               </div>
             ) : (
-              <p>Loading user information...</p> // Thông báo khi chưa có thông tin người dùng
+              <p>Loading user information...</p> 
             )}
           </div>
         </main>

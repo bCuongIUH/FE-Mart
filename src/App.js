@@ -19,6 +19,7 @@ import Suppliers from "./component/suppliers/suppliers";
 import ShoppingCart from "./component/shopping/shoppingCart";
 import SignupContext from "./untills/context/SignupContext";
 import SellPage from './component/sell/SellPage';
+import StatisticsChart from "./component/Statistical/Statistical";
 
 
 
@@ -59,7 +60,8 @@ function App() {
              <Route path="/Suppliers" element={<Suppliers />} />
              <Route path="/ShoppingCart" element={<ShoppingCart />} />
              <Route path="/ManagerSales" element={<SellPage />} />
-           
+             <Route path="/statistics" element={<StatisticsChart />} />
+             
           </Routes>
           </SignupContext>
       </AuthProvider>
