@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { getAllCart } from '../../../untills/api';
+import { createBill, getAllCart } from '../../../untills/api';
 import { AuthContext } from '../../../untills/context/AuthContext';
 import styles from './AllCart.module.css'; 
 
@@ -8,7 +8,8 @@ function AllCart() {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const [selectedItems, setSelectedItems] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState('Cash'); // Thêm trạng thái cho phương thức thanh toán
 
   useEffect(() => {
     const fetchGioHang = async () => {
@@ -22,8 +23,7 @@ function AllCart() {
         setCart(data);
         console.log('Dữ liệu giỏ hàng:', data); 
       } catch (error) {
-        setError("giỏ hàng trống");
-        // console.error(error);
+        setError("Giỏ hàng trống");
       }
     };
     fetchGioHang();
@@ -39,8 +39,19 @@ function AllCart() {
     .filter(item => selectedItems.includes(item._id))
     .reduce((total, item) => total + item.totalPrice, 0);
 
-  const handleCheckout = () => {
-    alert(`Tổng số tiền cần thanh toán: ${totalAmount} VND`);
+  const handleCheckout = async () => {
+    if (selectedItems.length === 0) {
+      alert('Vui lòng chọn sản phẩm để thanh toán.');
+      return;
+    }
+
+    try {
+      const bill = await createBill(user._id, paymentMethod); 
+      alert(`Hóa đơn đã được tạo thành công. Tổng số tiền: ${totalAmount} VND. Phương thức thanh toán: ${paymentMethod}`);
+    } catch (error) {
+      alert('Có lỗi xảy ra khi tạo hóa đơn, vui lòng thử lại.');
+      console.error('Lỗi khi tạo hóa đơn:', error);
+    }
   };
 
   const handleProductClick = (item) => {
@@ -61,7 +72,6 @@ function AllCart() {
         <ul>
           {cart && cart.items && cart.items.map((item) => (
             <li key={item._id} className={styles.cartItem}>
-              {/* Kiểm tra item.product trước khi truy cập thuộc tính image */}
               {item.product ? (
                 <>
                   <img src={item.product.image} alt={item.product.name} className={styles.cartItemImage} />
@@ -93,6 +103,18 @@ function AllCart() {
       {selectedItems.length > 0 && (
         <div className={styles.checkout}>
           <p>Tổng số tiền cần thanh toán: {totalAmount} VND</p>
+
+          {/* Thêm tùy chọn chọn phương thức thanh toán */}
+          <label htmlFor="paymentMethod">Chọn phương thức thanh toán:</label>
+          <select 
+            id="paymentMethod" 
+            value={paymentMethod} 
+            onChange={(e) => setPaymentMethod(e.target.value)} 
+          >
+            <option value="Cash">Tiền mặt</option>
+            <option value="Card">Thẻ</option>
+          </select>
+
           <button onClick={handleCheckout}>Thanh toán</button>
         </div>
       )}

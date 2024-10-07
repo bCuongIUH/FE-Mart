@@ -403,6 +403,8 @@ export const createBill = async (userId, paymentMethod) => {
     throw error;
   }
 };
+
+
 //tạo hóa đơn trực tiếp
 export const createDirectSaleBill = async (paymentMethod, items) => {
   try {

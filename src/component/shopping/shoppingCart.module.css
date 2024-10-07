@@ -1,20 +1,20 @@
-/* Toàn bộ trang */
 .profile-page {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     font-family: Arial, sans-serif;
+    height: 100px;
   }
   
-  /* Thanh header */
-  .profile-header {
+
+  .cart-header {
     background: linear-gradient(to right, #007bff, #00ff95);
     color: white;
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height:  70px;
+    height:  100px;
   }
   
   .brand-name {
