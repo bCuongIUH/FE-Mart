@@ -1,287 +1,203 @@
-    /* .container {
-        padding: 20px;
-    }
+.container {
+    padding: 20px;
+}
 
-    .warehouseList {
-        display: flex;
-        flex-direction: column;
-    }
+.warehouseList {
+    display: flex;
+    flex-direction: column;
+}
 
-    .warehouseItem {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        border: 1px solid #ccc;
-        margin: 10px 0;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        transition: background-color 0.3s;
-    }
+.warehouseItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #ccc;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s;
+    height: 20px;
+}
 
-    .warehouseItem:hover {
-        background-color: #f1f1f1; 
-    }
+.warehouseItem:hover {
+    background-color: #f1f1f1; 
+}
 
-    .productName, .productQuantity, .productPrice {
-        flex: 1; 
-        margin-right: 20px; 
-    }
+.productName, .productQuantity, .productPrice {
+    flex: 1; 
+    margin-right: 20px; 
+}
 
-    .exportButton {
-        padding: 10px 15px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+.exportButton {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
-    .exportButton:hover {
-        background-color: #45a049; 
-    }
+.exportButton:hover {
+    background-color: #45a049; 
+}
 
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.7); 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    .modalContent {
-        background-color: white;
-        padding: 30px;
-        border-radius: 12px; 
-        width: 600px;
-        max-width: 90%; 
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
-    }
+.modalContent {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px; 
+    width: 600px;
+    max-width: 90%; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+}
 
-    h3 {
-        margin-bottom: 20px; 
-        color: #333; 
-    }
+h3 {
+    margin-bottom: 20px; 
+    color: #333; 
+}
 
-    form {
-        display: flex;
-        flex-direction: column; 
-    }
+form {
+    display: flex;
+    flex-direction: column; 
+}
 
-    form div {
-        margin-bottom: 15px;
-    }
+form div {
+    margin-bottom: 15px;
+}
 
-    label {
-        margin-bottom: 5px;
-        font-weight: bold; 
-        color: #555; 
-    }
+label {
+    margin-bottom: 5px;
+    font-weight: bold; 
+    color: #555; 
+}
 
-    input[type="number"], textarea {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        width: 100%; 
-    }
+input[type="number"], textarea, select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%; 
+}
 
-    textarea {
-        resize: vertical;
-    }
+textarea {
+    resize: vertical;
+}
 
-    .modalButtons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px; 
-    }
+select {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
 
-    button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
+.modalButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px; 
+}
 
-    button[type="submit"] {
-        background-color: #007BFF; 
-        color: white;
-    }
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
-    button[type="submit"]:hover {
-        background-color: #0056b3; 
-    }
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+}
 
-    button[type="button"] {
-        background-color: #6c757d; 
-        color: white;
-    }
+button[type="button"] {
+    background-color: #f44336;
+    color: white;
+}
 
-    button[type="button"]:hover {
-        background-color: #5a6268; 
-    } */
-    .container {
-        padding: 20px;
-    }
-    
-    .warehouseList {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .warehouseItem {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 15px;
-        border: 1px solid #ccc;
-        margin: 10px 0;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-        transition: background-color 0.3s;
-    }
-    
-    .warehouseItem:hover {
-        background-color: #f1f1f1; 
-    }
-    
-    .productName, .productQuantity, .productPrice {
-        flex: 1; 
-        margin-right: 20px; 
-    }
-    
-    .exportButton {
-        padding: 10px 15px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    
-    .exportButton:hover {
-        background-color: #45a049; 
-    }
-    
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: rgba(0, 0, 0, 0.7); 
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    .modalContent {
-        background-color: white;
-        padding: 30px;
-        border-radius: 12px; 
-        width: 600px;
-        max-width: 90%; 
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
-    }
-    
-    h3 {
-        margin-bottom: 20px; 
-        color: #333; 
-    }
-    
-    form {
-        display: flex;
-        flex-direction: column; 
-    }
-    
-    form div {
-        margin-bottom: 15px;
-    }
-    
-    label {
-        margin-bottom: 5px;
-        font-weight: bold; 
-        color: #555; 
-    }
-    
-    input[type="number"], textarea, select {
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        width: 100%; 
-    }
-    
-    textarea {
-        resize: vertical;
-    }
-    
-    /* Styling for category selection */
-    select {
-        background-color: #fff;
-        border: 1px solid #ccc;
-        font-size: 16px;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 15px;
-    }
-    
-    .modalButtons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px; 
-    }
-    
-    button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    
-    button[type="submit"] {
-        background-color: #007BFF; 
-        color: white;
-    }
-    
-    button[type="submit"]:hover {
-        background-color: #0056b3; 
-    }
-    
-    button[type="button"] {
-        background-color: #6c757d; 
-        color: white;
-    }
-    
-    button[type="button"]:hover {
-        background-color: #5a6268; 
-    }
-    
-    input[type="file"] {
-        padding: 5px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 16px;
-        background-color: #f8f8f8;
-    }
-    
-    @media (max-width: 600px) {
-        .modalContent {
-            width: 90%;
-            padding: 20px;
-        }
-    
-        .warehouseItem {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-    }
-    
+.newCategoryInput {
+    margin-left: 10px;
+    flex: 1; 
+}
+
+.addCategoryButton {
+    margin-left: 10px;
+    padding: 5px 10px; 
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer; 
+}
+
+.addCategoryButton:hover {
+    background-color: #0056b3; 
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 15px;
+    margin: 0 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+}
+.exportedListContainer {
+    margin-top: 30px; /* Tạo khoảng cách trên giữa danh sách sản phẩm đã xuất và các phần khác */
+}
+
+.exportedListTitle {
+    font-size: 24px; /* Kích thước font chữ cho tiêu đề danh sách */
+    margin-bottom: 20px; /* Khoảng cách dưới tiêu đề */
+    color: #333; /* Màu chữ cho tiêu đề */
+}
+
+.exportedListTable {
+    width: 100%; /* Đảm bảo bảng chiếm toàn bộ chiều rộng */
+    border-collapse: collapse; /* Giảm khoảng cách giữa các ô trong bảng */
+}
+
+.exportedListHeader {
+    background-color: #f2f2f2; /* Màu nền cho tiêu đề bảng */
+}
+
+.exportedListHeader th {
+    padding: 10px; /* Khoảng cách bên trong ô tiêu đề */
+    border: 1px solid #ccc; /* Đường viền cho ô tiêu đề */
+    text-align: left; /* Canh trái cho văn bản trong ô tiêu đề */
+}
+
+.exportedListItem {
+    border-bottom: 1px solid #ccc; /* Đường viền dưới cho từng sản phẩm trong danh sách */
+}
+
+.exportedListItem td {
+    padding: 10px; /* Khoảng cách bên trong ô */
+}
+
+/* Thêm kiểu cho các ô cụ thể nếu cần */
+.exportedProductName {
+    font-weight: bold; /* Đậm chữ cho tên sản phẩm */
+}

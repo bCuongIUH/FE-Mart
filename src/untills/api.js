@@ -164,24 +164,8 @@ export const changePassword = async (userId, oldPassword, newPassword) => {
   }
 };
 // Lấy toàn bộ người dùng
-// export const getAllUsers = async () => {
-//   try {
-//     const response = await axios.get(`${API_URL}/auth/all-user`, config);
-//     return response.data.users; 
-//   } catch (error) {
-//     console.error('Lỗi khi lấy danh sách người dùng:', error);
-//     throw error; // Ném lỗi để xử lý ở nơi khác
-//   }
-// };
 export const getAllUsers = async () => {
   try {
-    const config = {
-      withCredentials: true,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // Thêm token vào header
-      },
-    };
-
     const response = await axios.get(`${API_URL}/auth/all-user`, config);
     return response.data.users; 
   } catch (error) {
@@ -189,6 +173,22 @@ export const getAllUsers = async () => {
     throw error; // Ném lỗi để xử lý ở nơi khác
   }
 };
+// export const getAllUsers = async () => {
+//   try {
+//     const config = {
+//       withCredentials: true,
+//       headers: {
+//         Authorization: `Bearer ${localStorage.getItem('token')}`, 
+//       },
+//     };
+
+//     const response = await axios.get(`${API_URL}/auth/all-user`, config);
+//     return response.data.users; 
+//   } catch (error) {
+//     console.error('Lỗi khi lấy danh sách người dùng:', error);
+//     throw error; // Ném lỗi để xử lý ở nơi khác
+//   }
+// };
 // Cập nhật vai trò người dùng
 export const updateUserRole = async (userId, newRole) => {
   try {

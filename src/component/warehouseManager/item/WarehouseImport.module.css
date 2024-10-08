@@ -1,5 +1,5 @@
  .formContainer {
-    width: 100%; 
+    width: 95%; 
     padding: 20px;
     background-color: #f9f9f9;
     border-radius: 8px;
@@ -86,4 +86,44 @@
   .cancelButton:hover {
     background-color: #c82333;
   }
-  
+  .warehouseList {
+    margin-top: 20px; 
+}
+
+.warehouseList h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px; 
+}
+
+.warehouseTable {
+    width: 100%; 
+    border-collapse: collapse;
+}
+
+.warehouseTable th, .warehouseTable td {
+    border: 1px solid #ddd; 
+    padding: 12px; 
+    text-align: left;
+}
+
+.warehouseTable th {
+    background-color: #f2f2f2; 
+    font-weight: bold;
+}
+
+.pagination {
+    margin-top: 20px; 
+}
+
+.pagination button {
+    margin-right: 5px; 
+    padding: 8px 12px; 
+    cursor: pointer; 
+    border: 1px solid #ddd; 
+    border-radius: 4px; 
+    background-color: #28a745;
+}
+
+.pagination button:hover {
+    background-color: #007bff;
+}

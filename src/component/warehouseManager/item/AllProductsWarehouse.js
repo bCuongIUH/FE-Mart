@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { deleteProductWarehouse, getAllWarehouse } from '../../../untills/api';
+import { deleteProductWarehouse, getAllUsers, getAllWarehouse } from '../../../untills/api';
 import { FaTrash } from 'react-icons/fa';
 import styles from './AllProductsWarehouse.module.css'; 
 import { AuthContext } from '../../../untills/context/AuthContext';
@@ -8,6 +8,7 @@ function AllProductsWarehouse() {
   const [warehouses, setWarehouse] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null); 
   const { user } = useContext(AuthContext); 
+  const [users, setUsers] = useState([]); 
 
   useEffect(() => {
     async function fetchWarehouse() {
@@ -21,7 +22,16 @@ function AllProductsWarehouse() {
         console.error('Lỗi lấy sản phẩm trong kho', error);
       }
     }
+    const fetchUsers = async () => {
+      try {
+          const userList = await getAllUsers(); 
+          setUsers(userList);
+      } catch (error) {
+          console.error("Lỗi khi lấy danh sách người dùng:", error);
+      }
+  };
     fetchWarehouse();
+    fetchUsers();
   }, []);
   const showProductDetails = (product) => {
     setSelectedProduct(product);
@@ -75,7 +85,7 @@ function AllProductsWarehouse() {
             <p>Số lượng: {selectedProduct.quantity}</p>
             <p>Giá nhập: {selectedProduct.purchasePrice}</p>
             <p>Ngày nhập: {new Date(selectedProduct.entryDate).toLocaleDateString('vi-VN')}</p> 
-            <p>Người nhập: {user && user._id === selectedProduct.createdBy ? user.fullName : 'Chưa có thông tin'}</p>
+            <p>Người nhập:  {users.find(user => user._id === selectedProduct.createdBy)?.fullName || 'Không xác định'}</p>
             <button onClick={closeModal}>Đóng</button>
           </div>
         </div>
