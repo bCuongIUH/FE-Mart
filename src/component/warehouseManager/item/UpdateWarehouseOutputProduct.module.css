@@ -1,128 +1,287 @@
-.container {
-    padding: 20px;
-}
+    /* .container {
+        padding: 20px;
+    }
 
-.warehouseList {
-    display: flex;
-    flex-direction: column;
-}
+    .warehouseList {
+        display: flex;
+        flex-direction: column;
+    }
 
-.warehouseItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    border: 1px solid #ccc;
-    margin: 10px 0;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    transition: background-color 0.3s;
-}
+    .warehouseItem {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        transition: background-color 0.3s;
+    }
 
-.warehouseItem:hover {
-    background-color: #f1f1f1; 
-}
+    .warehouseItem:hover {
+        background-color: #f1f1f1; 
+    }
 
-.productName, .productQuantity, .productPrice {
-    flex: 1; 
-    margin-right: 20px; 
-}
+    .productName, .productQuantity, .productPrice {
+        flex: 1; 
+        margin-right: 20px; 
+    }
 
-.exportButton {
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+    .exportButton {
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
 
-.exportButton:hover {
-    background-color: #45a049; 
-}
+    .exportButton:hover {
+        background-color: #45a049; 
+    }
 
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7); 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7); 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-.modalContent {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px; 
-    width: 600px;
-    max-width: 90%; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
-}
+    .modalContent {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px; 
+        width: 600px;
+        max-width: 90%; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+    }
 
-h3 {
-    margin-bottom: 20px; 
-    color: #333; 
-}
+    h3 {
+        margin-bottom: 20px; 
+        color: #333; 
+    }
 
-form {
-    display: flex;
-    flex-direction: column; 
-}
+    form {
+        display: flex;
+        flex-direction: column; 
+    }
 
-form div {
-    margin-bottom: 15px;
-}
+    form div {
+        margin-bottom: 15px;
+    }
 
-label {
-    margin-bottom: 5px;
-    font-weight: bold; 
-    color: #555; 
-}
+    label {
+        margin-bottom: 5px;
+        font-weight: bold; 
+        color: #555; 
+    }
 
-input[type="number"], textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
-    width: 100%; 
-}
+    input[type="number"], textarea {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 100%; 
+    }
 
-textarea {
-    resize: vertical;
-}
+    textarea {
+        resize: vertical;
+    }
 
-.modalButtons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px; 
-}
+    .modalButtons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px; 
+    }
 
-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
 
-button[type="submit"] {
-    background-color: #007BFF; 
-    color: white;
-}
+    button[type="submit"] {
+        background-color: #007BFF; 
+        color: white;
+    }
 
-button[type="submit"]:hover {
-    background-color: #0056b3; 
-}
+    button[type="submit"]:hover {
+        background-color: #0056b3; 
+    }
 
-button[type="button"] {
-    background-color: #6c757d; 
-    color: white;
-}
+    button[type="button"] {
+        background-color: #6c757d; 
+        color: white;
+    }
 
-button[type="button"]:hover {
-    background-color: #5a6268; 
-}
+    button[type="button"]:hover {
+        background-color: #5a6268; 
+    } */
+    .container {
+        padding: 20px;
+    }
+    
+    .warehouseList {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .warehouseItem {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        transition: background-color 0.3s;
+    }
+    
+    .warehouseItem:hover {
+        background-color: #f1f1f1; 
+    }
+    
+    .productName, .productQuantity, .productPrice {
+        flex: 1; 
+        margin-right: 20px; 
+    }
+    
+    .exportButton {
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    .exportButton:hover {
+        background-color: #45a049; 
+    }
+    
+    .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.7); 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modalContent {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px; 
+        width: 600px;
+        max-width: 90%; 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); 
+    }
+    
+    h3 {
+        margin-bottom: 20px; 
+        color: #333; 
+    }
+    
+    form {
+        display: flex;
+        flex-direction: column; 
+    }
+    
+    form div {
+        margin-bottom: 15px;
+    }
+    
+    label {
+        margin-bottom: 5px;
+        font-weight: bold; 
+        color: #555; 
+    }
+    
+    input[type="number"], textarea, select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        width: 100%; 
+    }
+    
+    textarea {
+        resize: vertical;
+    }
+    
+    /* Styling for category selection */
+    select {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        font-size: 16px;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .modalButtons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px; 
+    }
+    
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    button[type="submit"] {
+        background-color: #007BFF; 
+        color: white;
+    }
+    
+    button[type="submit"]:hover {
+        background-color: #0056b3; 
+    }
+    
+    button[type="button"] {
+        background-color: #6c757d; 
+        color: white;
+    }
+    
+    button[type="button"]:hover {
+        background-color: #5a6268; 
+    }
+    
+    input[type="file"] {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+        background-color: #f8f8f8;
+    }
+    
+    @media (max-width: 600px) {
+        .modalContent {
+            width: 90%;
+            padding: 20px;
+        }
+    
+        .warehouseItem {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    

@@ -251,6 +251,9 @@ export const updateWarehouseEntry = async (id, warehouseData) => {
       throw error;
   }
 };
+
+
+
 // export const updateWarehouseEntry = async (id, warehouseData, imageFile) => {
 //   try {
 //       // Tạo đối tượng FormData
@@ -444,6 +447,46 @@ export const updateBillStatus = async (billId, status) => {
     return response.data;
   } catch (error) {
     console.error('Lỗi khi cập nhật trạng thái hóa đơn:', error);
+    throw error;
+  }
+};
+// Hàm lấy danh sách danh mục
+export const getCategories = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/categories`, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách danh mục:', error);
+    throw error;
+  }
+};
+// Hàm thêm danh mục
+export const addCategory = async (categoryData) => {
+  try {
+    const response = await axios.post(`${API_URL}/categories/add`, categoryData, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi thêm danh mục:', error);
+    throw error;
+  }
+};
+// Hàm cập nhật danh mục
+export const updateCategory = async (categoryId, categoryData) => {
+  try {
+    const response = await axios.patch(`${API_URL}/categories/${categoryId}`, categoryData, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi cập nhật danh mục:', error);
+    throw error;
+  }
+};
+// Hàm xóa danh mục
+export const deleteCategory = async (categoryId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/categories/${categoryId}`, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi xóa danh mục:', error);
     throw error;
   }
 };
