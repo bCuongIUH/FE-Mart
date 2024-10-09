@@ -17,7 +17,6 @@ const ExportProduct = () => {
     const [newCategoryName, setNewCategoryName] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [exportedProducts, setExportedProducts] = useState([]);
-console.log(exportedProducts);
 
     const itemsPerPage = 9;
 
@@ -49,22 +48,24 @@ console.log(exportedProducts);
         setIsModalOpen(true);
     };
 
+    // Nut thực hiện update dữ liệu mang ra quầy bán
     const handleExport = async (e) => {
         e.preventDefault();
         if (!selectedEntry || !sellingPrice || !quantityToTake || !selectedCategory) {
             alert('Vui lòng điền đủ thông tin.');
             return;
         }
-        console.log('User ID:', user);
+        
         try {
-            const warehouseData = {
-                sellingPrice: parseFloat(sellingPrice),
-                quantityToTake: parseInt(quantityToTake),
-                description,
-                image: image ? URL.createObjectURL(image) : null,
-                categoryId: selectedCategory,
-                createdByOut: user?._id
-            };
+            const warehouseData = new FormData();
+            warehouseData.append('sellingPrice', parseFloat(sellingPrice));
+            warehouseData.append('quantityToTake', parseInt(quantityToTake));
+            warehouseData.append('description', description);
+            if (image) {
+                warehouseData.append('image', image);
+            }
+            warehouseData.append('categoryId', selectedCategory);
+            warehouseData.append('createdByOut', user?._id);
 
             const response = await updateWarehouseEntry(selectedEntry._id, warehouseData);
             alert(response.message);
@@ -254,8 +255,8 @@ console.log(exportedProducts);
                             </tr>
                         </thead>
                         <tbody>
-                            {exportedProducts.map((product) => (
-                                <tr className={styles.exportedListItem} key={product.id}>
+                            {exportedProducts.map((product, index) => (
+                                <tr key={index}>
                                     <td>{product.productName}</td>
                                     <td>{product.quantityToTake}</td>
                                     <td>{product.sellingPrice}</td>
@@ -270,5 +271,6 @@ console.log(exportedProducts);
             )}
         </div>
     );
-}
-export default ExportProduct    
+};
+
+export default ExportProduct;
