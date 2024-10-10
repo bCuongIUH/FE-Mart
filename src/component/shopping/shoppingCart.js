@@ -6,6 +6,7 @@ import AllCart from './item/AllCart';
 import ShipperCart from './item/ShipperCart';
 import CompletedCart from './item/completedCart';
 import ReturnedCart from './item/ReturnedCart';
+import CompletedCartUser from './item/CompletedCartUser';
 
 const ShoppingCart = () => {
     const { user, logout } = useContext(AuthContext);  
@@ -101,7 +102,7 @@ const ShoppingCart = () => {
                         {activeComponent === 'all' && <AllCart/>}
                         {activeComponent === 'pending' && <div>Đây là sản phẩm chờ thanh toán</div>}
                         {activeComponent === 'shipping' && <ShipperCart/>}
-                        {activeComponent === 'completed' && <CompletedCart/>}
+                        {activeComponent === 'completed' && <CompletedCartUser/>}
                         {activeComponent === 'refund' && <ReturnedCart/>}
                     </section>
                 </section>

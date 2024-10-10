@@ -325,7 +325,15 @@ export const getAllCart = async (userId) => {
     throw error;
   }
 };
-
+//lấy toàn bộ sp trừ thằng đg chờ thanh toán
+export const getAllCartPending = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/cart/allpending`, config); 
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 // Hàm lấy giỏ hàng trạng thái 'Shipper'
 export const getShipperCart = async (userId) => {
@@ -361,9 +369,10 @@ export const getHoanTraCart = async (userId) => {
 }
 
 // Hàm cập nhật giỏ hàng
-export const updateCart = async (cartId, status, adminId) => {
+export const updateCart = async (cartId, status, userId) => {//userID là id người thay đổi giỏ hàng - nhân viên
   try {
-    const response = await axios.patch(`${API_URL}/cart/update`, { cartId, status, adminId }, config);
+    console.log('Thông tin gửi đến:', { cartId, status, userId });
+    const response = await axios.put(`${API_URL}/cart/update`, { cartId, status, userId }, config);
     return response.data; 
   } catch (error) {
     console.error('Lỗi khi cập nhật giỏ hàng:', error);
@@ -418,6 +427,17 @@ export const createDirectSaleBill = async (paymentMethod, items) => {
     throw error;
   }
 };
+//lấy toàn bộ bill của người dùng
+export const getAllBills = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/bill/all`); 
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách tất cả hóa đơn:', error);
+    throw error;
+  }
+};
+
 // Lấy danh sách hóa đơn theo người dùng
 export const getBillsByUser = async (userId) => {
   try {
@@ -426,6 +446,26 @@ export const getBillsByUser = async (userId) => {
   } catch (error) {
     console.error('Lỗi khi lấy hóa đơn:', error);
     throw error;
+  }
+};
+//bill hàng mua trực tiếp ở quầy
+export const getBillOffline = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/bill/offline`); 
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy hóa đơn offline:', error);
+    throw error; 
+  }
+};
+//bill hàng mua onl 
+export const getBillOnline = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/bill/online`); 
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy hóa đơn offline:', error);
+    throw error; 
   }
 };
 

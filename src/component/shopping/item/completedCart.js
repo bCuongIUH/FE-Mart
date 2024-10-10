@@ -1,104 +1,128 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { getDamuaCart } from '../../../untills/api'; 
-import { AuthContext } from '../../../untills/context/AuthContext';
-import styles from './completedCart.module.css';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Button, List, Skeleton, Row, Col, Modal } from 'antd';
+import { getBillOffline } from '../../../untills/api'; 
 
-function CompletedCart() {
-  const [orders, setOrders] = useState([]);
+const CompletedCart = () => {
+  const [initLoading, setInitLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [billData, setBillData] = useState([]);
+  const [list, setList] = useState([]);
+  const [selectedBill, setSelectedBill] = useState(null); 
   const [error, setError] = useState(null);
-  const { user } = useContext(AuthContext);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false); 
 
   useEffect(() => {
-    const fetchCompletedOrders = async () => {
-      if (!user || !user._id) {
-        setError('Không tìm thấy thông tin người dùng');
-        return;
-      }
-
+    const fetchBillOffline = async () => {
       try {
-        const data = await getDamuaCart(user._id);
-       
-        const updatedOrders = data.map(order => {
-          const totalPrice = (order.items || []).reduce((total, item) => {
-            if (item.product) {
-              return total + item.unitPrice * item.quantity; 
-            }
-            return total;
-          }, 0);
-          
-          return { ...order, totalPrice }; 
-        });
-
-        setOrders(updatedOrders);
-        console.log('Đơn hàng đã hoàn thành:', updatedOrders);
+        const data = await getBillOffline();
+        setBillData(data);
+        setList(data);
+        setInitLoading(false);
       } catch (error) {
-        setError('Lỗi khi lấy dữ liệu đơn hàng');
+        setError('Lỗi khi lấy dữ liệu hóa đơn');
         console.error(error);
       }
     };
-    fetchCompletedOrders();
-  }, [user]);
 
-  const handleOrderClick = (order) => {
-    setSelectedOrder(order);
+    fetchBillOffline();
+  }, []);
+
+  const onLoadMore = () => {
+    setLoading(true);
+    setLoading(false);
   };
 
-  const closeModal = () => {
-    setSelectedOrder(null);
+  const showModal = (bill) => {
+    setSelectedBill(bill);
+    setIsModalVisible(true); 
   };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); 
+  };
+
+  const loadMore =
+    !initLoading && !loading ? (
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: 12,
+          height: 32,
+          lineHeight: '32px',
+        }}
+      >
+        <Button onClick={onLoadMore}>Tải thêm</Button>
+      </div>
+    ) : null;
 
   return (
-    <div>
-      <h2>Đơn hàng đã hoàn thành</h2>
-      {error && <p>{error}</p>}
-      {orders.length === 0 ? (
-        <p>Không có đơn hàng nào đã hoàn thành.</p>
-      ) : (
-        <ul>
-          {orders.map((order) => (
-            <li key={order._id} className={styles.orderItem} onClick={() => handleOrderClick(order)}>
-              <p>Mã đơn hàng: {order._id}</p>
-              <p>Ngày đặt: {new Date(order.createdAt).toLocaleDateString()}</p>
-              <p>Tổng tiền: {order.totalPrice} VND</p>
-              <p>Trạng thái: {order.status}</p>
-            </li>
+    <>
+      <List
+        className="demo-loadmore-list"
+        loading={initLoading}
+        itemLayout="horizontal"
+        loadMore={loadMore}
+        dataSource={list}
+        renderItem={(item) => (
+          <List.Item
+            actions={[
+              <a key="list-loadmore-edit">edit</a>,
+              <a key="list-loadmore-more">more</a>
+            ]}
+          >
+            <Skeleton avatar title={false} loading={initLoading} active>
+              <List.Item.Meta
+                // avatar={<Avatar src="https://via.placeholder.com/40" />}
+                title={<a onClick={() => showModal(item)}>Hóa đơn #{item._id}</a>} 
+              />
+              <Row gutter={20} style={{ width: '100%', alignItems: 'center' }}>
+                <Col span={6} style={{ marginLeft:'250px' }}>
+                  <strong>Tổng tiền:</strong> {item.totalAmount} VND
+                </Col>
+                <Col span={6}>
+                  <strong>Ngày mua:</strong> {new Date(item.createdAt).toLocaleDateString()}
+                </Col>
+                <Col span={6}>
+                  <strong>Phương thức thanh toán:</strong> {item.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}
+                </Col>
+              </Row>
+            </Skeleton>
+          </List.Item>
+        )}
+      />
+
+      {/* Modal hiển thị chi tiết hóa đơn */}
+      {selectedBill && (
+        <Modal
+          title={`Chi tiết hóa đơn #${selectedBill._id}`}
+          visible={isModalVisible}
+          onCancel={handleCancel}
+          footer={[
+            <Button key="back" onClick={handleCancel}>
+              Đóng
+            </Button>
+          ]}
+        >
+          <p><strong>Tổng tiền:</strong> {selectedBill.totalAmount} VND</p>
+          <p><strong>Ngày mua:</strong> {new Date(selectedBill.createdAt).toLocaleDateString()}</p>
+          <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p>
+          {/* <p><strong>Trạng thái:</strong> {selectedBill.status}</p> */}
+
+          {/* Lặp qua các sản phẩm trong hóa đơn */}
+          <h4>Sản phẩm:</h4>
+          {selectedBill.items.map((item, index) => (
+            <div key={index}>
+              <p><strong>Tên sản phẩm:</strong> {item.product.name}</p>
+              <p><strong>Số lượng:</strong> {item.quantity}</p>
+              <p><strong>Giá mỗi sản phẩm:</strong> {item.unitPrice} VND</p>
+              <p><strong>Tổng:</strong> {selectedBill.totalAmount} VND</p>
+              <hr />
+            </div>
           ))}
-        </ul>
+        </Modal>
       )}
-      {selectedOrder && (
-        <div className={styles.modal} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <span className={styles.close} onClick={closeModal}>&times;</span>
-            <h2>Chi tiết đơn hàng</h2>
-            <p>Mã đơn hàng: {selectedOrder._id}</p>
-            <p>Ngày đặt: {new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
-            <p>Tổng tiền: {selectedOrder.totalPrice} VND</p>
-            <p>Trạng thái: {selectedOrder.status}</p>
-            <h3>Sản phẩm:</h3>
-            <ul>
-              {selectedOrder.items.map((item) => (
-                <li key={item._id} className={styles.productItem}>
-                  {item.product ? (
-                    <div className={styles.productDetails}>
-                      <img src={item.product.image} alt={item.product.name} className={styles.productImage} />
-                      <div className={styles.productInfo}>
-                        <p>Tên sản phẩm: {item.product.name}</p>
-                        <p>Số lượng: {item.quantity}</p>
-                        <p>Giá: {item.unitPrice} VND</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <p>Thông tin sản phẩm không khả dụng.</p>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
-}
+};
 
 export default CompletedCart;

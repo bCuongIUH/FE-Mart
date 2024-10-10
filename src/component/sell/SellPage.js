@@ -16,6 +16,7 @@ function SellPage ()  {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate(); 
 
+ 
   
   useEffect(() => {
     const fetchProducts = async () => {

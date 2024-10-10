@@ -63,12 +63,7 @@ function StatisticsChart() {
 
   return (
     <div style={{ paddingTop: '100px' }}> 
-      <header className="header">
-        {/* <h1 className="header-title">C'Mart</h1> */}
-        <button className="header-title" onClick={handleBackButtonClick}>
-        C'Mart
-        </button>
-      </header>
+    
 
       <div className="statistics-container">
         <h2>Thống kê doanh thu</h2>

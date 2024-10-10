@@ -54,44 +54,71 @@ function AllProductsWarehouse() {
         console.error("Lỗi khi xóa sản phẩm:", error);
     }
 };
+//chức năng phân trang
+const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 8;
+const totalPages = Math.ceil(warehouses.length / itemsPerPage);
+const sortedWarehouses = warehouses.sort((a, b) => new Date(b.entryDate) - new Date(a.entryDate));
+const paginatedWarehouses = sortedWarehouses.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+);
 
-  
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Danh sách sản phẩm trong kho</h1>
-      {warehouses.length > 0 ? (
-        <ul className={styles.productList}>
-          {warehouses.map((warehouse) => (
-            <li key={warehouse._id} className={styles.productItem} onClick={() => showProductDetails(warehouse)}>
-              <div className={styles.productDetails}>
-                <span className={styles.productName}>{warehouse.productName}</span>
-                <span className={styles.productQuantity} title={`Số lượng: ${warehouse.quantity}`}>({`x${warehouse.quantity}`})</span>
-              </div>
-              <button className={styles.deleteButton} onClick={(e) => { e.stopPropagation(); handleDelete(warehouse._id); }}>
-                <FaTrash /> 
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Không có sản phẩm nào</p>
-      )}
+const handlePreviousPage = () => {
+    if (currentPage > 1) {
+        setCurrentPage(prev => prev - 1);
+    }
+};
 
-      {/* Modal thông tin sản phẩm */}
-      {selectedProduct && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2>{selectedProduct.productName}</h2>
-            <p>Số lượng: {selectedProduct.quantity}</p>
-            <p>Giá nhập: {selectedProduct.purchasePrice}</p>
-            <p>Ngày nhập: {new Date(selectedProduct.entryDate).toLocaleDateString('vi-VN')}</p> 
-            <p>Người nhập:  {users.find(user => user._id === selectedProduct.createdBy)?.fullName || 'Không xác định'}</p>
-            <button onClick={closeModal}>Đóng</button>
-          </div>
-        </div>
-      )}
+const handleNextPage = () => {
+    if (currentPage < totalPages) {
+        setCurrentPage(prev => prev + 1);
+    }
+};
+
+return (
+  <div className={styles.container}>
+    <h1 className={styles.title}>Danh sách sản phẩm trong kho</h1>
+    {warehouses.length > 0 ? (
+      <ul className={styles.productList}>
+        {paginatedWarehouses.map((warehouse) => (
+          <li key={warehouse._id} className={styles.productItem} onClick={() => showProductDetails(warehouse)}>
+            <div className={styles.productDetails}>
+              <span className={styles.productName}>{warehouse.productName}</span>
+              <span className={styles.productQuantity} title={`Số lượng: ${warehouse.quantity}`}>({`x${warehouse.quantity}`})</span>
+            </div>
+            <button className={styles.deleteButton} onClick={(e) => { e.stopPropagation(); handleDelete(warehouse._id); }}>
+              <FaTrash /> 
+            </button>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>Không có sản phẩm nào</p>
+    )}
+
+    {/* Nút điều hướng */}
+    <div className={styles.pagination}>
+      <button onClick={handlePreviousPage} disabled={currentPage === 1}>Trước</button>
+      <span>Trang {currentPage} / {totalPages}</span>
+      <button onClick={handleNextPage} disabled={currentPage === totalPages}>Tiếp</button>
     </div>
-  );
+
+    {/* Modal thông tin sản phẩm */}
+    {selectedProduct && (
+      <div className={styles.modalOverlay}>
+        <div className={styles.modalContent}>
+          <h2>{selectedProduct.productName}</h2>
+          <p>Số lượng: {selectedProduct.quantity}</p>
+          <p>Giá nhập: {selectedProduct.purchasePrice}</p>
+          <p>Ngày nhập: {new Date(selectedProduct.entryDate).toLocaleDateString('vi-VN')}</p> 
+          <p>Người nhập:  {users.find(user => user._id === selectedProduct.createdBy)?.fullName || 'Không xác định'}</p>
+          <button onClick={closeModal}>Đóng</button>
+        </div>
+      </div>
+    )}
+  </div>
+);
 }
 
 export default AllProductsWarehouse;

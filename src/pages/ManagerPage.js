@@ -45,11 +45,11 @@ const ManagerPage = () => {
 
   return (
     <div className="manager-page">
-      <header className="header">
+      {/* <header className="header">
         <div className="header-left">
           <button className="btn-home" onClick={goBack}>Quay lại</button>
         </div>
-      </header>
+      </header> */}
 
       <section className="product-list">
         {products.map(product => (

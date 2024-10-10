@@ -3,7 +3,9 @@ import { Layout, Menu, Avatar, Dropdown, Space } from 'antd';
 import { 
   DesktopOutlined, FileOutlined, TeamOutlined, UserOutlined, 
   SettingOutlined, LogoutOutlined, ShoppingCartOutlined, 
-  InboxOutlined, LineChartOutlined, DropboxOutlined 
+  InboxOutlined, LineChartOutlined, DropboxOutlined, 
+  EyeOutlined,
+  ProductOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import styles from './UIManager.module.css';
@@ -15,6 +17,11 @@ import WarehouseImport from '../component/warehouseManager/item/WarehouseImport'
 import SuppliersInfo from '../component/suppliers/item/suppliersInfo';
 import SuppliersImport from '../component/suppliers/item/suppliersImport';
 import ExportProduct from '../component/warehouseManager/item/UpdateWarehouseOutputProduct';
+import StatisticsChart from '../component/Statistical/Statistical';
+import CompletedCart from '../component/shopping/item/completedCart';
+import ManageEmployees from '../component/employees/ManageEmployees';
+import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
+import OrderTracking from '../component/OrderTracking/OrderTracking';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -74,18 +81,18 @@ const WarehouseManager = () => {
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <SubMenu key="sub1" icon={<ShoppingCartOutlined />} title="Quản lí bán hàng">
             <Menu.Item key="1" onClick={() => handleNavigate(<SellPage/>)}>Bán hàng</Menu.Item>
-            <Menu.Item key="2" onClick={() => handleNavigate('/AddProduct')}>Hóa đơn bán hàng</Menu.Item>
+            <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart/>)}>Hóa đơn bán hàng</Menu.Item>
           </SubMenu>
-          <SubMenu key="sub2" icon={<DesktopOutlined />} title="Quản lí sản phẩm">
+          <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
             <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item>
             {/* <Menu.Item key="4" onClick={() => handleNavigate('/AddProduct')}>Thêm sản phẩm</Menu.Item> */}
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
-            <Menu.Item key="5" onClick={() => handleNavigate('/ManageEmployees')}>Danh sách nhân viên</Menu.Item>
+            <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>
             <Menu.Item key="6" onClick={() => handleNavigate('/AddEmployee')}>Thêm nhân viên</Menu.Item>
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
-            <Menu.Item key="7" onClick={() => handleNavigate('/WarehouseManager')}>Kho tổng</Menu.Item>
+            <Menu.Item key="7" onClick={() => handleNavigate(<AllProductsWarehouse/>)}>Kho tổng</Menu.Item>
             <Menu.Item key="8" onClick={() => handleNavigate(<WarehouseImport/>)}>Quản lí nhập kho</Menu.Item>
             <Menu.Item key="9" onClick={() => handleNavigate(<ExportProduct/>)}>Quản lí xuất kho</Menu.Item>
             <Menu.Item key="10" onClick={() => handleNavigate('/WarehouseManager')}>Kiểm kê kho</Menu.Item>
@@ -99,9 +106,13 @@ const WarehouseManager = () => {
             <Menu.Item key="14" onClick={() => handleNavigate('/PromotionList')}>Danh sách chương trình</Menu.Item>
             <Menu.Item key="15" onClick={() => handleNavigate('/AddPromotion')}>Thêm chương trình</Menu.Item>
           </SubMenu>
-          <SubMenu key="sub7" icon={<LineChartOutlined />} title="Thống kê">
-            <Menu.Item key="16" onClick={() => handleNavigate('/SalesReport')}>Báo cáo doanh thu</Menu.Item>
+          <SubMenu key="sub7" icon={ <EyeOutlined />} title="Theo dõi đơn hàng">
+            <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking/>)}>Theo dõi đơn hàng</Menu.Item>
             <Menu.Item key="17" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">
+            <Menu.Item key="18" onClick={() => handleNavigate(<StatisticsChart/>)}>Báo cáo doanh thu</Menu.Item>
+            <Menu.Item key="19" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>

@@ -1,59 +1,41 @@
-/* StatisticsChart.css */
-.header {
-    display: flex;
-    align-items: center; /* Căn giữa theo chiều dọc */
-    justify-content: space-between; /* Căn giữa theo chiều ngang */
-    height: 100px; /* Chiều cao 100px */
-    background-color: #007bff; /* Màu nền của header */
-    color: white; /* Màu chữ */
-    padding: 0 20px; /* Khoảng cách hai bên */
-    position: fixed; /* Cố định vị trí */
-    top: 0; /* Nằm ở trên cùng */
-    left: 0;
-    right: 0;
-    z-index: 1000; /* Độ ưu tiên cao */
-  }
-  
-  .header-title {
-    margin: 0; /* Xóa margin của tiêu đề */
-    font-size: 24px; /* Kích thước chữ */
-  }
+
   
   .back-button {
-    padding: 10px 20px; /* Khoảng cách cho button */
-    background-color: #00d084; /* Màu nền của button */
-    color: white; /* Màu chữ */
-    border: none; /* Không có đường viền */
-    border-radius: 5px; /* Bo góc */
-    cursor: pointer; /* Thay đổi con trỏ khi hover */
+    padding: 10px 20px;
+    background-color: #00d084; 
+    color: white;
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
   }
   
   .back-button:hover {
-    background-color: #00b870; /* Giữ màu nền giống khi di chuột */
+    background-color: #00b870; 
   }
   
   .statistics-container {
-    margin: 20px; /* Khoảng cách cho container chính */
+    margin-left: 10px; 
+   
   }
   
   .button-group {
-    margin: 10px 0; /* Khoảng cách giữa các nút */
+    margin: 10px 0; 
   }
   
   .chart-revenue-container {
-    display: flex; /* Sắp xếp biểu đồ và tổng doanh thu bên cạnh nhau */
+    display: flex; 
   }
   
   .chart {
-    flex: 1; /* Chiếm không gian còn lại */
+    flex: 1; 
   }
   
   .revenue-summary {
-    margin-left: 20px; /* Khoảng cách bên trái cho phần tổng doanh thu */
-    width: 300px; /* Chiều rộng cố định cho phần tổng doanh thu */
-    padding: 10px; /* Padding cho phần tổng doanh thu */
-    border: 1px solid #ccc; /* Đường viền xung quanh */
-    border-radius: 5px; /* Bo góc */
-    background-color: #f8f9fa; /* Màu nền nhẹ */
+    margin-left: 20px; 
+    width: 300px; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    background-color: #f8f9fa; 
   }
   
