@@ -62,6 +62,7 @@ function App() {
              <Route path="/ManagerSales" element={<SellPage />} />
              <Route path="/statistics" element={<StatisticsChart />} />
              
+           
           </Routes>
           </SignupContext>
       </AuthProvider>

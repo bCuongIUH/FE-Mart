@@ -102,10 +102,10 @@ function SellPage ()  {
 
   return (
     <div className={styles["sell-container"]}>
-      <div className={styles["sell-header"]}>
+      {/* <div className={styles["sell-header"]}>
         <button className={styles["sell-header-title"]} onClick={handleBack}>C'Mart</button>
         <h1>Giao diện bán hàng</h1>
-      </div>
+      </div> */}
 
       <div className={styles["sell-content"]}>
         {/* sản phẩm */}
