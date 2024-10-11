@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { getAllWarehouse, updateWarehouseEntry, getCategories, addCategory } from '../../../untills/api';
 import styles from './UpdateWarehouseOutputProduct.module.css';
 import { AuthContext } from '../../../untills/context/AuthContext';
+import { message } from 'antd';
 
 const ExportProduct = () => {
     const { user } = useContext(AuthContext);
@@ -92,7 +93,10 @@ const ExportProduct = () => {
             setSelectedCategory('');
             setNewCategoryName('');
         } catch (error) {
-            alert('Lỗi khi xuất sản phẩm: ' + error.message);
+            //log alert test
+            alert('Lỗi khi xuất sản phẩm số lượng vượt quá: ' + error.message);
+            console.log(message);
+            
         }
     };
 

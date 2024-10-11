@@ -12,7 +12,7 @@ const OrderTracking = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedCartId, setSelectedCartId] = useState(null);
   const [newStatus, setNewStatus] = useState('');
-  const { user } = useContext(AuthContext); // Lấy userId từ AuthContext
+  const { user } = useContext(AuthContext); 
 console.log(user);
 
   const columns = [
@@ -88,7 +88,7 @@ console.log(user);
 
   const handleOk = async () => {
     try {
-      // Gọi hàm updateCart với selectedCartId, newStatus và userId
+      
       await updateCart(selectedCartId, newStatus, user);
       setIsModalVisible(false); 
       setNewStatus(''); 
@@ -101,7 +101,7 @@ console.log(user);
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    setNewStatus(''); // Đặt lại trạng thái khi hủy
+    setNewStatus('');
   };
 
   useEffect(() => {
@@ -137,7 +137,7 @@ console.log(user);
           style={{ width: '100%' }}
           placeholder="Chọn trạng thái mới"
         >
-          <Option value="DaMua">Đã Mua</Option>
+          <Option value="DaMua">Đã giao hàng</Option>
           <Option value="HoanTra">Hoàn Trả</Option>
         </Select>
       </Modal>

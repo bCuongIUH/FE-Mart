@@ -61,7 +61,7 @@ const ManagerPage = () => {
               <p className="product-price">${product.lines[0].unitPrice}</p>
             </div>
             <div className="product-actions">
-              <button className="btn-edit">Sửa</button>
+              {/* <button className="btn-edit">Sửa</button> */}
               <button className="btn-delete" onClick={(e) => {
                 e.stopPropagation(); 
                 handleDeleteProduct(product._id);
