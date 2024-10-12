@@ -21,6 +21,7 @@ const WarehouseImport = () => {
   const itemsPerPage = 6;
   const [page, setPage] = useState(1);
 
+console.log("đây",warehouseProducts);
 
   useEffect(() => {
     const fetchSuppliers = async () => {

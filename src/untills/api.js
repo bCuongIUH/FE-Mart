@@ -173,22 +173,7 @@ export const getAllUsers = async () => {
     throw error; // Ném lỗi để xử lý ở nơi khác
   }
 };
-// export const getAllUsers = async () => {
-//   try {
-//     const config = {
-//       withCredentials: true,
-//       headers: {
-//         Authorization: `Bearer ${localStorage.getItem('token')}`, 
-//       },
-//     };
 
-//     const response = await axios.get(`${API_URL}/auth/all-user`, config);
-//     return response.data.users; 
-//   } catch (error) {
-//     console.error('Lỗi khi lấy danh sách người dùng:', error);
-//     throw error; // Ném lỗi để xử lý ở nơi khác
-//   }
-// };
 // Cập nhật vai trò người dùng
 export const updateUserRole = async (userId, newRole) => {
   try {
@@ -251,33 +236,6 @@ export const updateWarehouseEntry = async (id, warehouseData) => {
       throw error;
   }
 };
-
-
-
-// export const updateWarehouseEntry = async (id, warehouseData, imageFile) => {
-//   try {
-//       // Tạo đối tượng FormData
-//       const formData = new FormData();
-      
-//       // Thêm các trường dữ liệu vào FormData
-//       Object.entries(warehouseData).forEach(([key, value]) => {
-//           formData.append(key, value);
-//       });
-
-//       // Thêm file hình ảnh nếu có
-//       if (imageFile) {
-//           formData.append('image', imageFile);
-//       }
-
-//       // Gửi yêu cầu PUT đến backend
-//       const response = await axios.put(`${API_URL}/warehouses/update/${id}`, formData); // Có thể thêm config nếu cần
-
-//       return response.data; // Trả về dữ liệu nhận được từ server
-//   } catch (error) {
-//       console.error('Lỗi khi cập nhật phiếu nhập kho:', error.response?.data || error.message);
-//       throw error; // Ném lỗi nếu có
-//   }
-// };
 
 // xóa phiếu nhập kho
 export const deleteProductWarehouse = async (id) => {
@@ -528,5 +486,59 @@ export const deleteCategory = async (categoryId) => {
   } catch (error) {
     console.error('Lỗi khi xóa danh mục:', error);
     throw error;
+  }
+};
+// đơn vị tính
+// Hàm thêm đơn vị tính
+export const addUnit = async (unitData) => {
+  try {
+    const response = await axios.post(`${API_URL}/units`, unitData, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi thêm đơn vị tính:', error);
+    throw error;
+  }
+};
+
+// Hàm lấy tất cả đơn vị tính
+export const getUnits = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/units`, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách đơn vị tính:', error);
+    throw error;
+  }
+};
+
+// Hàm cập nhật đơn vị tính
+export const updateUnit = async (unitId, unitData) => {
+  try {
+    const response = await axios.put(`${API_URL}/units/${unitId}`, unitData, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi cập nhật đơn vị tính:', error);
+    throw error;
+  }
+};
+
+// Hàm xóa đơn vị tính
+export const deleteUnit = async (unitId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/units/${unitId}`, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi xóa đơn vị tính:', error);
+    throw error;
+  }
+};
+//nhập hàng
+export const addWarehouseEntry = async (warehouseEntryData) => {
+  try {
+    const response = await axios.post(`${API_URL}/warehouses/add`, warehouseEntryData, config);
+    return response.data; // Trả về dữ liệu từ phản hồi
+  } catch (error) {
+    console.error('Lỗi khi nhập hàng:', error.response?.data || error.message);
+    throw error; 
   }
 };

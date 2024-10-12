@@ -9,7 +9,6 @@ import  RequireAuth from "./untills/context/AuthenticatedRouter";
 import { UserProvider } from './untills/context/UserContext';
 import { AuthProvider } from './untills/context/AuthContext'; 
 import UIManager from "./pages/UIManager";
-import ManagerPage from "./pages/ManagerPage";
 import Profile from "../src/component/profile/profile";
 import UserInfo from "./component/profile/profile.UserInfo";
 import ChangePassword from "./component/password/ChangePassword";
@@ -20,6 +19,7 @@ import ShoppingCart from "./component/shopping/shoppingCart";
 import SignupContext from "./untills/context/SignupContext";
 import SellPage from './component/sell/SellPage';
 import StatisticsChart from "./component/Statistical/Statistical";
+import ProductPage from "./component/products/ProductPage";
 
 
 
@@ -51,7 +51,7 @@ function App() {
                 </RequireAuth>
               }
             />
-             <Route path="/ManagerPage" element={<ManagerPage />} />
+             <Route path="/ManagerPage" element={<ProductPage />} />
              <Route path="/Profile" element={<Profile />} /> 
              <Route path="/user-info" element={<UserInfo />} /> 
              <Route path="/change-password" element={<ChangePassword />} /> 

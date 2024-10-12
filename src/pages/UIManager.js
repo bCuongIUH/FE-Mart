@@ -12,7 +12,6 @@ import styles from './UIManager.module.css';
 
 import { AuthContext } from '../untills/context/AuthContext';
 import SellPage from '../component/sell/SellPage';
-import ManagerPage from './ManagerPage';
 import WarehouseImport from '../component/warehouseManager/item/WarehouseImport';
 import SuppliersInfo from '../component/suppliers/item/suppliersInfo';
 import SuppliersImport from '../component/suppliers/item/suppliersImport';
@@ -22,6 +21,9 @@ import CompletedCart from '../component/shopping/item/completedCart';
 import ManageEmployees from '../component/employees/ManageEmployees';
 import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
 import OrderTracking from '../component/OrderTracking/OrderTracking';
+import AddProduct from '../component/products/AddProduct';
+import ProductPage from '../component/products/ProductPage';
+import NhapHangPage from '../component/products/NhapHangPage';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -42,7 +44,10 @@ const WarehouseManager = () => {
     logout();
     navigate('/');
   };
-
+  const handleAddProductClick = () => {
+    setCurrentComponent(<AddProduct />); 
+    setShowUserInfo(false);
+  };
   const userMenu = (
     <Menu>
       <Menu.Item key="profile" icon={<UserOutlined />} onClick={() => handleNavigate('/profile')}>
@@ -69,7 +74,7 @@ const WarehouseManager = () => {
           <Dropdown overlay={userMenu} trigger={['click']}>
             <Space>
               <Avatar src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" />
-              <span>{user ? user.fullName : 'Loading...'}</span>
+              <span >{user ? user.fullName : 'Loading...'}</span>
             </Space>
           </Dropdown>
         </div>
@@ -84,7 +89,8 @@ const WarehouseManager = () => {
             <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart/>)}>Hóa đơn bán hàng</Menu.Item>
           </SubMenu>
           <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
-            <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item>
+            {/* <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item> */}
+            <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage onAddProduct={handleAddProductClick} />)}>Danh sách sản phẩm</Menu.Item>
             {/* <Menu.Item key="4" onClick={() => handleNavigate('/AddProduct')}>Thêm sản phẩm</Menu.Item> */}
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
@@ -93,9 +99,9 @@ const WarehouseManager = () => {
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
             <Menu.Item key="7" onClick={() => handleNavigate(<AllProductsWarehouse/>)}>Kho tổng</Menu.Item>
-            <Menu.Item key="8" onClick={() => handleNavigate(<WarehouseImport/>)}>Quản lí nhập kho</Menu.Item>
+            <Menu.Item key="8" onClick={() => handleNavigate(<NhapHangPage/>)}>Quản lí nhập kho</Menu.Item>
             <Menu.Item key="9" onClick={() => handleNavigate(<ExportProduct/>)}>Quản lí xuất kho</Menu.Item>
-            <Menu.Item key="10" onClick={() => handleNavigate('/WarehouseManager')}>Kiểm kê kho</Menu.Item>
+            <Menu.Item key="10" onClick={() => handleNavigate('/')}>Kiểm kê kho</Menu.Item>
             <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
           </SubMenu>
           <SubMenu key="sub5" icon={<DesktopOutlined />} title="Quản lí nhà cung cấp">

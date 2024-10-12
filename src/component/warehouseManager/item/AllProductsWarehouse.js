@@ -9,6 +9,7 @@ function AllProductsWarehouse() {
   const [selectedProduct, setSelectedProduct] = useState(null); 
   const { user } = useContext(AuthContext); 
   const [users, setUsers] = useState([]); 
+// console.log("đây2",warehouses);
 
   useEffect(() => {
     async function fetchWarehouse() {
