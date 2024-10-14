@@ -25,6 +25,7 @@ import AddProduct from '../component/products/AddProduct';
 import ProductPage from '../component/products/ProductPage';
 import NhapHangPage from '../component/products/NhapHangPage';
 import PromotionManager from '../component/PromotionManager/PromotionManager';
+import PriceProduct from '../component/PriceProduct/PriceProduct';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -92,7 +93,7 @@ const WarehouseManager = () => {
           <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
             {/* <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item> */}
             <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage />)}>Danh sách sản phẩm</Menu.Item>
-            {/* <Menu.Item key="4" onClick={() => handleNavigate('/AddProduct')}>Thêm sản phẩm</Menu.Item> */}
+            <Menu.Item key="4" onClick={() => handleNavigate(<PriceProduct/>)}>Thiết lập giá</Menu.Item>
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
             <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>

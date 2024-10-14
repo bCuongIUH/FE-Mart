@@ -154,6 +154,30 @@ export const updateProductPrice = async (id, newPrice) => {
       console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
   }
 };
+// Cập nhật khoảng giá
+export const updatePriceRange = async (productId, priceRange) => {
+  try {
+      const response = await axios.put(`${API_URL}/products/priceRanges/${productId}`, priceRange);
+      console.log('Cập nhật khoảng giá thành công:', response.data);
+      return response.data; 
+  } catch (error) {
+      console.error('Lỗi khi cập nhật khoảng giá:', error.response?.data?.message || error.message);
+      throw error; 
+  }
+};
+
+// Cập nhật trạng thái active của khoảng giá
+export const togglePriceRangeActive = async (productId, priceRangeId, isActive) => {
+  try {
+      const response = await axios.put(`${API_URL}/products/priceRanges/active${productId}`, {
+          priceRangeId: priceRangeId, // ID của khoảng giá
+          isActive: isActive, // true để kích hoạt, false để hủy kích hoạt
+      });
+      console.log('Cập nhật trạng thái khoảng giá thành công:', response.data);
+  } catch (error) {
+      console.error('Lỗi khi cập nhật trạng thái khoảng giá:', error.response?.data?.message || error.message);
+  }
+};
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu

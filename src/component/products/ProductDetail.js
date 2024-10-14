@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Descriptions, Tag, Row, Col, Card, Image, message, Switch } from 'antd';
-import { getCategories, updateProductStatus } from '../../untills/api'; 
+import { getCategories, updateProductStatus } from '../../untills/api';
+import Barcode from './Barcode'; // Nhập component Barcode
 
 const ProductDetail = ({ product, onBack }) => {
     const [categories, setCategories] = useState([]);
-    const [isAvailable, setIsAvailable] = useState(product.isAvailable); 
+    const [isAvailable, setIsAvailable] = useState(product.isAvailable);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -23,35 +24,24 @@ const ProductDetail = ({ product, onBack }) => {
         fetchCategories();
     }, []);
 
-    // Cấu hình vị trí hiển thị message
-    message.config({
-        top: 100, 
-        duration: 3,
-        maxCount: 3, 
-        placement: 'topRight', 
-    });
-
-    // Hàm xử lý thay đổi trạng thái bán
     const handleSwitchChange = async (checked, productId) => {
-        // Kiểm tra nếu số lượng = 0
         if (product.quantity === 0 && checked) {
             message.warning('Không thể cập nhật trạng thái thành Đang bán vì sản phẩm hiện tại không còn hàng!');
-            return; 
+            return;
         }
 
-        // Kiểm tra giá sản phẩm
         if (checked && (!product.price || product.price <= 0)) {
             message.warning('Không thể cập nhật trạng thái thành Đang bán vì giá sản phẩm không hợp lệ!');
-            return; 
+            return;
         }
 
         setIsAvailable(checked);
         try {
-            await updateProductStatus(productId, checked); 
+            await updateProductStatus(productId, checked);
             message.success(`Trạng thái sản phẩm đã ${checked ? 'cập nhật thành Đang bán' : 'cập nhật thành Ngưng bán'}`);
         } catch (error) {
             message.error('Cập nhật trạng thái không thành công!');
-            setIsAvailable(!checked); 
+            setIsAvailable(!checked);
         }
     };
 
@@ -59,8 +49,8 @@ const ProductDetail = ({ product, onBack }) => {
         <div>
             <h2>Chi tiết sản phẩm</h2>
             <Row gutter={16}>
-                {/* Cột bên trái: Thông tin sản phẩm */}
-                <Col span={8}>
+                {/* Cột bên trái: Thông tin chi tiết sản phẩm chiếm 2 phần */}
+                <Col span={16}>
                     <Card title="Thông tin Sản phẩm">
                         <Image
                             src={product.image}
@@ -77,10 +67,15 @@ const ProductDetail = ({ product, onBack }) => {
                                 {categories.find(category => category._id === product.category)?.name || 'Không xác định'}
                             </Descriptions.Item>
                         </Descriptions>
+                        
+                       
+                        <div style={{ textAlign: 'center', marginTop: -100 }}>
+                            <Barcode code={product.barcode} />
+                        </div>
                     </Card>
                 </Col>
 
-                {/* Cột giữa: Trạng thái bán */}
+                {/* Cột bên phải: Trạng thái bán và Chương trình khuyến mãi */}
                 <Col span={8}>
                     <Card title="Trạng thái bán">
                         <Descriptions column={1}>
@@ -95,14 +90,11 @@ const ProductDetail = ({ product, onBack }) => {
                                 />
                             </Descriptions.Item>
                             <Descriptions.Item label="Số lượng">{product.quantity}</Descriptions.Item>
-                            <Descriptions.Item label="Giá bán">{product.price}</Descriptions.Item>
+                            <Descriptions.Item label="Giá bán">{product.price.toLocaleString()} đ</Descriptions.Item>
                         </Descriptions>
                     </Card>
-                </Col>
 
-                {/* Cột bên phải: Chương trình khuyến mãi */}
-                <Col span={8}>
-                    <Card title="Chương trình khuyến mãi">
+                    <Card title="Chương trình khuyến mãi" style={{ marginTop: 16 }}>
                         <Descriptions column={1}>
                             <Descriptions.Item label="Khuyến mãi hiện tại">
                                 Không có khuyến mãi

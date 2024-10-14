@@ -35,7 +35,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const products = await getAllProducts();
+        const products = await getAllProducts(); 
         const formattedData = products.map((product) => {
           let status = { text: 'Hết hàng', color: 'red' };
           if (product.quantity > 20) {
@@ -43,6 +43,23 @@ const ProductPage = () => {
           } else if (product.quantity > 0) {
             status = { text: 'Sắp hết', color: 'orange' };
           }
+
+          const today = new Date();
+          let currentPrice = product.price;
+
+          // Xác định giá hiện tại từ priceRanges
+          if (product.priceRanges && product.priceRanges.length > 0) {
+            const validRange = product.priceRanges.find(range => {
+              const startDate = new Date(range.startDate);
+              const endDate = new Date(range.endDate);
+              return today >= startDate && today <= endDate && range.isActive; // Kiểm tra trạng thái hoạt động
+            });
+
+            if (validRange) {
+              currentPrice = validRange.price; // Cập nhật giá sản phẩm
+            }
+          }
+
           return {
             key: product._id,
             code: product.code,
@@ -52,18 +69,17 @@ const ProductPage = () => {
             image: product.image,
             category: product.category,
             quantity: product.quantity || 0, 
-            price: product.price,
+            price: currentPrice,
             isAvailable: product.isAvailable,
             lines: product.lines,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             status: status,
+            priceRanges: product.priceRanges, 
           };
         });
 
-        // Sắp xếp sản phẩm theo ngày tạo (newest first)
-        formattedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
+        // Cập nhật lại state với dữ liệu đã xử lý
         setData(formattedData);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -168,6 +184,7 @@ const ProductPage = () => {
                 key: 'status',
                 render: (status) => <Tag color={status.color}>{status.text}</Tag> 
               },
+              { title: 'Giá', dataIndex: 'price', key: 'price' }, 
             ]}
             dataSource={data.filter(item => item.nameProduct.toLowerCase().includes(searchTerm.toLowerCase()))}
           />

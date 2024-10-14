@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, Row, Col, Card, Upload, message } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { createProduct, getCategories } from '../../untills/api';
-import './AddProduct.css'; // Import your CSS file
+import './AddProduct.css'; 
 
 const { Option } = Select;
 
@@ -49,6 +49,7 @@ const AddProduct = ({ onCancel }) => {
       setFileList([]);
     } catch (error) {
       message.error('Có lỗi xảy ra: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+      
     }
   };
 
@@ -65,7 +66,7 @@ const AddProduct = ({ onCancel }) => {
     <Form form={form} layout="vertical" onFinish={onFinish}>
       {/* Thông tin chung */}
       <Card title="Thông tin sản phẩm">
-        <Row gutter={8}> {/* Giảm gutter */}
+        <Row gutter={8} > {/* Giảm gutter */}
           <Col span={8}>
             <Form.Item
               name="name"
@@ -82,6 +83,7 @@ const AddProduct = ({ onCancel }) => {
               label="Mã sản phẩm"
               rules={[{ required: true, message: 'Nhập mã!' }]}
               className="form-item" // Thêm class cho styling
+              
             >
               <Input />
             </Form.Item>
