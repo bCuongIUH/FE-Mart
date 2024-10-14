@@ -143,6 +143,17 @@ export const updateProductStatus = async (id, newStatus) => {
       console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
   }
 };
+//cập nhật giá
+export const updateProductPrice = async (id, newPrice) => {
+  try {
+      const response = await axios.put(`${API_URL}/products/price/${id}`, {
+        price: newPrice, 
+      });
+      console.log('Cập nhật giá thành công:', response.data);
+  } catch (error) {
+      console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
+  }
+};
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu

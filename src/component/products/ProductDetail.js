@@ -6,7 +6,6 @@ const ProductDetail = ({ product, onBack }) => {
     const [categories, setCategories] = useState([]);
     const [isAvailable, setIsAvailable] = useState(product.isAvailable); 
 
-
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -24,8 +23,28 @@ const ProductDetail = ({ product, onBack }) => {
         fetchCategories();
     }, []);
 
+    // Cấu hình vị trí hiển thị message
+    message.config({
+        top: 100, 
+        duration: 3,
+        maxCount: 3, 
+        placement: 'topRight', 
+    });
+
     // Hàm xử lý thay đổi trạng thái bán
     const handleSwitchChange = async (checked, productId) => {
+        // Kiểm tra nếu số lượng = 0
+        if (product.quantity === 0 && checked) {
+            message.warning('Không thể cập nhật trạng thái thành Đang bán vì sản phẩm hiện tại không còn hàng!');
+            return; 
+        }
+
+        // Kiểm tra giá sản phẩm
+        if (checked && (!product.price || product.price <= 0)) {
+            message.warning('Không thể cập nhật trạng thái thành Đang bán vì giá sản phẩm không hợp lệ!');
+            return; 
+        }
+
         setIsAvailable(checked);
         try {
             await updateProductStatus(productId, checked); 
