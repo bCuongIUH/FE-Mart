@@ -45,10 +45,10 @@ const WarehouseManager = () => {
     logout();
     navigate('/');
   };
-  const handleAddProductClick = () => {
-    setCurrentComponent(<AddProduct />); 
-    setShowUserInfo(false);
-  };
+  // const handleAddProductClick = () => {
+  //   setCurrentComponent(<AddProduct />); 
+  //   setShowUserInfo(false);
+  // };
   const userMenu = (
     <Menu>
       <Menu.Item key="profile" icon={<UserOutlined />} onClick={() => handleNavigate('/profile')}>
@@ -91,7 +91,7 @@ const WarehouseManager = () => {
           </SubMenu>
           <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
             {/* <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item> */}
-            <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage onAddProduct={handleAddProductClick} />)}>Danh sách sản phẩm</Menu.Item>
+            <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage />)}>Danh sách sản phẩm</Menu.Item>
             {/* <Menu.Item key="4" onClick={() => handleNavigate('/AddProduct')}>Thêm sản phẩm</Menu.Item> */}
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">

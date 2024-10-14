@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Input, Dropdown, Menu, Tag } from 'antd'; 
 import { getAllProducts } from '../../untills/api';
 import NhapHangInput from './NhapHangInput';
-import AddProduct from './AddProduct'; // Import component AddProduct
+import AddProduct from './AddProduct'; 
+import ProductDetail from './ProductDetail'; 
 
 const ProductPage = () => {
   const [data, setData] = useState([]); 
@@ -11,6 +12,7 @@ const ProductPage = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isAddingNewProduct, setIsAddingNewProduct] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null); 
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -26,9 +28,19 @@ const ProductPage = () => {
           return {
             key: product._id,
             code: product.code,
+            barcode: product.barcode,
             nameProduct: product.name,
+            description: product.description,
+            image: product.image,
+            category: product.category,
             quantity: product.quantity || 0, 
+            price: product.price,
+            isAvailable: product.isAvailable,
+            lines: product.lines,
+            createdAt: product.createdAt,
+            updatedAt: product.updatedAt,
             status: status,
+
           };
         });
         setData(formattedData);
@@ -51,7 +63,6 @@ const ProductPage = () => {
     }
   };
   
-
   const handleCancel = () => {
     setIsAddingProduct(false);
   };
@@ -64,21 +75,31 @@ const ProductPage = () => {
     <Menu onClick={handleMenuClick}>
       <Menu.Item key="1">Bỏ chọn</Menu.Item>
       <Menu.Item key="2">Nhập hàng</Menu.Item>
-      <Menu.Item key="3">Nhập hàng</Menu.Item>
     </Menu>
   );
 
   const handleAddNewProduct = () => {
-    setIsAddingNewProduct(true); // Chuyển sang chế độ thêm sản phẩm
+    setIsAddingNewProduct(true); 
   };
 
-  // Render nội dung chính
+
+  const handleRowClick = (record) => {
+    setSelectedProduct(record); 
+  };
+
+
+  const handleBackToList = () => {
+    setSelectedProduct(null); 
+  };
+
   return (
     <>
       {isAddingNewProduct ? ( 
-        <AddProduct onCancel={() => setIsAddingNewProduct(false)} /> // Hiển thị component AddProduct
+        <AddProduct onCancel={() => setIsAddingNewProduct(false)} /> 
       ) : isAddingProduct ? (
         <NhapHangInput selectedProducts={selectedProducts} onCancel={handleCancel} />
+      ) : selectedProduct ? (
+        <ProductDetail product={selectedProduct} onBack={handleBackToList} />
       ) : (
         <>
           <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
@@ -106,6 +127,9 @@ const ProductPage = () => {
               selectedRowKeys,
               onChange: onSelectChange,
             }}
+            onRow={(record) => ({
+              onClick: () => handleRowClick(record), // Khi nhấn vào hàng nào, gọi handleRowClick
+            })}
             columns={[
               { title: 'Mã', dataIndex: 'code', key: 'code' },
               { title: 'Tên sản phẩm', dataIndex: 'nameProduct', key: 'nameProduct' },
