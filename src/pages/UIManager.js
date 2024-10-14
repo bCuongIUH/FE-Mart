@@ -75,7 +75,7 @@ const WarehouseManager = () => {
           <Dropdown overlay={userMenu} trigger={['click']}>
             <Space>
               <Avatar src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" />
-              <span >{user ? user.fullName : 'Loading...'}</span>
+              <span style={{color: 'white'}} >{user ? user.fullName : 'Loading...'}</span>
             </Space>
           </Dropdown>
         </div>

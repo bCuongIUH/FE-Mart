@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, Dropdown, Menu, Tag } from 'antd'; 
-import { getAllProducts } from '../../untills/api';
+import { Table, Button, Input, Dropdown, Menu, Tag, message } from 'antd'; 
+import { getAllProducts, getCategories } from '../../untills/api';
 import NhapHangInput from './NhapHangInput';
 import AddProduct from './AddProduct'; 
 import ProductDetail from './ProductDetail'; 
@@ -13,6 +13,24 @@ const ProductPage = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [isAddingNewProduct, setIsAddingNewProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+        try {
+            const response = await getCategories();
+            if (Array.isArray(response.categories)) {
+                setCategories(response.categories);
+            } else {
+                message.error('Dữ liệu danh mục không hợp lệ!');
+            }
+        } catch (error) {
+            message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+        }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -40,9 +58,12 @@ const ProductPage = () => {
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             status: status,
-
           };
         });
+
+        // Sắp xếp sản phẩm theo ngày tạo (newest first)
+        formattedData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
         setData(formattedData);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -56,7 +77,7 @@ const ProductPage = () => {
     if (key === "1") { 
       setSelectedRowKeys([]); 
       setSelectedProducts([]);
-    } else if (key === "2") { // Nhập hàng
+    } else if (key === "2") { 
       const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
       setSelectedProducts(selectedItems);
       setIsAddingProduct(true);
@@ -82,11 +103,9 @@ const ProductPage = () => {
     setIsAddingNewProduct(true); 
   };
 
-
   const handleRowClick = (record) => {
     setSelectedProduct(record); 
   };
-
 
   const handleBackToList = () => {
     setSelectedProduct(null); 
@@ -128,11 +147,20 @@ const ProductPage = () => {
               onChange: onSelectChange,
             }}
             onRow={(record) => ({
-              onClick: () => handleRowClick(record), // Khi nhấn vào hàng nào, gọi handleRowClick
+              onClick: () => handleRowClick(record),
             })}
             columns={[
               { title: 'Mã', dataIndex: 'code', key: 'code' },
               { title: 'Tên sản phẩm', dataIndex: 'nameProduct', key: 'nameProduct' },
+              { 
+                title: 'Loại sản phẩm', 
+                dataIndex: 'category', 
+                key: 'category',
+                render: (categoryId) => {
+                  const category = categories.find(cat => cat._id === categoryId);
+                  return category ? category.name : 'Không xác định';
+                },
+              },
               { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
               { 
                 title: 'Trạng thái', 

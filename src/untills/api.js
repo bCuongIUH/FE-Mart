@@ -132,6 +132,17 @@ export const deleteProduct = async (id) => {
     throw error;
   }
 };
+// cập nhật trạng thái
+export const updateProductStatus = async (id, newStatus) => {
+  try {
+      const response = await axios.put(`${API_URL}/products/status/${id}`, {
+          isAvailable: newStatus, 
+      });
+      console.log('Cập nhật trạng thái thành công:', response.data);
+  } catch (error) {
+      console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
+  }
+};
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu
