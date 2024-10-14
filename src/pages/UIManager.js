@@ -24,6 +24,7 @@ import OrderTracking from '../component/OrderTracking/OrderTracking';
 import AddProduct from '../component/products/AddProduct';
 import ProductPage from '../component/products/ProductPage';
 import NhapHangPage from '../component/products/NhapHangPage';
+import PromotionManager from '../component/PromotionManager/PromotionManager';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -109,7 +110,7 @@ const WarehouseManager = () => {
             <Menu.Item key="13" onClick={() => handleNavigate(<SuppliersImport/>)}>Thêm nhà cung cấp</Menu.Item>
           </SubMenu>
           <SubMenu key="sub6" icon={<DropboxOutlined />} title="Quản lí chương trình khuyến mãi">
-            <Menu.Item key="14" onClick={() => handleNavigate('/PromotionList')}>Danh sách chương trình</Menu.Item>
+            <Menu.Item key="14" onClick={() => handleNavigate(<PromotionManager/>)}>Danh sách chương trình</Menu.Item>
             <Menu.Item key="15" onClick={() => handleNavigate('/AddPromotion')}>Thêm chương trình</Menu.Item>
           </SubMenu>
           <SubMenu key="sub7" icon={ <EyeOutlined />} title="Theo dõi đơn hàng">

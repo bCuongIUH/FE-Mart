@@ -542,3 +542,43 @@ export const addWarehouseEntry = async (warehouseEntryData) => {
     throw error; 
   }
 };
+//chương trình khuyến mãi
+export const addPromotion = async (promotionData) => {
+  try {
+    const response = await axios.post(`${API_URL}/promotions`, promotionData, config);
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi thêm chương trình khuyến mãi:', error.response?.data || error.message);
+    throw error; 
+  }
+};
+// Hàm lấy danh sách chương trình khuyến mãi
+export const getPromotions = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/promotions`, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy danh sách chương trình khuyến mãi:', error.response?.data || error.message);
+    throw error; 
+  }
+};
+// Hàm cập nhật chương trình khuyến mãi
+export const updatePromotion = async (promotionId, promotionData) => {
+  try {
+    const response = await axios.put(`${API_URL}/promotions/${promotionId}`, promotionData, config);
+    return response.data; 
+  } catch (error) {
+    console.error(`Lỗi khi cập nhật chương trình khuyến mãi với ID ${promotionId}:`, error.response?.data || error.message);
+    throw error; 
+  }
+};
+// Hàm xóa chương trình khuyến mãi
+export const deletePromotion = async (promotionId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/promotions/${promotionId}`, config);
+    return response.data; 
+  } catch (error) {
+    console.error(`Lỗi khi xóa chương trình khuyến mãi với ID ${promotionId}:`, error.response?.data || error.message);
+    throw error;
+  }
+};

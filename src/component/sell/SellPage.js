@@ -48,14 +48,14 @@ function SellPage ()  {
   const addToCart = () => {
     if (selectedProduct) {
    
-      if (quantity > selectedProduct.lines[0]?.quantity) {
+      if (quantity > selectedProduct.quantity) {
         alert("Số lượng yêu cầu vượt quá số lượng tồn kho!");
         return;
       }
   
-      const linePrice = selectedProduct.lines[0]?.unitPrice || 0;
+      const linePrice = selectedProduct.price || 0;
       const totalItemPrice = linePrice * quantity;
-      const updatedCart = [...cart, { ...selectedProduct, unitPrice: linePrice, quantity }];
+      const updatedCart = [...cart, { ...selectedProduct, price: linePrice, quantity }];
       setCart(updatedCart);
       setTotalPrice(totalPrice + totalItemPrice);
       closeModal(); 
@@ -79,8 +79,8 @@ function SellPage ()  {
       const items = cart.map(item => ({
         product: item._id,
         quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.unitPrice * item.quantity,
+        price: item.price,
+        totalPrice: item.price * item.quantity,
       }));
 
       //tạo
@@ -94,12 +94,14 @@ function SellPage ()  {
     } catch (error) {
       console.error("Lỗi khi thanh toán:", error);
       alert("Thanh toán thất bại!");
+      console.log(error);
     }
   };
 
   const handleBack = () => {
     navigate(-1);
   };
+
 
   return (
     <div className={styles["sell-container"]}>
@@ -116,8 +118,8 @@ function SellPage ()  {
             {products.map((product) => (
               <div key={product._id} className={styles["sell-product-item"]}>
                 <h3>{product.name}</h3>
-                <p>Giá: {product.lines[0]?.unitPrice || 0} VND</p>
-                <p>Số lượng tồn: {product.lines[0]?.quantity || 0}</p>
+                <p>Giá: {product.price|| 0} VND</p>
+                <p>Số lượng tồn: {product.quantity || 0}</p>
                 <button onClick={() => openModal(product)}>Thêm vào giỏ</button>
               </div>
             ))}
@@ -132,7 +134,7 @@ function SellPage ()  {
               cart.map((item, index) => (
                 <div key={index} className={styles["sell-cart-item"]}>
                   <h4>{item.name}</h4>
-                  <p>Giá: {item.unitPrice} VND</p>
+                  <p>Giá: {item.price} VND</p>
                   <p>Số lượng: {item.quantity}</p>
                   <button className={styles["remove-item"]} onClick={() => removeFromCart(index)}>-</button>
                 </div>
@@ -153,14 +155,14 @@ function SellPage ()  {
         <div className={styles["modal"]}>
           <div className={styles["modal-content"]}>
             <h3>{selectedProduct.name}</h3>
-            <p>Giá: {selectedProduct.lines[0]?.unitPrice || 0} VND</p>
-            <p>Số lượng tồn kho: {selectedProduct.lines[0]?.quantity || 0}</p>
+            <p>Giá: {selectedProduct.price || 0} VND</p>
+            <p>Số lượng tồn kho: {selectedProduct.quantity || 0}</p>
             <label>
               Số lượng:
               <input
                 type="number"
                 min="1"
-                max={selectedProduct.lines[0]?.quantity}
+                max={selectedProduct.quantity}
                 value={quantity}
                 onChange={handleQuantityChange}
               />

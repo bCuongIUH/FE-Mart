@@ -18,16 +18,16 @@ const NhapHangPage = () => {
         const products = await getAllProducts();
         const formattedData = products.map((product) => {
           let status = { text: 'Hết hàng', color: 'red' }; // Mặc định trạng thái là 'Hết hàng'
-          if (product.lines[0]?.quantity > 20) {
+          if (product.quantity > 20) {
             status = { text: 'Còn hàng', color: 'green' };
-          } else if (product.lines[0]?.quantity > 0) {
+          } else if (product.quantity > 0) {
             status = { text: 'Sắp hết', color: 'orange' };
           }
           return {
             key: product._id,
             code: product.code,
             nameProduct: product.name,
-            quantity: product.lines[0]?.quantity || 0, 
+            quantity: product.quantity || 0, 
             status: status,
           };
         });

@@ -113,8 +113,9 @@ const CompletedCart = () => {
           {selectedBill.items.map((item, index) => (
             <div key={index}>
               <p><strong>Tên sản phẩm:</strong> {item.product.name}</p>
+              {/* <p><strong></strong>{item.product.image}</p> */}
               <p><strong>Số lượng:</strong> {item.quantity}</p>
-              <p><strong>Giá mỗi sản phẩm:</strong> {item.unitPrice} VND</p>
+              <p><strong>Giá mỗi sản phẩm:</strong> {item.price} VND</p>
               <p><strong>Tổng:</strong> {selectedBill.totalAmount} VND</p>
               <hr />
             </div>
