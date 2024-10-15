@@ -17,16 +17,16 @@ const ProductPage = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-        try {
-            const response = await getCategories();
-            if (Array.isArray(response.categories)) {
-                setCategories(response.categories);
-            } else {
-                message.error('Dữ liệu danh mục không hợp lệ!');
-            }
-        } catch (error) {
-            message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+      try {
+        const response = await getCategories();
+        if (Array.isArray(response.categories)) {
+          setCategories(response.categories);
+        } else {
+          message.error('Dữ liệu danh mục không hợp lệ!');
         }
+      } catch (error) {
+        message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+      }
     };
 
     fetchCategories();
@@ -45,7 +45,7 @@ const ProductPage = () => {
           }
 
           const today = new Date();
-          let currentPrice = product.price;
+          let currentPrice = product.price; // Default price if no price range applies
 
           // Xác định giá hiện tại từ priceRanges
           if (product.priceRanges && product.priceRanges.length > 0) {
@@ -56,7 +56,7 @@ const ProductPage = () => {
             });
 
             if (validRange) {
-              currentPrice = validRange.price; // Cập nhật giá sản phẩm
+              currentPrice = validRange.price; // Cập nhật giá sản phẩm nếu có khoảng giá hợp lệ
             }
           }
 
@@ -69,15 +69,16 @@ const ProductPage = () => {
             image: product.image,
             category: product.category,
             quantity: product.quantity || 0, 
-            price: currentPrice,
             isAvailable: product.isAvailable,
             lines: product.lines,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
             status: status,
-            priceRanges: product.priceRanges, 
+            price: currentPrice || 0, 
+            priceRanges: product.priceRanges || [],
           };
         });
+console.log(formattedData);
 
         // Cập nhật lại state với dữ liệu đã xử lý
         setData(formattedData);

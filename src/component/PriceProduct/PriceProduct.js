@@ -1,180 +1,210 @@
 import React, { useEffect, useState } from 'react';
-import { Table, InputNumber, Button, message, DatePicker, Collapse } from 'antd';
-import { getAllProducts, updatePriceRange, togglePriceRangeActive } from '../../untills/api';
-
-const { Panel } = Collapse;
-
-const PriceSetupPage = () => {
-  const [data, setData] = useState([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [newPrice, setNewPrice] = useState(null);
-  const [newStartDate, setNewStartDate] = useState(null);
-  const [newEndDate, setNewEndDate] = useState(null);
-
+import { Table, Input, Button, DatePicker, message, Spin } from 'antd';
+import { getAllProducts, createPriceList, getAllPriceLists } from '../../untills/api';
+const PriceListManager = () => {
+  const [products, setProducts] = useState([]);
+  const [priceLists, setPriceLists] = useState([]);
+  const [newPriceList, setNewPriceList] = useState({
+    code: '',
+    name: '',
+    description: '',
+    startDate: null,
+    endDate: null,
+    isActive: true,
+  });
+  const [loading, setLoading] = useState(false);
+  
   useEffect(() => {
-    const fetchProducts = async () => {
+    async function fetchAllProducts() {
       try {
         const products = await getAllProducts();
-        const formattedData = products.map((product) => {
-          const currentDate = new Date();
-
-          // Kiểm tra khoảng giá đang hoạt động
-          const currentPriceRange = product.priceRanges.find(range =>
-            new Date(range.startDate) <= currentDate && new Date(range.endDate) >= currentDate
-          );
-          const currentSellingPrice = currentPriceRange ? currentPriceRange.price : 0;
-
-          return {
-            key: product._id,
-            code: product.code,
-            nameProduct: product.name,
-            lastImportPrice: product.lastImportPrice || 0,
-            currentSellingPrice: currentSellingPrice || 0,
-            priceRanges: product.priceRanges || [],
-          };
-        });
-
-        setData(formattedData);
-        console.log('Fetched Products:', formattedData);
+        setProducts(products);
       } catch (error) {
-        message.error('Lỗi khi tải danh sách sản phẩm: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
       }
-    };
+    }
 
-    fetchProducts();
+    async function fetchAllPriceLists() {
+      try {
+        const priceListsData = await getAllPriceLists();
+        setPriceLists(priceListsData.priceLists || []); 
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách bảng giá:', error);
+      }
+    }
+
+    fetchAllProducts();
+    fetchAllPriceLists(); 
   }, []);
 
-  const handleAddPriceRange = async (key) => {
-    if (!newPrice || !newStartDate || !newEndDate) {
-      message.error('Vui lòng nhập đầy đủ thông tin giá và ngày bắt đầu/kết thúc');
-      return;
-    }
-
-    // Kiểm tra tính hợp lệ của ngày
-    const startDate = new Date(newStartDate);
-    const endDate = new Date(newEndDate);
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      message.error('Ngày không hợp lệ');
-      return;
-    }
-
-    if (startDate > endDate) {
-      message.error('Ngày bắt đầu phải nhỏ hơn ngày kết thúc');
-      return;
-    }
-
-    const priceRange = {
-      price: newPrice,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-    };
-
+   const handleAddPriceList = async () => {
     try {
-      const response = await updatePriceRange(key, priceRange);
-      const updatedProduct = response.data;
-
-      // Cập nhật dữ liệu sản phẩm
-      setData(prevData =>
-        prevData.map(product =>
-          product.key === key ? updatedProduct : product
-        )
-      );
-
-      // Mở phần chi tiết khoảng giá sau khi thêm
-      if (!expandedRowKeys.includes(key)) {
-        setExpandedRowKeys(prev => [...prev, key]);
+      const formattedPriceList = {
+        ...newPriceList,
+        startDate: newPriceList.startDate ? newPriceList.startDate.toISOString() : null,
+        endDate: newPriceList.endDate ? newPriceList.endDate.toISOString() : null,
+      };
+      const response = await createPriceList(formattedPriceList);
+      if (response.success) {
+        setPriceLists((prevLists) => [...prevLists, response.priceList]);
+        setNewPriceList({
+          code: '',
+          name: '',
+          description: '',
+          startDate: null,
+          endDate: null,
+          isActive: true,
+        });
+        message.success('Price list created successfully!');
+      } else {
+        message.error('Failed to create price list.');
       }
-
-      setNewPrice(null);
-      setNewStartDate(null);
-      setNewEndDate(null);
-      message.success('Thêm khoảng giá thành công!');
     } catch (error) {
-      message.error('Lỗi khi thêm khoảng giá: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+      message.error('Failed to create price list.');
     }
   };
 
-  const handleToggleActive = async (productId, priceRangeId, isActive) => {
-    try {
-      await togglePriceRangeActive(productId, priceRangeId, isActive);
-      message.success(`Cập nhật trạng thái khoảng giá thành công!`);
-    } catch (error) {
-      message.error('Lỗi khi cập nhật trạng thái khoảng giá: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
-    }
+
+  const handlePriceChange = (productId, value) => {
+    // Hàm xử lý thay đổi giá...
   };
 
-  const onExpand = (expanded, record) => {
-    if (!record) return;
-    const newExpandedRowKeys = expanded
-      ? [...expandedRowKeys, record.key]
-      : expandedRowKeys.filter(key => key !== record.key);
-
-    setExpandedRowKeys(newExpandedRowKeys);
+  const expandedRowRender = (record) => {
+    return (
+      <div>
+        <h4>Danh sách sản phẩm</h4>
+        <Table
+          dataSource={products.map(product => ({
+            key: product._id,
+            code: product.code,
+            name: product.name,
+            image: product.image,
+          }))}
+          columns={[
+            {
+              title: 'Mã sản phẩm',
+              dataIndex: 'code',
+              key: 'code',
+            },
+            {
+              title: 'Tên sản phẩm',
+              dataIndex: 'name',
+              key: 'name',
+            },
+            {
+              title: 'Hình ảnh',
+              dataIndex: 'image',
+              key: 'image',
+              render: (image) => <img src={image} alt="product" style={{ width: 50 }} />,
+            },
+            {
+              title: 'Gía',
+              key: 'newPrice',
+              render: (text, product) => (
+                <Input
+                  type="number"
+                  placeholder="Nhập giá"
+                  onChange={(e) => handlePriceChange(product.key, e.target.value)}
+                />
+              ),
+            },
+          ]}
+          pagination={false}
+        />
+      </div>
+    );
   };
 
-return (
+  return (
     <>
-      <h2>Thiết lập giá sản phẩm</h2>
-      <Table
-        expandedRowKeys={expandedRowKeys}
-        onExpand={onExpand}
-        columns={[
-          { title: 'Mã sản phẩm', dataIndex: 'code', key: 'code' },
-          { title: 'Tên sản phẩm', dataIndex: 'nameProduct', key: 'nameProduct' },
-          {
-            title: 'Giá nhập cuối',
-            dataIndex: 'lastImportPrice',
-            key: 'lastImportPrice',
-            render: (price) => `${(price || 0).toLocaleString()} đ`,
-          },
-          {
-            title: 'Giá bán hiện tại',
-            dataIndex: 'currentSellingPrice',
-            key: 'currentSellingPrice',
-            render: (price) => `${(price || 0).toLocaleString()} đ`,
-          },
-        ]}
-        dataSource={data.map(product => ({ ...product, key: product.key }))} 
-        pagination={{ pageSize: 10 }}
-        expandable={{
-          expandedRowRender: (record) => (
-            <Collapse>
-              <Panel header="Chi tiết khoảng giá" key="1">
-                {record.priceRanges.length > 0 ? (
-                  record.priceRanges.map((range) => (
-                    <div key={range._id}> 
-                      <p>Giá: {range.price ? range.price.toLocaleString() : 'Chưa có'} đ</p>
-                      <p>Từ {new Date(range.startDate).toLocaleDateString()} đến {new Date(range.endDate).toLocaleDateString()}</p>
-                      <Button
-                        type={range.isActive ? "danger" : "primary"}
-                        onClick={() => handleToggleActive(record.key, range._id, !range.isActive)}
-                      >
-                        {range.isActive ? "Hủy kích hoạt" : "Kích hoạt"}
-                      </Button>
-                    </div>
-                  ))
-                ) : (
-                  <p>Không có khoảng giá nào.</p>
-                )}
-                <InputNumber
-                  placeholder="Nhập giá mới"
-                  value={newPrice}
-                  onChange={setNewPrice}
-                />
-                <DatePicker.RangePicker
-                  onChange={(dates) => {
-                    setNewStartDate(dates[0]);
-                    setNewEndDate(dates[1]);
-                  }}
-                />
-                <Button onClick={() => handleAddPriceRange(record.key)}>Thêm khoảng giá</Button>
-              </Panel>
-            </Collapse>
-          ),
-        }}
+      <h2>Quản lý Bảng Giá</h2>
+      {/* Phần nhập liệu thêm bảng giá */}
+      <Input
+        placeholder="Mã bảng giá"
+        value={newPriceList.code}
+        onChange={(e) => setNewPriceList({ ...newPriceList, code: e.target.value })}
       />
+      <Input
+        placeholder="Tên bảng giá"
+        value={newPriceList.name}
+        onChange={(e) => setNewPriceList({ ...newPriceList, name: e.target.value })}
+      />
+      <Input
+        placeholder="Mô tả"
+        value={newPriceList.description}
+        onChange={(e) => setNewPriceList({ ...newPriceList, description: e.target.value })}
+      />
+      <DatePicker
+        placeholder="Ngày bắt đầu"
+        onChange={(date) => setNewPriceList({ ...newPriceList, startDate: date })}
+      />
+      <DatePicker
+        placeholder="Ngày kết thúc"
+        onChange={(date) => setNewPriceList({ ...newPriceList, endDate: date })}
+      />
+      <Button onClick={handleAddPriceList}>Thêm bảng giá</Button>
+
+      {loading ? (
+        <Spin tip="Loading..." />
+      ) : (
+        <Table
+          dataSource={priceLists.map((list) => ({
+            key: list._id,
+            code: list.code,
+            name: list.name,
+            description: list.description,
+            startDate: list.startDate,
+            endDate: list.endDate,
+            isActive: list.isActive,
+          }))}
+          columns={[
+            {
+              title: 'STT',
+              render: (text, record, index) => index + 1,
+            },
+            {
+              title: 'Mã bảng giá',
+              dataIndex: 'code',
+              key: 'code',
+            },
+            {
+              title: 'Tên bảng giá',
+              dataIndex: 'name',
+              key: 'name',
+            },
+            {
+              title: 'Mô tả',
+              dataIndex: 'description',
+              key: 'description',
+            },
+            {
+              title: 'Ngày bắt đầu',
+              dataIndex: 'startDate',
+              key: 'startDate',
+              render: (date) => new Date(date).toLocaleDateString(),
+            },
+            {
+              title: 'Ngày kết thúc',
+              dataIndex: 'endDate',
+              key: 'endDate',
+              render: (date) => new Date(date).toLocaleDateString(),
+            },
+            {
+              title: 'Trạng thái',
+              dataIndex: 'isActive',
+              key: 'isActive',
+              render: (isActive) => (isActive ? 'Đang hoạt động' : 'Ngưng hoạt động'),
+            },
+          ]}
+          pagination={{ pageSize: 10 }}
+          expandable={{
+            expandedRowRender,
+            rowExpandable: (record) => true,
+          }}
+        />
+      )}
     </>
   );
 };
 
-export default PriceSetupPage;
+export default PriceListManager;

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Descriptions, Tag, Row, Col, Card, Image, message, Switch } from 'antd';
 import { getCategories, updateProductStatus } from '../../untills/api';
-import Barcode from './Barcode'; // Nhập component Barcode
+import Barcode from './Barcode'; 
 
 const ProductDetail = ({ product, onBack }) => {
     const [categories, setCategories] = useState([]);
@@ -90,7 +90,7 @@ const ProductDetail = ({ product, onBack }) => {
                                 />
                             </Descriptions.Item>
                             <Descriptions.Item label="Số lượng">{product.quantity}</Descriptions.Item>
-                            <Descriptions.Item label="Giá bán">{product.price.toLocaleString()} đ</Descriptions.Item>
+                            {/* <Descriptions.Item label="Giá bán">{product.price.toLocaleString()} đ</Descriptions.Item> */}
                         </Descriptions>
                     </Card>
 

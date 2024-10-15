@@ -143,39 +143,23 @@ export const updateProductStatus = async (id, newStatus) => {
       console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
   }
 };
-//cập nhật giá
-export const updateProductPrice = async (id, newPrice) => {
+//thêm bảng giá header
+export const createPriceList = async (data) => {
   try {
-      const response = await axios.put(`${API_URL}/products/price/${id}`, {
-        price: newPrice, 
-      });
-      console.log('Cập nhật giá thành công:', response.data);
+    const response = await axios.post(`${API_URL}/price-list`, data);
+    return response.data; 
   } catch (error) {
-      console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
-  }
-};
-// Cập nhật khoảng giá
-export const updatePriceRange = async (productId, priceRange) => {
-  try {
-      const response = await axios.put(`${API_URL}/products/priceRanges/${productId}`, priceRange);
-      console.log('Cập nhật khoảng giá thành công:', response.data);
-      return response.data; 
-  } catch (error) {
-      console.error('Lỗi khi cập nhật khoảng giá:', error.response?.data?.message || error.message);
-      throw error; 
+    throw new Error(error.response?.data.message || 'Failed to create price list');
   }
 };
 
-// Cập nhật trạng thái active của khoảng giá
-export const togglePriceRangeActive = async (productId, priceRangeId, isActive) => {
+//lấy ds bảng giá 
+export const getAllPriceLists = async () => {
   try {
-      const response = await axios.put(`${API_URL}/products/priceRanges/active${productId}`, {
-          priceRangeId: priceRangeId, // ID của khoảng giá
-          isActive: isActive, // true để kích hoạt, false để hủy kích hoạt
-      });
-      console.log('Cập nhật trạng thái khoảng giá thành công:', response.data);
+    const response = await axios.get(`${API_URL}/price-list`);
+    return response.data; 
   } catch (error) {
-      console.error('Lỗi khi cập nhật trạng thái khoảng giá:', error.response?.data?.message || error.message);
+    throw new Error(error.response?.data.message || 'Failed to fetch price lists');
   }
 };
 
