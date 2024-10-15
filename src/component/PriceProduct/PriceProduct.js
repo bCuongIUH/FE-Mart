@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Input, Button, DatePicker, message, Spin } from 'antd';
-import { getAllProducts, createPriceList, getAllPriceLists } from '../../untills/api';
+import { getAllProducts, createPriceList, getAllPriceLists, addPricesToPriceList } from '../../untills/api'; 
+import { SaveOutlined } from '@ant-design/icons';
+
 const PriceListManager = () => {
   const [products, setProducts] = useState([]);
   const [priceLists, setPriceLists] = useState([]);
@@ -13,31 +15,31 @@ const PriceListManager = () => {
     isActive: true,
   });
   const [loading, setLoading] = useState(false);
-  
-  useEffect(() => {
-    async function fetchAllProducts() {
-      try {
-        const products = await getAllProducts();
-        setProducts(products);
-      } catch (error) {
-        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
-      }
-    }
+  const [productPrices, setProductPrices] = useState({});
 
-    async function fetchAllPriceLists() {
+  useEffect(() => {
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
+        const productsData = await getAllProducts();
+        setProducts(productsData);
+
         const priceListsData = await getAllPriceLists();
         setPriceLists(priceListsData.priceLists || []); 
       } catch (error) {
-        console.error('Lỗi khi lấy danh sách bảng giá:', error);
+        console.error('Lỗi khi tải dữ liệu:', error);
+        message.error('Lỗi khi tải dữ liệu.');
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    fetchAllProducts();
-    fetchAllPriceLists(); 
+
+    fetchAllData();
   }, []);
+  console.log("đấ",priceLists);
 
-   const handleAddPriceList = async () => {
+  const handleAddPriceList = async () => {
     try {
       const formattedPriceList = {
         ...newPriceList,
@@ -55,21 +57,57 @@ const PriceListManager = () => {
           endDate: null,
           isActive: true,
         });
-        message.success('Price list created successfully!');
+        setProductPrices({}); // Reset giá sản phẩm
+        message.success('Bảng giá đã được tạo thành công!');
       } else {
-        message.error('Failed to create price list.');
+        message.error('Không thể tạo bảng giá.');
       }
     } catch (error) {
-      message.error('Failed to create price list.');
+      message.error('Không thể tạo bảng giá.');
     }
   };
 
-
   const handlePriceChange = (productId, value) => {
-    // Hàm xử lý thay đổi giá...
+    setProductPrices((prevPrices) => ({
+      ...prevPrices,
+      [productId]: value, // Cập nhật giá cho sản phẩm cụ thể
+    }));
   };
 
+  const handleSavePrices = async (priceListId) => {
+    const pricesToUpdate = Object.entries(productPrices).map(([productId, price]) => ({
+      productId,
+      price: Number(price),
+    }));
+  
+    console.log('Danh sách giá sẽ cập nhật:', pricesToUpdate);
+    console.log('Giá trị priceListId:', priceListId); // Kiểm tra giá trị priceListId
+  
+    const payload = {
+      priceListId, 
+      products: pricesToUpdate, 
+    };
+  
+    console.log('Payload gửi đi:', payload);
+  
+    try {
+      const response = await addPricesToPriceList(priceListId, pricesToUpdate); // Gọi hàm với giá trị cần thiết
+      if (response.success) {
+        message.success('Giá đã được cập nhật thành công!');
+        setProductPrices({}); // Reset giá sản phẩm sau khi cập nhật thành công
+      } else {
+        message.error('Không thể cập nhật giá.');
+      }
+    } catch (error) {
+      console.error('Lỗi khi cập nhật giá:', error);
+      message.error('Không thể cập nhật giá.');
+    }
+  };
+  
+
   const expandedRowRender = (record) => {
+    console.log('Record ID:', record.key); 
+   
     return (
       <div>
         <h4>Danh sách sản phẩm</h4>
@@ -79,6 +117,8 @@ const PriceListManager = () => {
             code: product.code,
             name: product.name,
             image: product.image,
+            currentPrice: product.currentPrice,
+            newPrice: productPrices[product._id] || '', 
           }))}
           columns={[
             {
@@ -98,19 +138,36 @@ const PriceListManager = () => {
               render: (image) => <img src={image} alt="product" style={{ width: 50 }} />,
             },
             {
-              title: 'Gía',
+              title: 'Giá hiện tại',
+              dataIndex: 'currentPrice',
+              key: 'currentPrice',
+              render: (text) => (
+                <span>{text ? text.toLocaleString() : 'Chưa cập nhật'} VNĐ</span>
+              ),
+            },
+            {
+              title: 'Giá mới',
               key: 'newPrice',
               render: (text, product) => (
                 <Input
                   type="number"
                   placeholder="Nhập giá"
-                  onChange={(e) => handlePriceChange(product.key, e.target.value)}
+                  value={productPrices[product.key] || ''}
+                  onChange={(e) => handlePriceChange(product.key, e.target.value)} 
                 />
               ),
             },
           ]}
           pagination={false}
         />
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          onClick={() => handleSavePrices(record.key)} 
+          style={{ marginTop: 16 }}
+        >
+          Cập nhật Giá
+        </Button>
       </div>
     );
   };
@@ -142,7 +199,9 @@ const PriceListManager = () => {
         placeholder="Ngày kết thúc"
         onChange={(date) => setNewPriceList({ ...newPriceList, endDate: date })}
       />
-      <Button onClick={handleAddPriceList}>Thêm bảng giá</Button>
+      <Button type="primary" onClick={handleAddPriceList} style={{ marginTop: 16 }}>
+        Thêm bảng giá
+      </Button>
 
       {loading ? (
         <Spin tip="Loading..." />
@@ -181,25 +240,24 @@ const PriceListManager = () => {
               title: 'Ngày bắt đầu',
               dataIndex: 'startDate',
               key: 'startDate',
-              render: (date) => new Date(date).toLocaleDateString(),
+              render: (text) => new Date(text).toLocaleDateString(),
             },
             {
               title: 'Ngày kết thúc',
               dataIndex: 'endDate',
               key: 'endDate',
-              render: (date) => new Date(date).toLocaleDateString(),
+              render: (text) => new Date(text).toLocaleDateString(),
             },
             {
               title: 'Trạng thái',
               dataIndex: 'isActive',
               key: 'isActive',
-              render: (isActive) => (isActive ? 'Đang hoạt động' : 'Ngưng hoạt động'),
+              render: (text) => (text ? 'Kích hoạt' : 'Ngừng hoạt động'),
             },
           ]}
-          pagination={{ pageSize: 10 }}
           expandable={{
             expandedRowRender,
-            rowExpandable: (record) => true,
+            rowExpandable: (record) => record.isActive,
           }}
         />
       )}

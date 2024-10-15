@@ -149,7 +149,7 @@ export const createPriceList = async (data) => {
     const response = await axios.post(`${API_URL}/price-list`, data);
     return response.data; 
   } catch (error) {
-    throw new Error(error.response?.data.message || 'Failed to create price list');
+    throw new Error(error.response?.data.message || 'Lỗi khi thêm bảng giá');
   }
 };
 
@@ -159,9 +159,22 @@ export const getAllPriceLists = async () => {
     const response = await axios.get(`${API_URL}/price-list`);
     return response.data; 
   } catch (error) {
-    throw new Error(error.response?.data.message || 'Failed to fetch price lists');
+    throw new Error(error.response?.data.message || 'Lỗi lấy bảng giá');
   }
 };
+// Thêm giá sản phẩm vào bảng giá
+export const addPricesToPriceList = async (priceListId, products) => {
+  try {
+    const response = await axios.post(`${API_URL}/price-list/addprice`, {
+      priceListId,
+      products,
+    });
+    return response.data; 
+  } catch (error) {
+    throw new Error(error.response?.data.message || 'Lỗi cập nhập bảng giá');
+  }
+};
+
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu
