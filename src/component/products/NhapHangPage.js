@@ -10,14 +10,14 @@ const NhapHangPage = () => {
   const [searchTerm, setSearchTerm] = useState(''); 
   const [isAddingProduct, setIsAddingProduct] = useState(false); 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
-  const [selectedProducts, setSelectedProducts] = useState([]); // Lưu các sản phẩm đã chọn
+  const [selectedProducts, setSelectedProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const products = await getAllProducts();
         const formattedData = products.map((product) => {
-          let status = { text: 'Hết hàng', color: 'red' }; // Mặc định trạng thái là 'Hết hàng'
+          let status = { text: 'Hết hàng', color: 'red' }; 
           if (product.quantity > 20) {
             status = { text: 'Còn hàng', color: 'green' };
           } else if (product.quantity > 0) {
@@ -40,17 +40,17 @@ const NhapHangPage = () => {
     fetchProducts();
   }, []);
 
-  // Hàm xử lý khi nhấn nút "Nhập hàng" từ menu
+ 
   const handleMenuClick = ({ key }) => {
-    if (key === "1") { // Kiểm tra nếu là Nhập hàng
+    if (key === "1") { 
       const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
-      setSelectedProducts(selectedItems); // Lưu các sản phẩm đã chọn
-      setIsAddingProduct(true); // Chuyển sang component Nhập hàng
+      setSelectedProducts(selectedItems);
+      setIsAddingProduct(true); 
     }
   };
 
   const handleCancel = () => {
-    setIsAddingProduct(false); // Quay lại bảng sản phẩm
+    setIsAddingProduct(false); 
   };
 
   // Hàm xử lý chọn checkbox
@@ -84,7 +84,7 @@ const NhapHangPage = () => {
       )}
 
       {isAddingProduct ? (
-        <AddProduct selectedProducts={selectedProducts} onCancel={handleCancel} /> 
+        <NhapHangInput selectedProducts={selectedProducts} onCancel={handleCancel} /> 
       ) : (
         <>
           {selectedRowKeys.length > 0 && (

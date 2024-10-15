@@ -10,11 +10,14 @@ const ProductPage = () => {
   const [searchTerm, setSearchTerm] = useState(''); 
   const [isAddingProduct, setIsAddingProduct] = useState(false); 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [selectedProducts, setSelectedProducts] = useState([]); // Đây sẽ lưu các sản phẩm đã chọn
   const [isAddingNewProduct, setIsAddingNewProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null); 
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
 
+  // Lấy danh mục
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -31,12 +34,35 @@ const ProductPage = () => {
 
     fetchCategories();
   }, []);
+  
+  // Lấy danh sách sản phẩm
+  useEffect(() => {
+    const fetchAllData = async () => {
+      setLoading(true);
+      try {
+        const productsData = await getAllProducts();
+        setProducts(productsData);
+        
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu:', error);
+        message.error('Lỗi khi tải dữ liệu.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchAllData();
+  }, []);
 
+
+  // Lấy sản phẩm và định dạng dữ liệu
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const products = await getAllProducts(); 
-        const formattedData = products.map((product) => {
+        const productsData = await getAllProducts(); 
+        console.log('Fetched Products:', productsData);
+
+        const formattedData = productsData.map((product) => {
           let status = { text: 'Hết hàng', color: 'red' };
           if (product.quantity > 20) {
             status = { text: 'Còn hàng', color: 'green' };
@@ -45,40 +71,29 @@ const ProductPage = () => {
           }
 
           const today = new Date();
-          let currentPrice = product.price; // Default price if no price range applies
+          let currentPrice = product.currentPrice;
 
-          // Xác định giá hiện tại từ priceRanges
           if (product.priceRanges && product.priceRanges.length > 0) {
             const validRange = product.priceRanges.find(range => {
               const startDate = new Date(range.startDate);
               const endDate = new Date(range.endDate);
-              return today >= startDate && today <= endDate && range.isActive; // Kiểm tra trạng thái hoạt động
+              return today >= startDate && today <= endDate && range.isActive; 
             });
+            console.log(`Valid Range for ${product.name}: `, validRange);
 
-            if (validRange) {
-              currentPrice = validRange.price; // Cập nhật giá sản phẩm nếu có khoảng giá hợp lệ
-            }
+           if (validRange) {
+            currentPrice = validRange.currentPrice;
           }
-
+        }
+         
           return {
-            key: product._id,
-            code: product.code,
-            barcode: product.barcode,
-            nameProduct: product.name,
-            description: product.description,
-            image: product.image,
-            category: product.category,
-            quantity: product.quantity || 0, 
-            isAvailable: product.isAvailable,
-            lines: product.lines,
-            createdAt: product.createdAt,
-            updatedAt: product.updatedAt,
-            status: status,
-            price: currentPrice || 0, 
-            priceRanges: product.priceRanges || [],
+            ...product, 
+            currentPrice: currentPrice, 
+            status: status 
           };
         });
-console.log(formattedData);
+        console.log(productsData);
+
 
         // Cập nhật lại state với dữ liệu đã xử lý
         setData(formattedData);
@@ -90,14 +105,23 @@ console.log(formattedData);
     fetchProducts();
   }, []);
 
+  // Hàm để cập nhật giá sản phẩm
+  const updateProductPrice = (productId, newPrice) => {
+    setData(prevData =>
+      prevData.map(product => 
+        product._id === productId ? { ...product, price: newPrice } : product
+      )
+    );
+  };
+
   const handleMenuClick = ({ key }) => {
     if (key === "1") { 
       setSelectedRowKeys([]); 
-      setSelectedProducts([]);
+      setSelectedProducts([]); // Reset lại các sản phẩm đã chọn
     } else if (key === "2") { 
-      const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
-      setSelectedProducts(selectedItems);
-      setIsAddingProduct(true);
+      const selectedItems = data.filter(item => selectedRowKeys.includes(item._id));
+      setSelectedProducts(selectedItems); // Cập nhật danh sách các sản phẩm đã chọn
+      setIsAddingProduct(true); // Chuyển sang màn hình nhập hàng
     }
   };
   
@@ -128,12 +152,22 @@ console.log(formattedData);
     setSelectedProduct(null); 
   };
 
+  // Hàm để xử lý khi nhập hàng thành công
+  const handlePriceUpdate = (productId, newPrice) => {
+    updateProductPrice(productId, newPrice);
+    message.success('Cập nhật giá thành công!');
+  };
+
   return (
     <>
       {isAddingNewProduct ? ( 
         <AddProduct onCancel={() => setIsAddingNewProduct(false)} /> 
       ) : isAddingProduct ? (
-        <NhapHangInput selectedProducts={selectedProducts} onCancel={handleCancel} />
+        <NhapHangInput 
+          selectedProducts={selectedProducts} 
+          onCancel={handleCancel} 
+          onPriceUpdate={handlePriceUpdate} 
+        />
       ) : selectedProduct ? (
         <ProductDetail product={selectedProduct} onBack={handleBackToList} />
       ) : (
@@ -158,17 +192,19 @@ console.log(formattedData);
               </Dropdown>
             </div>
           )}
-          <Table 
+         <Table 
             rowSelection={{
-              selectedRowKeys,
+              selectedRowKeys, 
               onChange: onSelectChange,
+            
+              type: 'checkbox', 
             }}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
             })}
-            columns={[
+            columns={[ 
               { title: 'Mã', dataIndex: 'code', key: 'code' },
-              { title: 'Tên sản phẩm', dataIndex: 'nameProduct', key: 'nameProduct' },
+              { title: 'Tên sản phẩm', dataIndex: 'name', key: 'name' },
               { 
                 title: 'Loại sản phẩm', 
                 dataIndex: 'category', 
@@ -185,9 +221,9 @@ console.log(formattedData);
                 key: 'status',
                 render: (status) => <Tag color={status.color}>{status.text}</Tag> 
               },
-              { title: 'Giá', dataIndex: 'price', key: 'price' }, 
+              { title: 'Giá', dataIndex: 'currentPrice', key: 'currentPrice' }, 
             ]}
-            dataSource={data.filter(item => item.nameProduct.toLowerCase().includes(searchTerm.toLowerCase()))}
+            dataSource={data.filter(item => item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))}
           />
         </>
       )}

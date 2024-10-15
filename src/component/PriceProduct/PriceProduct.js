@@ -3,7 +3,7 @@ import { Table, Input, Button, DatePicker, message, Spin } from 'antd';
 import { getAllProducts, createPriceList, getAllPriceLists, addPricesToPriceList } from '../../untills/api'; 
 import { SaveOutlined } from '@ant-design/icons';
 
-const PriceListManager = () => {
+const PriceProduct = () => {
   const [products, setProducts] = useState([]);
   const [priceLists, setPriceLists] = useState([]);
   const [newPriceList, setNewPriceList] = useState({
@@ -16,6 +16,7 @@ const PriceListManager = () => {
   });
   const [loading, setLoading] = useState(false);
   const [productPrices, setProductPrices] = useState({});
+  const [showPriceListForm, setShowPriceListForm] = useState(false); 
 
   useEffect(() => {
     const fetchAllData = async () => {
@@ -34,10 +35,8 @@ const PriceListManager = () => {
       }
     };
 
-
     fetchAllData();
   }, []);
-  console.log("đấ",priceLists);
 
   const handleAddPriceList = async () => {
     try {
@@ -58,6 +57,7 @@ const PriceListManager = () => {
           isActive: true,
         });
         setProductPrices({}); 
+        setShowPriceListForm(false); 
         message.success('Bảng giá đã được tạo thành công!');
       } else {
         message.error('Không thể tạo bảng giá.');
@@ -79,17 +79,12 @@ const PriceListManager = () => {
       productId,
       price: Number(price),
     }));
-  
-    console.log('Danh sách giá sẽ cập nhật:', pricesToUpdate);
-    console.log('Giá trị priceListId:', priceListId); 
-  
+
     const payload = {
       priceListId, 
       products: pricesToUpdate, 
     };
-  
-    console.log('Payload gửi đi:', payload);
-  
+
     try {
       const response = await addPricesToPriceList(priceListId, pricesToUpdate); 
       if (response.success) {
@@ -103,10 +98,8 @@ const PriceListManager = () => {
       message.error('Không thể cập nhật giá.');
     }
   };
-  
 
   const expandedRowRender = (record) => {  
-    
     const productPricesForList = record.products.reduce((acc, product) => {  
       acc[product.productId] = product.price;  
       return acc;  
@@ -121,7 +114,6 @@ const PriceListManager = () => {
             code: product.code,  
             name: product.name,  
             image: product.image,  
-            
             currentPrice: productPricesForList[product._id] || product.currentPrice,  
             newPrice: productPricesForList[product._id] || '', 
           }))}  
@@ -180,33 +172,51 @@ const PriceListManager = () => {
   return (  
     <>  
       <h2>Quản lý Bảng Giá</h2>  
-      {/* Phần nhập liệu thêm bảng giá */}  
-      <Input  
-        placeholder="Mã bảng giá"  
-        value={newPriceList.code}  
-        onChange={(e) => setNewPriceList({ ...newPriceList, code: e.target.value })}  
-      />  
-      <Input  
-        placeholder="Tên bảng giá"  
-        value={newPriceList.name}  
-        onChange={(e) => setNewPriceList({ ...newPriceList, name: e.target.value })}  
-      />  
-      <Input  
-        placeholder="Mô tả"  
-        value={newPriceList.description}  
-        onChange={(e) => setNewPriceList({ ...newPriceList, description: e.target.value })}  
-      />  
-      <DatePicker  
-        placeholder="Ngày bắt đầu"  
-        onChange={(date) => setNewPriceList({ ...newPriceList, startDate: date })}  
-      />  
-      <DatePicker  
-        placeholder="Ngày kết thúc"  
-        onChange={(date) => setNewPriceList({ ...newPriceList, endDate: date })}  
-      />  
-      <Button type="primary" onClick={handleAddPriceList} style={{ marginTop: 16 }}>  
-        Thêm bảng giá  
-      </Button>  
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+        <Button type="primary" onClick={() => setShowPriceListForm(true)}>  
+          Thêm bảng giá  
+        </Button>  
+      </div>
+
+      {showPriceListForm && (  
+        <div style={{ marginBottom: 16 }}> 
+          <Input  
+            placeholder="Mã bảng giá"  
+            value={newPriceList.code}  
+            onChange={(e) => setNewPriceList({ ...newPriceList, code: e.target.value })}  
+          />  
+          <Input  
+            placeholder="Tên bảng giá"  
+            value={newPriceList.name}  
+            onChange={(e) => setNewPriceList({ ...newPriceList, name: e.target.value })}  
+          />  
+          <Input  
+            placeholder="Mô tả"  
+            value={newPriceList.description}  
+            onChange={(e) => setNewPriceList({ ...newPriceList, description: e.target.value })}  
+          />  
+          <DatePicker  
+            placeholder="Ngày bắt đầu"  
+            showTime={{ format: 'HH:mm' }}  
+            format="YYYY-MM-DD HH:mm" 
+            onChange={(date) => setNewPriceList({ ...newPriceList, startDate: date })}  
+          />  
+
+          <DatePicker  
+            placeholder="Ngày kết thúc"  
+            showTime={{ format: 'HH:mm' }}  
+            format="YYYY-MM-DD HH:mm"  
+            onChange={(date) => setNewPriceList({ ...newPriceList, endDate: date })}  
+          />  
+
+          <Button type="primary" onClick={handleAddPriceList} style={{ marginTop: 16 }}>  
+            Lưu bảng giá  
+          </Button>  
+          <Button style={{ marginLeft: 8 }} onClick={() => setShowPriceListForm(false)}>
+            Đóng
+          </Button>
+        </div>
+      )}
 
       {loading ? (  
         <Spin tip="Loading..." />  
@@ -220,7 +230,7 @@ const PriceListManager = () => {
             startDate: list.startDate,  
             endDate: list.endDate,  
             isActive: list.isActive,  
-            products: list.products, // Include products for price retrieval  
+            products: list.products, 
           }))}  
           columns={[  
             {  
@@ -246,29 +256,28 @@ const PriceListManager = () => {
               title: 'Ngày bắt đầu',  
               dataIndex: 'startDate',  
               key: 'startDate',  
-              render: (text) => new Date(text).toLocaleDateString(),  
+              render: (date) => new Date(date).toLocaleDateString(),  
             },  
             {  
               title: 'Ngày kết thúc',  
               dataIndex: 'endDate',  
               key: 'endDate',  
-              render: (text) => new Date(text).toLocaleDateString(),  
+              render: (date) => new Date(date).toLocaleDateString(),  
             },  
             {  
               title: 'Trạng thái',  
               dataIndex: 'isActive',  
               key: 'isActive',  
-              render: (text) => (text ? 'Kích hoạt' : 'Ngừng hoạt động'),  
+              render: (text) => (text ? 'Hoạt động' : 'Ngừng hoạt động'),  
             },  
           ]}  
           expandable={{  
             expandedRowRender,  
-            rowExpandable: (record) => record.isActive,  
           }}  
         />  
       )}  
     </>  
   );  
-};  
+};
 
-export default PriceListManager;  
+export default PriceProduct;

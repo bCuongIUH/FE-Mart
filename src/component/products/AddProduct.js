@@ -36,8 +36,8 @@ const AddProduct = ({ onCancel }) => {
       formData.append('barcode', values.barcode);
       formData.append('categoryId', values.categoryId);
       formData.append('description', values.description);
-      formData.append('quantity', values.quantity); // Thêm số lượng
-      formData.append('price', values.price); // Thêm giá
+      formData.append('quantity', values.quantity); 
+      formData.append('price', values.price); 
 
       if (fileList.length > 0) {
         formData.append('image', fileList[0].originFileObj);

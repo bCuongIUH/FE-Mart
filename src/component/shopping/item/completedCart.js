@@ -43,14 +43,7 @@ const CompletedCart = () => {
 
   const loadMore =
     !initLoading && !loading ? (
-      <div
-        style={{
-          textAlign: 'center',
-          marginTop: 12,
-          height: 32,
-          lineHeight: '32px',
-        }}
-      >
+      <div style={{ textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px' }}>
         <Button onClick={onLoadMore}>Tải thêm</Button>
       </div>
     ) : null;
@@ -64,15 +57,9 @@ const CompletedCart = () => {
         loadMore={loadMore}
         dataSource={list}
         renderItem={(item) => (
-          <List.Item
-            actions={[
-              <a key="list-loadmore-edit">edit</a>,
-              <a key="list-loadmore-more">more</a>
-            ]}
-          >
+          <List.Item actions={[<a key="list-loadmore-more">.</a>]}>
             <Skeleton avatar title={false} loading={initLoading} active>
               <List.Item.Meta
-                // avatar={<Avatar src="https://via.placeholder.com/40" />}
                 title={<a onClick={() => showModal(item)}>Hóa đơn #{item._id}</a>} 
               />
               <Row gutter={20} style={{ width: '100%', alignItems: 'center' }}>
@@ -97,29 +84,37 @@ const CompletedCart = () => {
           title={`Chi tiết hóa đơn #${selectedBill._id}`}
           visible={isModalVisible}
           onCancel={handleCancel}
-          footer={[
-            <Button key="back" onClick={handleCancel}>
-              Đóng
-            </Button>
-          ]}
+          footer={[<Button key="back" onClick={handleCancel}>Đóng</Button>]}
         >
-          <p><strong>Tổng tiền:</strong> {selectedBill.totalAmount} VND</p>
+          <h4>Thông tin hóa đơn:</h4>
           <p><strong>Ngày mua:</strong> {new Date(selectedBill.createdAt).toLocaleDateString()}</p>
           <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p>
-          {/* <p><strong>Trạng thái:</strong> {selectedBill.status}</p> */}
 
-          {/* Lặp qua các sản phẩm trong hóa đơn */}
-          <h4>Sản phẩm:</h4>
-          {selectedBill.items.map((item, index) => (
-            <div key={index}>
-              <p><strong>Tên sản phẩm:</strong> {item.product.name}</p>
-              {/* <p><strong></strong>{item.product.image}</p> */}
-              <p><strong>Số lượng:</strong> {item.quantity}</p>
-              <p><strong>Giá mỗi sản phẩm:</strong> {item.price} VND</p>
-              <p><strong>Tổng:</strong> {selectedBill.totalAmount} VND</p>
-              <hr />
-            </div>
-          ))}
+          {/* Bảng hiển thị sản phẩm */}
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Tên sản phẩm</th>
+                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Số lượng</th>
+                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Giá</th>
+                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedBill.items.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.product.name}</td>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.quantity}</td>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.currentPrice} VND</td>
+                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.totalPrice} VND</td>
+                </tr>
+              ))}
+              <tr>
+                <td colSpan={3} style={{ textAlign: 'right', fontWeight: 'bold' }}>Tổng cộng:</td>
+                <td style={{  padding: '8px',fontWeight:'bold' }}>{selectedBill.totalAmount} VND</td>
+              </tr>
+            </tbody>
+          </table>
         </Modal>
       )}
     </>

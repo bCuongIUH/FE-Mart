@@ -30,7 +30,7 @@ const ProductDetail = ({ product, onBack }) => {
             return;
         }
 
-        if (checked && (!product.price || product.price <= 0)) {
+        if (checked && (!product.currentPrice || product.currentPrice <= 0)) {
             message.warning('Không thể cập nhật trạng thái thành Đang bán vì giá sản phẩm không hợp lệ!');
             return;
         }
@@ -90,7 +90,7 @@ const ProductDetail = ({ product, onBack }) => {
                                 />
                             </Descriptions.Item>
                             <Descriptions.Item label="Số lượng">{product.quantity}</Descriptions.Item>
-                            {/* <Descriptions.Item label="Giá bán">{product.price.toLocaleString()} đ</Descriptions.Item> */}
+                            <Descriptions.Item label="Giá bán">{product.currentPrice.toLocaleString()} đ</Descriptions.Item>
                         </Descriptions>
                     </Card>
 

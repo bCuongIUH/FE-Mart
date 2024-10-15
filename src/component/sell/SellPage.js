@@ -53,9 +53,9 @@ function SellPage ()  {
         return;
       }
   
-      const linePrice = selectedProduct.price || 0;
+      const linePrice = selectedProduct.currentPrice || 0;
       const totalItemPrice = linePrice * quantity;
-      const updatedCart = [...cart, { ...selectedProduct, price: linePrice, quantity }];
+      const updatedCart = [...cart, { ...selectedProduct, currentPrice: linePrice, quantity }];
       setCart(updatedCart);
       setTotalPrice(totalPrice + totalItemPrice);
       closeModal(); 
@@ -63,7 +63,7 @@ function SellPage ()  {
   };
   
   const removeFromCart = (index) => {
-    const removedProductPrice = cart[index].unitPrice * cart[index].quantity;
+    const removedProductPrice = cart[index].currentPrice * cart[index].quantity;
     const updatedCart = cart.filter((_, i) => i !== index);
     setCart(updatedCart);
     setTotalPrice(totalPrice - removedProductPrice);
@@ -79,8 +79,8 @@ function SellPage ()  {
       const items = cart.map(item => ({
         product: item._id,
         quantity: item.quantity,
-        price: item.price,
-        totalPrice: item.price * item.quantity,
+        currentPrice: item.currentPrice,
+        totalPrice: item.currentPrice * item.quantity,
       }));
 
       //tạo
@@ -118,7 +118,7 @@ function SellPage ()  {
             {products.map((product) => (
               <div key={product._id} className={styles["sell-product-item"]}>
                 <h3>{product.name}</h3>
-                <p>Giá: {product.price|| 0} VND</p>
+                <p>Giá: {product.currentPrice|| 0} VND</p>
                 <p>Số lượng tồn: {product.quantity || 0}</p>
                 <button onClick={() => openModal(product)}>Thêm vào giỏ</button>
               </div>
@@ -134,7 +134,7 @@ function SellPage ()  {
               cart.map((item, index) => (
                 <div key={index} className={styles["sell-cart-item"]}>
                   <h4>{item.name}</h4>
-                  <p>Giá: {item.price} VND</p>
+                  <p>Giá: {item.currentPrice} VND</p>
                   <p>Số lượng: {item.quantity}</p>
                   <button className={styles["remove-item"]} onClick={() => removeFromCart(index)}>-</button>
                 </div>
