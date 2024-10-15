@@ -46,6 +46,8 @@ const NhapHangPage = () => {
       const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
       setSelectedProducts(selectedItems);
       setIsAddingProduct(true); 
+      
+      
     }
   };
 

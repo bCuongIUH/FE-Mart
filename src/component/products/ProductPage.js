@@ -10,7 +10,7 @@ const ProductPage = () => {
   const [searchTerm, setSearchTerm] = useState(''); 
   const [isAddingProduct, setIsAddingProduct] = useState(false); 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
-  const [selectedProducts, setSelectedProducts] = useState([]); // Đây sẽ lưu các sản phẩm đã chọn
+  const [selectedProducts, setSelectedProducts] = useState([]); 
   const [isAddingNewProduct, setIsAddingNewProduct] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null); 
   const [categories, setCategories] = useState([]);
@@ -87,6 +87,7 @@ const ProductPage = () => {
         }
          
           return {
+            key: product._id, // thêm để chọn sp 
             ...product, 
             currentPrice: currentPrice, 
             status: status 
@@ -117,11 +118,11 @@ const ProductPage = () => {
   const handleMenuClick = ({ key }) => {
     if (key === "1") { 
       setSelectedRowKeys([]); 
-      setSelectedProducts([]); // Reset lại các sản phẩm đã chọn
+      setSelectedProducts([]); 
     } else if (key === "2") { 
-      const selectedItems = data.filter(item => selectedRowKeys.includes(item._id));
-      setSelectedProducts(selectedItems); // Cập nhật danh sách các sản phẩm đã chọn
-      setIsAddingProduct(true); // Chuyển sang màn hình nhập hàng
+      const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
+      setSelectedProducts(selectedItems);
+      setIsAddingProduct(true); 
     }
   };
   
@@ -132,6 +133,7 @@ const ProductPage = () => {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+  
 
   const menu = (
     <Menu onClick={handleMenuClick}>
@@ -197,7 +199,7 @@ const ProductPage = () => {
               selectedRowKeys, 
               onChange: onSelectChange,
             
-              type: 'checkbox', 
+              // type: 'checkbox', 
             }}
             onRow={(record) => ({
               onClick: () => handleRowClick(record),
