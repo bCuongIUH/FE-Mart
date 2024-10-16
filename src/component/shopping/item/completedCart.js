@@ -23,6 +23,7 @@ const CompletedCart = () => {
         console.error(error);
       }
     };
+console.log("1233",billData);
 
     fetchBillOffline();
   }, []);

@@ -12,16 +12,14 @@ import styles from './UIManager.module.css';
 
 import { AuthContext } from '../untills/context/AuthContext';
 import SellPage from '../component/sell/SellPage';
-import WarehouseImport from '../component/warehouseManager/item/WarehouseImport';
 import SuppliersInfo from '../component/suppliers/item/suppliersInfo';
 import SuppliersImport from '../component/suppliers/item/suppliersImport';
-import ExportProduct from '../component/warehouseManager/item/UpdateWarehouseOutputProduct';
+// import ExportProduct from '../component/warehouseManager/item/UpdateWarehouseOutputProduct';
 import StatisticsChart from '../component/Statistical/Statistical';
 import CompletedCart from '../component/shopping/item/completedCart';
 import ManageEmployees from '../component/employees/ManageEmployees';
 import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
 import OrderTracking from '../component/OrderTracking/OrderTracking';
-import AddProduct from '../component/products/AddProduct';
 import ProductPage from '../component/products/ProductPage';
 import NhapHangPage from '../component/products/NhapHangPage';
 import PromotionManager from '../component/PromotionManager/PromotionManager';
@@ -100,9 +98,9 @@ const WarehouseManager = () => {
             <Menu.Item key="6" onClick={() => handleNavigate('/AddEmployee')}>Thêm nhân viên</Menu.Item>
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
-            <Menu.Item key="7" onClick={() => handleNavigate(<AllProductsWarehouse/>)}>Kho tổng</Menu.Item>
+            <Menu.Item key="7" onClick={() => handleNavigate()}>Kho tổng</Menu.Item>
             <Menu.Item key="8" onClick={() => handleNavigate(<NhapHangPage/>)}>Quản lí nhập kho</Menu.Item>
-            <Menu.Item key="9" onClick={() => handleNavigate(<ExportProduct/>)}>Quản lí xuất kho</Menu.Item>
+            <Menu.Item key="9" onClick={() => handleNavigate()}>Quản lí xuất kho</Menu.Item>
             <Menu.Item key="10" onClick={() => handleNavigate('/')}>Kiểm kê kho</Menu.Item>
             <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
           </SubMenu>

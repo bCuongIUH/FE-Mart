@@ -275,7 +275,16 @@ export const getAllSuppliers = async () => {
     throw error;
   }
 };
-//thêm sp vào kho
+//tạo header kho
+export const createPhieuKho = async (warehouseData) => {
+  try {
+    const response = await axios.post(`${API_URL}/warehouses/add`, warehouseData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm vào kho:', error.response?.data || error.message);
+    throw error;
+  }
+};
 export const addProductToWarehouse = async (warehouseData) => {
   try {
     const response = await axios.post(`${API_URL}/warehouses/add`, warehouseData, config);
@@ -294,29 +303,17 @@ export const getAllWarehouse = async () => {
     throw error;
   }
 };
-
-// update sp -> lấy từ kho ra product
-export const updateWarehouseEntry = async (id, warehouseData) => {
+// Nhập hàng vào phiếu nhập hàng
+export const nhapHang = async (entryId, products) => {
   try {
-      const response = await axios.put(`${API_URL}/warehouses/update/${id}`, warehouseData);
+      const response = await axios.post(`${API_URL}/warehouses/nhap-hang`, { entryId, products }, config);
       return response.data;
   } catch (error) {
-      console.error('Lỗi khi cập nhật phiếu nhập kho:', error.response?.data || error.message);
+      console.error('Lỗi khi nhập hàng:', error.response?.data || error.message);
       throw error;
   }
 };
 
-// xóa phiếu nhập kho
-export const deleteProductWarehouse = async (id) => {
-  try {
-    const response = await axios.delete(`${API_URL}/warehouses/delete/${id}`);
-    console.log(response.data);
-    return response.data; 
-  } catch (error) {
-    console.error("Lỗi khi xóa sản phẩm:", error);
-    throw error; 
-  }
-};
 
 // Tạo mới ncc
 export const createCart = async (suppliersData) => {

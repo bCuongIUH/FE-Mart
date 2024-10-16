@@ -53,6 +53,7 @@ console.log(products);
   const handleQuantityChange = (event) => {
     setQuantity(Number(event.target.value));
   };
+console.log("123",cart);
 
   const addToCart = () => {
     if (selectedProduct) {
@@ -98,6 +99,7 @@ console.log(products);
     try {
       const items = cart.map(item => ({
         product: item._id,
+        name : item.name,
         quantity: item.quantity,
         currentPrice: item.currentPrice,
         totalPrice: item.currentPrice * item.quantity,

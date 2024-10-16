@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Input, Dropdown, Menu, Tag } from 'antd'; 
-import { getAllProducts } from '../../untills/api';
-
+import { Table, Button, Input, Dropdown, Menu, Tag, message } from 'antd'; 
+import { getAllProducts, createPhieuKho, nhapHang } from '../../untills/api';
 import NhapHangInput from './NhapHangInput';
-import AddProduct from './AddProduct';
 
 const NhapHangPage = () => {
   const [data, setData] = useState([]); 
@@ -11,6 +9,7 @@ const NhapHangPage = () => {
   const [isAddingProduct, setIsAddingProduct] = useState(false); 
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [entryId, setEntryId] = useState(null); 
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -40,19 +39,37 @@ const NhapHangPage = () => {
     fetchProducts();
   }, []);
 
- 
-  const handleMenuClick = ({ key }) => {
+  const handleMenuClick = async ({ key }) => {
     if (key === "1") { 
-      const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
-      setSelectedProducts(selectedItems);
-      setIsAddingProduct(true); 
-      
-      
+      if (!selectedRowKeys.length) {
+        message.warning('Vui lòng chọn ít nhất một sản phẩm.');
+        return;
+      }
+
+      // Tạo header phiếu nhập kho
+      try {
+        const warehouseData = {
+          // Thông tin cần thiết để tạo header
+          createdBy: 'User', // Ví dụ: thông tin người tạo
+          // Thêm các thông tin khác nếu cần
+        };
+
+        const response = await createPhieuKho(warehouseData);
+        setEntryId(response.data._id); // Lưu lại ID phiếu nhập kho
+        const selectedItems = data.filter(item => selectedRowKeys.includes(item.key));
+        setSelectedProducts(selectedItems);
+        setIsAddingProduct(true); 
+      } catch (error) {
+        message.error('Lỗi khi tạo phiếu nhập kho: ' + error.message);
+      }
     }
   };
 
   const handleCancel = () => {
     setIsAddingProduct(false); 
+    setEntryId(null); // Reset ID phiếu nhập kho
+    setSelectedRowKeys([]); // Reset selected rows
+    setSelectedProducts([]); // Reset selected products
   };
 
   // Hàm xử lý chọn checkbox
@@ -86,7 +103,11 @@ const NhapHangPage = () => {
       )}
 
       {isAddingProduct ? (
-        <NhapHangInput selectedProducts={selectedProducts} onCancel={handleCancel} /> 
+        <NhapHangInput 
+          selectedProducts={selectedProducts} 
+          entryId={entryId} // Gửi entryId vào NhapHangInput
+          onCancel={handleCancel} 
+        /> 
       ) : (
         <>
           {selectedRowKeys.length > 0 && (
