@@ -191,7 +191,7 @@ export const deactivatePriceList = async (priceListId) => {
     throw new Error(error.response?.data.message || 'Lỗi khi ngừng hoạt động bảng giá');
   }
 };
-//
+//kích hoạt bảng giá
 export const activatePriceList = async (priceListId) => {
   try {
     const response = await axios.post(`${API_URL}/price-list/activate`, { priceListId });
@@ -200,7 +200,7 @@ export const activatePriceList = async (priceListId) => {
     throw new Error(error.response?.data.message || 'Lỗi khi kích hoạt bảng giá');
   }
 };
-// kích hoạt bảng giá
+
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu
