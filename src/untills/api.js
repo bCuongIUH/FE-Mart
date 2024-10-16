@@ -174,7 +174,33 @@ export const addPricesToPriceList = async (priceListId, products) => {
     throw new Error(error.response?.data.message || 'Lỗi cập nhập bảng giá');
   }
 };
-
+ export const getPriceListById = async (priceListId) => {
+  try {
+    const response = await axios.get(`${API_URL}/price-list/${priceListId}`);
+    return response.data; // Đảm bảo rằng bạn trả về đúng dữ liệu
+  } catch (error) {
+    throw new Error(error.response?.data.message || 'Lỗi khi lấy thông tin bảng giá');
+  }
+};
+//ngưng hoạt động bảng giá
+export const deactivatePriceList = async (priceListId) => {
+  try {
+    const response = await axios.post(`${API_URL}/price-list/deactivate`, { priceListId });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data.message || 'Lỗi khi ngừng hoạt động bảng giá');
+  }
+};
+//
+export const activatePriceList = async (priceListId) => {
+  try {
+    const response = await axios.post(`${API_URL}/price-list/activate`, { priceListId });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data.message || 'Lỗi khi kích hoạt bảng giá');
+  }
+};
+// kích hoạt bảng giá
 
 // Mật khẩu
 // Gửi yêu cầu quên mật khẩu
