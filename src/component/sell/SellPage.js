@@ -29,7 +29,10 @@ function SellPage() {
       }
     };
     fetchProducts();
-  }, []);
+  }, []); 
+
+  
+console.log(products);
 
   const handleOutsideClick = (event) => {
     if (event.target.closest('.product-card')) return; 

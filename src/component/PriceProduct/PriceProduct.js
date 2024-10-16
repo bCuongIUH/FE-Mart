@@ -73,6 +73,7 @@ const PriceProduct = () => {
       [productId]: value, 
     }));
   };
+console.log("đây",priceLists );
 
   const handleSavePrices = async (priceListId) => {
     const pricesToUpdate = Object.entries(productPrices).map(([productId, price]) => ({

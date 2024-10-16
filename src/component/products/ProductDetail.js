@@ -62,7 +62,7 @@ const ProductDetail = ({ product, onBack }) => {
                         <Descriptions column={1}>
                             <Descriptions.Item label="Mã">{product.code}</Descriptions.Item>
                             <Descriptions.Item label="Mã vạch">{product.barcode}</Descriptions.Item>
-                            <Descriptions.Item label="Tên sản phẩm">{product.nameProduct}</Descriptions.Item>
+                            <Descriptions.Item label="Tên sản phẩm">{product.name}</Descriptions.Item>
                             <Descriptions.Item label="Phân loại">
                                 {categories.find(category => category._id === product.category)?.name || 'Không xác định'}
                             </Descriptions.Item>
