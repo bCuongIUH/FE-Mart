@@ -21,7 +21,7 @@
   height: 100px;
 }
 
-/* Để phần nội dung chính không bị che khuất bởi header */
+
 .mainContent {
   flex: 1;
   padding: 20px;

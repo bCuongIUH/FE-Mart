@@ -6,7 +6,7 @@ import Register from "../Register/Register";
 function HomePage() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const modalRef = useRef(null); // Tham chiếu cho modal
+  const modalRef = useRef(null); 
 
   const handleLoginClick = () => {
     setShowLogin(true);

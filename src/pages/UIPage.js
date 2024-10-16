@@ -11,6 +11,7 @@ function UIPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+console.log(products);
 
 
   useEffect(() => {

@@ -8,6 +8,7 @@ function ShipperCart() {
   const [error, setError] = useState(null);
   const { user } = useContext(AuthContext);
   const [selectedOrder, setSelectedOrder] = useState(null);
+console.log("12",orders);
 
   useEffect(() => {
     const fetchShipperOrders = async () => {
@@ -22,7 +23,7 @@ function ShipperCart() {
         const updatedOrders = data.map(order => {
           const totalPrice = order.items.reduce((total, item) => {
             if (item.product) {
-              return total + item.unitPrice * item.quantity; 
+              return total + item.currentPrice * item.quantity; 
             }
             return total;
           }, 0);
@@ -85,7 +86,7 @@ function ShipperCart() {
                       <div className={styles.productInfo}>
                         <p>Tên sản phẩm: {item.product.name}</p>
                         <p>Số lượng: {item.quantity}</p>
-                        <p>Giá: {item.unitPrice} VND</p>
+                        <p>Giá: {item.currentPrice} VND</p>
                       </div>
                     </div>
                   ) : (

@@ -6,7 +6,7 @@ import { AuthContext } from '../../untills/context/AuthContext';
 function ProductsModal({ product, onClose, onBuyNow }) {
   const { user } = useContext(AuthContext); 
   const [quantity, setQuantity] = useState(1); 
-  const maxQuantity = product.lines[0]?.quantity || 0; 
+  const maxQuantity = product.quantity || 0; 
   const [cart, setCart] = useState([]);
 
   const handleClickOutside = (e) => {
@@ -62,7 +62,7 @@ function ProductsModal({ product, onClose, onBuyNow }) {
           <div className={styles.modalDetails}>
             <h2 className={styles.modalTitle}>{product.name}</h2>
             <p className={styles.modalDescription}>{product.description}</p>
-            <p className={styles.modalPrice}>{product.lines[0]?.unitPrice} VNĐ</p>
+            <p className={styles.modalPrice}>{product.currentPrice} VNĐ</p>
             <div className={styles.quantityControl}>
               <p><strong>Số lượng có sẵn:</strong> {maxQuantity}</p>
               <div className={styles.quantityButtons}>

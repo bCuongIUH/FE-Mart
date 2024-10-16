@@ -10,6 +10,7 @@ function AllCart() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('Cash'); // Thêm trạng thái cho phương thức thanh toán
+console.log(cart);
 
   useEffect(() => {
     const fetchGioHang = async () => {
@@ -28,6 +29,8 @@ function AllCart() {
     };
     fetchGioHang();
   }, [user]);
+
+console.log(cart);
 
   const handleCheckboxChange = (itemId) => {
     setSelectedItems((prev) => 
@@ -129,7 +132,7 @@ function AllCart() {
                 <img src={selectedProduct.product.image} alt={selectedProduct.product.name} className={styles.modalImage} />
                 <p>Tên: {selectedProduct.product.name}</p>
                 <p>Mô tả: {selectedProduct.product.description}</p>
-                <p>Giá: {selectedProduct.unitPrice} VND</p>
+                <p>Giá: {selectedProduct.currentPrice} VND</p>
                 <p>Số lượng: {selectedProduct.quantity}</p>
                 <p>Tổng giá: {selectedProduct.totalPrice} VND</p>
               </>
