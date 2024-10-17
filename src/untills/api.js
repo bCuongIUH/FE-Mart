@@ -285,15 +285,7 @@ export const createPhieuKho = async (warehouseData) => {
     throw error;
   }
 };
-export const addProductToWarehouse = async (warehouseData) => {
-  try {
-    const response = await axios.post(`${API_URL}/warehouses/add`, warehouseData, config);
-    return response.data;
-  } catch (error) {
-    console.error('Lỗi khi thêm sản phẩm vào kho:', error.response?.data || error.message);
-    throw error;
-  }
-};
+
 //lấy tất cả ds sp trong kho
 export const getAllWarehouse = async () => {
   try {
@@ -303,16 +295,49 @@ export const getAllWarehouse = async () => {
     throw error;
   }
 };
-// Nhập hàng vào phiếu nhập hàng
-export const nhapHang = async (entryId, products) => {
+// Hàm lấy sản phẩm theo nhà cung cấp
+export const getProductsBySupplier = async (supplierId) => {
   try {
-      const response = await axios.post(`${API_URL}/warehouses/nhap-hang`, { entryId, products }, config);
-      return response.data;
+      const response = await axios.get(`${API_URL}/warehouses/supplier/${supplierId}`, config);
+      console.log('Dữ liệu trả về từ API:', response.data); 
+      // Kiểm tra xem có thuộc tính products hay không
+      if (response.data.products && Array.isArray(response.data.products)) {
+          return response.data.products; 
+      } else {
+          console.error('Dữ liệu không phải là mảng:', response.data);
+          return []; 
+      }
   } catch (error) {
-      console.error('Lỗi khi nhập hàng:', error.response?.data || error.message);
-      throw error;
+      console.error('Lỗi khi lấy sản phẩm:', error); 
+      throw error; 
   }
 };
+
+
+// Hàm tạo phiếu nhập kho
+export const createWarehouseEntry = async (entryData) => {
+  try {
+      const response = await axios.post(`${API_URL}/entries`, entryData);
+      return response.data; // Trả về kết quả từ API
+  } catch (error) {
+      throw error; // Xử lý lỗi
+  }
+};
+export const nhapHang = async (entryId, products) => {
+  try {
+    const response = await axios.post(`${API_URL}/warehouses/nhap-hang`, {
+      entryId: entryId, // Chắc chắn rằng đây là một chuỗi
+      products: products // Dữ liệu sản phẩm
+    }, config);
+    
+    return response.data;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message;
+    console.error('Lỗi khi nhập hàng:', errorMessage);
+    throw new Error(errorMessage); 
+  }
+};
+
 
 
 // Tạo mới ncc

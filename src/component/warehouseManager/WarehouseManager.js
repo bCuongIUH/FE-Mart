@@ -1,143 +1,123 @@
-// import React, { useContext, useState } from 'react';
-// import styles from './WarehouseManager.module.css';
-// import { AuthContext } from '../../untills/context/AuthContext';
-// import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { getAllSuppliers, getProductsBySupplier } from '../../untills/api'; 
 
-// import AllProductsWarehouse from './item/AllProductsWarehouse';
-// import WarehouseImport from './item/WarehouseImport';
-// import ExportProduct from './item/UpdateWarehouseOutputProduct';
+const NhapKho = () => {
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplierId, setSelectedSupplierId] = useState('');
+  const [products, setProducts] = useState([]);
+  const [entryCode, setEntryCode] = useState('');
+  const [enteredBy, setEnteredBy] = useState('');
+  const [entryProducts, setEntryProducts] = useState([]);
 
-// function WarehouseManager() {
-//   const [selectedComponent, setSelectedComponent] = useState(null);
-//   const [selectedCategory, setSelectedCategory] = useState(null);
-//   const [showDropdown, setShowDropdown] = useState(false);
-//   const { user, logout } = useContext(AuthContext);
+  useEffect(() => {
+      const fetchSuppliers = async () => {
+          try {
+              const data = await getAllSuppliers();
+              setSuppliers(data);
+          } catch (error) {
+              console.error('Lỗi khi lấy nhà cung cấp:', error);
+          }
+      };
+      fetchSuppliers();
+  }, []);
 
-//   const navigate = useNavigate();
+  useEffect(() => {
+      const fetchProductsBySupplier = async () => {
+          if (selectedSupplierId) {
+              try {
+                  const data = await getProductsBySupplier(selectedSupplierId);
+                  console.log('Dữ liệu sản phẩm:', data); // Kiểm tra dữ liệu sản phẩm
+                  setProducts(data);
+                  setEntryProducts(data.map(product => ({ productId: product._id, quantity: 0, price: 0 }))); // Cập nhật entryProducts với sản phẩm đã lấy
+              } catch (error) {
+                  console.error('Lỗi khi lấy sản phẩm:', error);
+              }
+          } else {
+              setProducts([]);
+              setEntryProducts([]); // Reset entryProducts khi không có nhà cung cấp
+          }
+      };
+      fetchProductsBySupplier();
+  }, [selectedSupplierId]);
 
-  
-//   const categories = [
-//     {
-//       name: 'Quản lý nhập kho',
-//       subcategories: [
-//         { name: 'Danh sách sản phẩm', component: <AllProductsWarehouse /> },
-//         { name: 'Tạo phiếu nhập kho', component: <WarehouseImport/> }, 
-//         { name: 'Quản lý nhà cung cấp', component: <div>Quản lý nhà cung cấp component</div> }, 
-//         { name: 'Xem lịch sử nhập kho', component: <div>Lịch sử nhập kho component</div> },
-//       ],
-//     },
-//     {
-//       name: 'Quản lý xuất kho',
-//       subcategories: [
-//         { name: 'Tạo phiếu xuất kho', component: <ExportProduct/>},
-//         { name: 'Quản lý đơn vị vận chuyển', component: <div>Quản lý đơn vị vận chuyển component</div> }, 
-//         { name: 'Xem lịch sử xuất kho', component: <div>Lịch sử xuất kho component</div> },
-//       ],
-//     },
-//     {
-//       name: 'Kiểm kê kho',
-//       subcategories: [
-//         { name: 'Tạo phiếu kiểm kê', component: <div>Tạo phiếu kiểm kê component</div> }, 
-//         { name: 'Báo cáo hàng tồn kho', component: <div>Báo cáo hàng tồn kho component</div> }, 
-//         { name: 'Lịch sử kiểm kê', component: <div>Lịch sử kiểm kê component</div> },
-//       ],
-//     },
-//     {
-//       name: 'Báo cáo & Thống kê',
-//       subcategories: [
-//         { name: 'Báo cáo nhập xuất tồn', component: <div>Báo cáo nhập xuất tồn component</div> }, 
-//         { name: 'Báo cáo doanh thu', component: <div>Báo cáo doanh thu component</div> }, 
-//         { name: 'Thống kê tồn kho', component: <div>Thống kê tồn kho component</div> },
-//       ],
-//     },
-//   ];
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+      console.log('Dữ liệu nhập kho:', {
+          entryCode,
+          enteredBy,
+          entryProducts,
+      });
+      // Gửi dữ liệu nhập kho đến API ở đây
+  };
 
-//   const handleCategoryClick = (category) => {
-//     setSelectedCategory(category === selectedCategory ? null : category);
-//   };
+  const handleProductChange = (product, quantity, price) => {
+      const updatedProducts = entryProducts.map((p) => 
+          p.productId === product._id ? { ...p, quantity, price } : p
+      );
+      setEntryProducts(updatedProducts);
+  };
 
-//   const toggleDropdown = () => {
-//     setShowDropdown(!showDropdown);
-//   };
+  return (
+      <form onSubmit={handleSubmit}>
+          <div>
+              <label>Mã phiếu nhập:</label>
+              <input type="text" value={entryCode} onChange={(e) => setEntryCode(e.target.value)} required />
+          </div>
+          <div>
+              <label>Nhà cung cấp:</label>
+              <select value={selectedSupplierId} onChange={(e) => setSelectedSupplierId(e.target.value)} required>
+                  <option value="">Chọn nhà cung cấp</option>
+                  {suppliers.map((supplier) => (
+                      <option key={supplier._id} value={supplier._id}>{supplier.name}</option>
+                  ))}
+              </select>
+          </div>
+          <div>
+              <label>Người nhập:</label>
+              <input type="text" value={enteredBy} onChange={(e) => setEnteredBy(e.target.value)} required />
+          </div>
+          <h3>Sản phẩm thuộc nhà cung cấp đã chọn:</h3>
+          {products.length > 0 ? (
+              <table>
+                  <thead>
+                      <tr>
+                          <th>Hình ảnh</th>
+                          <th>Mã sản phẩm</th>
+                          <th>Tên sản phẩm</th>
+                          <th>Giá nhập</th>
+                          <th>Số lượng nhập</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {products.map((product) => (
+                          <tr key={product._id}>
+                              <td>
+                                  <img src={product.image} alt={product.name} style={{ width: '50px', height: '50px' }} />
+                              </td>
+                              <td>{product.code}</td>
+                              <td>{product.name}</td>
+                              <td>
+                                  <input type="number" 
+                                         onChange={(e) => handleProductChange(product, entryProducts.find(p => p.productId === product._id)?.quantity || 0, e.target.value)} 
+                                         required 
+                                  />
+                              </td>
+                              <td>
+                                  <input type="number" 
+                                         onChange={(e) => handleProductChange(product, e.target.value, entryProducts.find(p => p.productId === product._id)?.price || 0)} 
+                                         required 
+                                  />
+                              </td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+          ) : (
+              <p>Không có sản phẩm nào thuộc nhà cung cấp này.</p>
+          )}
+          <button type="submit">Nhập kho</button>
+      </form>
+  );
+};
 
-//   const handleLogout = () => {
-//     logout();
-//     navigate('/');
-//   };
-
-//   const handleGoBack = () => {
-//     navigate(-1); 
-//   };
-
-//   // Hàm xử lý khi nhấn vào subcategory
-//   const handleSubcategoryClick = (component) => {
-//     setSelectedComponent(component); 
-//   };
-
-//   return (
-//     <div className={styles.warehouseManager}>
-//       <header className={styles.header}>
-//         <button className={styles.backButton} onClick={handleGoBack}>
-//           Quay lại
-//         </button>
-//         <h1>Quản lý kho</h1>
-//         <div className={styles.account}>
-//           <img
-//             src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg"
-//             alt="User Avatar"
-//             className={styles.avatar}
-//             onClick={toggleDropdown}
-//           />
-//           {showDropdown && (
-//             <div className={styles.dropdown}>
-//               <ul>
-//                 <li><a href="/profile">Thông tin</a></li>
-//                 <li><a href="/settings">Cài đặt</a></li>
-//                 <li><a href="#" onClick={handleLogout}>Đăng xuất</a></li>
-//               </ul>
-//             </div>
-//           )}
-//         </div>
-//       </header>
-
-//       <div className={styles.content}>
-//         <div className={styles.menu}>
-//           {categories.map((category, index) => (
-//             <div key={index} className={styles.category}>
-//               <button
-//                 className={styles.categoryButton}
-//                 onClick={() => handleCategoryClick(category.name)}
-//               >
-//                 {category.name}
-//               </button>
-//               {selectedCategory === category.name && (
-//                 <ul className={styles.subcategoryList}>
-//                   {category.subcategories.map((subcategory, idx) => (
-//                     <li 
-//                       key={idx} 
-//                       className={styles.subcategoryItem}
-//                       onClick={() => handleSubcategoryClick(subcategory.component)} 
-//                     >
-//                       {subcategory.name}
-//                     </li>
-//                   ))}
-//                 </ul>
-//               )}
-//             </div>
-//           ))}
-//         </div>
-        
-      
-//         <div className={styles.mainContent}>
-//           {selectedComponent ? (
-//             selectedComponent
-//           ) : (
-//             <p>Chọn mục quản lý để bắt đầu.</p>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default WarehouseManager;
+export default NhapKho;

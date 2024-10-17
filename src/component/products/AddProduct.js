@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, Row, Col, Card, Upload, message } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { createProduct, getCategories } from '../../untills/api';
+import { createProduct, getCategories, getAllSuppliers } from '../../untills/api'; // Import hàm lấy nhà cung cấp
 import './AddProduct.css'; 
 
 const { Option } = Select;
@@ -10,6 +10,7 @@ const AddProduct = ({ onCancel }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]); 
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -25,8 +26,23 @@ const AddProduct = ({ onCancel }) => {
       }
     };
 
+   
+
     fetchCategories();
   }, []);
+  useEffect(() => {
+    async function fetchSuppliers() {
+      try {
+        const suppliersList = await getAllSuppliers();
+        setSuppliers(suppliersList);
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách nhà cung cấp:', error);
+      }
+    }
+    fetchSuppliers();
+  }, []);
+console.log(suppliers);
+
 
   const onFinish = async (values) => {
     try {
@@ -35,9 +51,8 @@ const AddProduct = ({ onCancel }) => {
       formData.append('code', values.code);
       formData.append('barcode', values.barcode);
       formData.append('categoryId', values.categoryId);
+      formData.append('supplierId', values.supplierId); // Thêm ID nhà cung cấp
       formData.append('description', values.description);
-      formData.append('quantity', values.quantity); 
-      formData.append('price', values.price); 
 
       if (fileList.length > 0) {
         formData.append('image', fileList[0].originFileObj);
@@ -49,7 +64,6 @@ const AddProduct = ({ onCancel }) => {
       setFileList([]);
     } catch (error) {
       message.error('Có lỗi xảy ra: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
-      
     }
   };
 
@@ -66,13 +80,13 @@ const AddProduct = ({ onCancel }) => {
     <Form form={form} layout="vertical" onFinish={onFinish}>
       {/* Thông tin chung */}
       <Card title="Thông tin sản phẩm">
-        <Row gutter={8} > {/* Giảm gutter */}
+        <Row gutter={8}>
           <Col span={8}>
             <Form.Item
               name="name"
               label="Tên sản phẩm"
               rules={[{ required: true, message: 'Nhập tên!' }]}
-              className="form-item" // Thêm class cho styling
+              className="form-item"
             >
               <Input />
             </Form.Item>
@@ -82,8 +96,7 @@ const AddProduct = ({ onCancel }) => {
               name="code"
               label="Mã sản phẩm"
               rules={[{ required: true, message: 'Nhập mã!' }]}
-              className="form-item" // Thêm class cho styling
-              
+              className="form-item"
             >
               <Input />
             </Form.Item>
@@ -93,19 +106,19 @@ const AddProduct = ({ onCancel }) => {
               name="barcode"
               label="Mã vạch"
               rules={[{ required: true, message: 'Nhập mã vạch!' }]}
-              className="form-item" // Thêm class cho styling
+              className="form-item"
             >
               <Input />
             </Form.Item>
           </Col>
         </Row>
-        <Row gutter={8}> 
+        <Row gutter={8}>
           <Col span={8}>
             <Form.Item
               name="categoryId"
               label="Loại sản phẩm"
               rules={[{ required: true, message: 'Chọn loại!' }]}
-              className="form-item" 
+              className="form-item"
             >
               <Select placeholder="Chọn loại">
                 {categories.map(category => (
@@ -116,18 +129,33 @@ const AddProduct = ({ onCancel }) => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={8} >
+          <Col span={8}>
+            <Form.Item
+              name="supplierId" 
+              label="Nhà cung cấp"
+              rules={[{ required: true, message: 'Chọn nhà cung cấp!' }]}
+              className="form-item"
+            >
+              <Select placeholder="Chọn nhà cung cấp">
+                {suppliers.map(supplier => ( 
+                  <Option key={supplier._id} value={supplier._id}>
+                    {supplier.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
             <Form.Item
               name="description"
               label="Mô tả sản phẩm"
               rules={[{ required: true, message: 'Nhập mô tả sản phẩm!' }]}
-              className="form-item" 
+              className="form-item"
             >
               <Input.TextArea rows={4} placeholder="Nhập mô tả sản phẩm" />
             </Form.Item>
           </Col>
         </Row>
-      
       </Card>
 
       {/* Tải hình ảnh */}

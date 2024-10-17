@@ -24,6 +24,8 @@ import ProductPage from '../component/products/ProductPage';
 import NhapHangPage from '../component/products/NhapHangPage';
 import PromotionManager from '../component/PromotionManager/PromotionManager';
 import PriceProduct from '../component/PriceProduct/PriceProduct';
+import NhapKho from '../component/warehouseManager/WarehouseManager';
+
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -99,7 +101,7 @@ const WarehouseManager = () => {
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
             <Menu.Item key="7" onClick={() => handleNavigate()}>Kho tổng</Menu.Item>
-            <Menu.Item key="8" onClick={() => handleNavigate(<NhapHangPage/>)}>Quản lí nhập kho</Menu.Item>
+            <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>
             <Menu.Item key="9" onClick={() => handleNavigate()}>Quản lí xuất kho</Menu.Item>
             <Menu.Item key="10" onClick={() => handleNavigate('/')}>Kiểm kê kho</Menu.Item>
             <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
