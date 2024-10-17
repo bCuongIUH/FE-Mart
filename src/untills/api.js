@@ -317,26 +317,13 @@ export const getProductsBySupplier = async (supplierId) => {
 // Hàm tạo phiếu nhập kho
 export const createWarehouseEntry = async (entryData) => {
   try {
-      const response = await axios.post(`${API_URL}/entries`, entryData);
+      const response = await axios.post(`${API_URL}/warehouses/add`, entryData);
       return response.data; // Trả về kết quả từ API
   } catch (error) {
-      throw error; // Xử lý lỗi
+      throw error; 
   }
 };
-export const nhapHang = async (entryId, products) => {
-  try {
-    const response = await axios.post(`${API_URL}/warehouses/nhap-hang`, {
-      entryId: entryId, // Chắc chắn rằng đây là một chuỗi
-      products: products // Dữ liệu sản phẩm
-    }, config);
-    
-    return response.data;
-  } catch (error) {
-    const errorMessage = error.response?.data?.message || error.message;
-    console.error('Lỗi khi nhập hàng:', errorMessage);
-    throw new Error(errorMessage); 
-  }
-};
+
 
 
 

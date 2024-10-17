@@ -18,6 +18,7 @@ const PriceProduct = () => {
   const [productPrices, setProductPrices] = useState({});
   const [showPriceListForm, setShowPriceListForm] = useState(false); 
   const [newPrices, setNewPrices] = useState({});
+ 
   
   useEffect(() => {
     const fetchAllData = async () => {
