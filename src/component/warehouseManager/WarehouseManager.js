@@ -1,8 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllWarehouse, getAllUsers } from '../../untills/api';
+import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllWarehouse, getAllUsers, getAllProducts } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
 import { Table, Input, Select, Button, Drawer, Modal } from 'antd';
 const { Option } = Select;
+
+
+const initialWarehouseEntry = {
+  entryCode: '',        
+  supplierId: '',       
+  enteredBy: '',      
+  totalAmount: 0,       
+  products: [],        
+ 
+};
 
 const NhapKho = () => {
   const { user } = useContext(AuthContext);
@@ -15,7 +25,14 @@ const NhapKho = () => {
   const [warehouseEntries, setWarehouseEntries] = useState([]);
   const [showEntryForm, setShowEntryForm] = useState(false);
   const [users, setUsers] = useState([]);
+  const [warehouseEntry, setWarehouseEntry] = useState(initialWarehouseEntry);
+  const [error, setError] = useState(null);
+ 
+  
 
+  const resetEntryForm = () => {
+    setWarehouseEntry(initialWarehouseEntry); 
+  };
   // Fetch suppliers
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -84,12 +101,20 @@ const NhapKho = () => {
     }
   };
 
-  const handleProductChange = (product, quantity, price) => {
+  const handleProductChange = (productId, quantity, price) => {
+    // Kiểm tra xem sản phẩm có tồn tại trong danh sách không
+    const productExists = products.find(product => product._id === productId);
+    if (!productExists) {
+      console.error(`Product with ID ${productId} not found`);
+      return;
+    }
+  
     const updatedProducts = entryProducts.map((p) =>
-      p.productId === product._id ? { ...p, quantity: quantity || 0, price: price || 0 } : p
+      p.productId === productId ? { ...p, quantity: quantity || 0, price: price || 0 } : p
     );
     setEntryProducts(updatedProducts);
   };
+  
 
   const columns = [
     {
@@ -126,6 +151,26 @@ const NhapKho = () => {
     return user ? user.fullName : 'Không xác định';
   };
 
+  //l lấy sản phẩm
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (error) {
+        setError('Lỗi khi lấy dữ liệu sản phẩm');
+        console.error(error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+// hàm lấy thông tin chung của sp
+  const getProductDetails = (productId) => {
+    const product = products.find((item) => item._id === productId); 
+    return product ? { name: product.name, code: product.code, image: product.image } : { name: 'Không tìm thấy', code: 'Không tìm thấy', image: null };
+  };
+
   return (
     <div>
       {!showEntryForm && (
@@ -142,16 +187,33 @@ const NhapKho = () => {
                expandedRowRender: record => (
                  <Table
                    columns={[
+                    {
+                      title: 'Mã sản phẩm',
+                      render: (text, product) => {
+                        const { code } = getProductDetails(product.productId);
+                        return code;
+                      },
+                    },
                      {
-                       title: 'Mã sản phẩm',
-                       dataIndex: 'productId',
-                     },
+                      title: 'Tên sản phẩm',
+                      render: (text, product) => {
+                        const { name } = getProductDetails(product.productId);
+                        return name;
+                      },
+                    },
+                    {
+                      title: 'Hình ảnh',
+                      render: (text, product) => {
+                        const { image } = getProductDetails(product.productId);
+                        return image ? <img src={image} alt={product.productId} style={{ width: 50, height: 50 }} /> : null;
+                      },
+                    },
                      {
                        title: 'Số lượng',
                        dataIndex: 'quantity',
                      },
                      {
-                       title: 'Giá',
+                       title: 'Giá nhập',
                        dataIndex: 'price',
                      },
                    ]}
@@ -166,12 +228,15 @@ const NhapKho = () => {
          </>
        )}
      </div>
-     
+   
       )}
       <Button
         type="primary"
-        style={{ position: 'fixed', top: 100, right: 20 }}
-        onClick={() => setShowEntryForm(true)}
+        style={{ position: 'fixed', top: 70, right: 20 }}
+        onClick={() => {
+          resetEntryForm(); // Reset form trước khi hiển thị
+          setShowEntryForm(true);
+        }}
       >
         Tạo phiếu nhập kho mới
       </Button>
@@ -204,7 +269,66 @@ const NhapKho = () => {
           </div>
           <h3>Sản phẩm thuộc nhà cung cấp đã chọn:</h3>
           {products.length > 0 ? (
-            <Table columns={columns} dataSource={products} rowKey="_id" pagination={false} />
+          <Table
+          columns={[
+            {
+              title: 'Mã sản phẩm',
+              render: (text, product) => {
+                const { code } = getProductDetails(product.productId);
+                return <span>{code}</span>;
+              },
+            },
+            {
+              title: 'Tên sản phẩm',
+              dataIndex: 'productId',
+              render: (text, product) => {
+                const productDetails = getProductDetails(product.productId);
+                return <span>{productDetails.name || 'Không có tên'}</span>;
+              },
+            },
+            {
+              title: 'Hình ảnh',
+              render: (text, product) => {
+                const { image } = getProductDetails(product.productId);
+                return image ? (
+                  <img src={image} alt={product.productId} style={{ width: 50, height: 50 }} />
+                ) : (
+                  <span>Không có hình</span>
+                );
+              },
+            },
+            {
+              title: 'Giá nhập',
+              dataIndex: 'price',
+              render: (text, product) => (
+                <Input
+                  type="number"
+                  min={0}
+                  onChange={(e) => handleProductChange(product.productId, product.quantity, e.target.value)} // Chú ý ở đây
+                />
+              ),
+            },
+            {
+              title: 'Số lượng',
+              dataIndex: 'quantity',
+              render: (text, product) => (
+                <Input
+                  type="number"
+                  min={0}
+                  onChange={(e) => handleProductChange(product.productId, e.target.value, product.price)} // Chú ý ở đây
+                />
+              ),
+            },
+          ]}
+          dataSource={entryProducts}
+          rowKey="productId"
+          pagination={{
+            pageSize: 6, // Số sản phẩm hiển thị trên mỗi trang
+            showSizeChanger: true, // Cho phép thay đổi số lượng sản phẩm hiển thị
+            pageSizeOptions: ['10', '20', '30'], // Các tùy chọn số sản phẩm trên mỗi trang
+            showTotal: (total) => `Tổng ${total} sản phẩm`, // Hiển thị tổng số sản phẩm
+          }}
+        />
           ) : (
             <p>Không có sản phẩm nào thuộc nhà cung cấp này.</p>
           )}
