@@ -25,10 +25,10 @@ const ProductPage = () => {
         if (Array.isArray(response.categories)) {
           setCategories(response.categories);
         } else {
-          message.error('Dữ liệu danh mục không hợp lệ!');
+          // message.error('Dữ liệu danh mục không hợp lệ!');
         }
       } catch (error) {
-        message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+        // message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
       }
     };
 
@@ -45,7 +45,7 @@ const ProductPage = () => {
         
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu:', error);
-        message.error('Lỗi khi tải dữ liệu.');
+        // message.error('Lỗi khi tải dữ liệu.');
       } finally {
         setLoading(false);
       }
@@ -160,6 +160,13 @@ const ProductPage = () => {
     message.success('Cập nhật giá thành công!');
   };
 
+  //quy đổi giá
+  function formatPriceInVND(price) {
+    if (typeof price !== 'number') {
+      return '0 đ'; 
+    }
+    return price.toLocaleString('vi-VN') + ' đ';
+  }
   return (
     <>
       {isAddingNewProduct ? ( 
@@ -223,7 +230,12 @@ const ProductPage = () => {
                 key: 'status',
                 render: (status) => <Tag color={status.color}>{status.text}</Tag> 
               },
-              { title: 'Giá', dataIndex: 'currentPrice', key: 'currentPrice' }, 
+              { 
+                title: 'Giá', 
+                dataIndex: 'currentPrice', 
+                key: 'currentPrice',
+                render: (value) => formatPriceInVND(value), // Format the price
+              }, 
             ]}
             dataSource={data.filter(item => item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))}
           />

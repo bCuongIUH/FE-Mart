@@ -1,71 +1,22 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllWarehouse, getAllUsers, getAllProducts } from '../../untills/api';
+import React, { useContext, useEffect, useState } from 'react';
+import { Table, Button, Input } from 'antd';
+import { getAllProducts, getAllSuppliers, getAllUsers, getAllWarehouse } from '../../untills/api';
+import WarehouseEntryForm from './NhapKhoDetail';
 import { AuthContext } from '../../untills/context/AuthContext';
-import { Table, Input, Select, Button, Drawer, Modal } from 'antd';
-const { Option } = Select;
-
-
-const initialWarehouseEntry = {
-  entryCode: '',        
-  supplierId: '',       
-  enteredBy: '',      
-  totalAmount: 0,       
-  products: [],        
- 
-};
+import './WarehouseManager.module.css';
 
 const NhapKho = () => {
   const { user } = useContext(AuthContext);
-  const [suppliers, setSuppliers] = useState([]);
-  const [selectedSupplierId, setSelectedSupplierId] = useState('');
-  const [products, setProducts] = useState([]);
-  const [entryCode, setEntryCode] = useState('');
-  const [entryProducts, setEntryProducts] = useState([]);
-  const [enteredBy, setEnteredBy] = useState(user._id || '');
   const [warehouseEntries, setWarehouseEntries] = useState([]);
-  const [showEntryForm, setShowEntryForm] = useState(false);
-  const [users, setUsers] = useState([]);
-  const [warehouseEntry, setWarehouseEntry] = useState(initialWarehouseEntry);
+  const [products, setProducts] = useState([]);
+  const [showAddEntry, setShowAddEntry] = useState(false);
   const [error, setError] = useState(null);
- 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [enteredBy, setEnteredBy] = useState(user ? user._id : '');
+  const [users, setUsers] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
   
-
-  const resetEntryForm = () => {
-    setWarehouseEntry(initialWarehouseEntry); 
-  };
-  // Fetch suppliers
-  useEffect(() => {
-    const fetchSuppliers = async () => {
-      try {
-        const data = await getAllSuppliers();
-        setSuppliers(data);
-      } catch (error) {
-        console.error('Lỗi khi lấy nhà cung cấp:', error);
-      }
-    };
-    fetchSuppliers();
-  }, []);
-
-  // Fetch products by selected supplier
-  useEffect(() => {
-    const fetchProductsBySupplier = async () => {
-      if (selectedSupplierId) {
-        try {
-          const data = await getProductsBySupplier(selectedSupplierId);
-          setProducts(data);
-          setEntryProducts(data.map(product => ({ productId: product._id, quantity: 0, price: 0 })));
-        } catch (error) {
-          console.error('Lỗi khi lấy sản phẩm:', error);
-        }
-      } else {
-        setProducts([]);
-        setEntryProducts([]);
-      }
-    };
-    fetchProductsBySupplier();
-  }, [selectedSupplierId]);
-
-  // Fetch warehouse entries
+  // Fetch các phiếu nhập kho
   useEffect(() => {
     const fetchWarehouseEntries = async () => {
       try {
@@ -78,61 +29,21 @@ const NhapKho = () => {
     fetchWarehouseEntries();
   }, []);
 
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const entryData = {
-      entryCode,
-      enteredBy: user._id,
-      supplierId: selectedSupplierId,
-      products: entryProducts,
+  // Fetch sản phẩm
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (error) {
+        setError('Lỗi khi lấy dữ liệu sản phẩm');
+        console.error(error);
+      }
     };
+    fetchProducts();
+  }, []);
 
-    console.log('Dữ liệu nhập kho:', entryData);
-    try {
-      const result = await createWarehouseEntry(entryData);
-      console.log('Kết quả từ API:', result);
-      setEntryCode('');
-      setSelectedSupplierId('');
-      setEntryProducts([]);
-      setShowEntryForm(false);
-    } catch (error) {
-      console.error('Lỗi khi tạo phiếu nhập kho:', error);
-    }
-  };
-
-  const handleProductChange = (productId, quantity, price) => {
-    // Kiểm tra xem sản phẩm có tồn tại trong danh sách không
-    const productExists = products.find(product => product._id === productId);
-    if (!productExists) {
-      console.error(`Product with ID ${productId} not found`);
-      return;
-    }
-  
-    const updatedProducts = entryProducts.map((p) =>
-      p.productId === productId ? { ...p, quantity: quantity || 0, price: price || 0 } : p
-    );
-    setEntryProducts(updatedProducts);
-  };
-  
-
-  const columns = [
-    {
-      title: 'Mã phiếu',
-      dataIndex: 'entryCode',
-    },
-    {
-      title: 'Người nhập',
-      dataIndex: 'enteredBy',
-      render: (enteredBy) => getUserNameById(enteredBy),
-    },
-    {
-      title: 'Ngày nhập',
-      dataIndex: 'createdAt',
-      render: (text) => new Date(text).toLocaleString(),
-    },
-  ];
-
+  // Fetch người dùng
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -145,196 +56,228 @@ const NhapKho = () => {
     fetchUsers();
   }, []);
 
+  // Fetch nhà cung cấp
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const data = await getAllSuppliers();
+        setSuppliers(data);
+      } catch (error) {
+        console.error('Lỗi khi lấy nhà cung cấp:', error);
+      }
+    };
+    fetchSuppliers();
+  }, []);
+
+  const getSupplierNameById = (id) => {
+    const supplier = suppliers.find(supplier => supplier._id === id);
+    return supplier ? supplier.name : 'Không có nhà cung cấp';
+  };
+
   // Hàm tìm tên người dùng từ danh sách users
   const getUserNameById = (userId) => {
     const user = users.find(u => u._id === userId);
     return user ? user.fullName : 'Không xác định';
   };
 
-  //l lấy sản phẩm
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllProducts();
-        setProducts(data);
-      } catch (error) {
-        setError('Lỗi khi lấy dữ liệu sản phẩm');
-        console.error(error);
-      }
-    };
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(7);
 
-    fetchProducts();
-  }, []);
-// hàm lấy thông tin chung của sp
-  const getProductDetails = (productId) => {
-    const product = products.find((item) => item._id === productId); 
-    return product ? { name: product.name, code: product.code, image: product.image } : { name: 'Không tìm thấy', code: 'Không tìm thấy', image: null };
-  };
+  const expandedRowRender = (record) => {
+    const { products } = record;
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(products.length / productsPerPage);
 
-  return (
-    <div>
-      {!showEntryForm && (
-       <div>
-       {!showEntryForm && (
-         <>
-           <h3>Danh sách phiếu nhập kho:</h3>
-           <Table
-             columns={columns}
-             dataSource={warehouseEntries}
-             rowKey="_id"
-             pagination={false}
-             expandable={{
-               expandedRowRender: record => (
-                 <Table
-                   columns={[
-                    {
-                      title: 'Mã sản phẩm',
-                      render: (text, product) => {
-                        const { code } = getProductDetails(product.productId);
-                        return code;
-                      },
-                    },
-                     {
-                      title: 'Tên sản phẩm',
-                      render: (text, product) => {
-                        const { name } = getProductDetails(product.productId);
-                        return name;
-                      },
-                    },
-                    {
-                      title: 'Hình ảnh',
-                      render: (text, product) => {
-                        const { image } = getProductDetails(product.productId);
-                        return image ? <img src={image} alt={product.productId} style={{ width: 50, height: 50 }} /> : null;
-                      },
-                    },
-                     {
-                       title: 'Số lượng',
-                       dataIndex: 'quantity',
-                     },
-                     {
-                       title: 'Giá nhập',
-                       dataIndex: 'price',
-                     },
-                   ]}
-                   dataSource={record.products}
-                   pagination={false}
-                   rowKey="productId" 
-                 />
-               ),
-               rowExpandable: record => true, 
-             }}
-           />
-         </>
-       )}
-     </div>
-   
-      )}
-      <Button
-        type="primary"
-        style={{ position: 'fixed', top: 70, right: 20 }}
-        onClick={() => {
-          resetEntryForm(); // Reset form trước khi hiển thị
-          setShowEntryForm(true);
-        }}
-      >
-        Tạo phiếu nhập kho mới
-      </Button>
-
-      <Modal
-        width={1000}
-        title="Tạo phiếu nhập kho mới"
-        visible={showEntryForm}
-        onCancel={() => setShowEntryForm(false)}
-        footer={null}
-        centered
-      >
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Mã phiếu nhập:</label>
-            <Input type="text" value={entryCode} onChange={(e) => setEntryCode(e.target.value)} required />
-          </div>
-          <div>
-            <label>Nhà cung cấp:</label>
-            <Select value={selectedSupplierId} onChange={(value) => setSelectedSupplierId(value)} required>
-              <Option value="">Chọn nhà cung cấp</Option>
-              {suppliers.map((supplier) => (
-                <Option key={supplier._id} value={supplier._id}>{supplier.name}</Option>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <label>Người nhập:</label>
-            <span>{user.fullName}</span>
-          </div>
-          <h3>Sản phẩm thuộc nhà cung cấp đã chọn:</h3>
-          {products.length > 0 ? (
-          <Table
+    return (
+      <>
+        <Table
           columns={[
             {
               title: 'Mã sản phẩm',
               render: (text, product) => {
                 const { code } = getProductDetails(product.productId);
-                return <span>{code}</span>;
+                return code;
               },
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#ffc4a4',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },
             {
               title: 'Tên sản phẩm',
-              dataIndex: 'productId',
               render: (text, product) => {
-                const productDetails = getProductDetails(product.productId);
-                return <span>{productDetails.name || 'Không có tên'}</span>;
+                const { name } = getProductDetails(product.productId);
+                return name;
               },
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#ffc4a4',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },
             {
               title: 'Hình ảnh',
               render: (text, product) => {
-                const { image } = getProductDetails(product.productId);
-                return image ? (
-                  <img src={image} alt={product.productId} style={{ width: 50, height: 50 }} />
+                const productDetails = getProductDetails(product.productId);
+                return productDetails && productDetails.image ? (
+                  <img
+                    src={productDetails.image}
+                    alt={productDetails.name}
+                    style={{ width: '50px', height: '50px' }}
+                  />
                 ) : (
                   <span>Không có hình</span>
                 );
               },
-            },
-            {
-              title: 'Giá nhập',
-              dataIndex: 'price',
-              render: (text, product) => (
-                <Input
-                  type="number"
-                  min={0}
-                  onChange={(e) => handleProductChange(product.productId, product.quantity, e.target.value)} // Chú ý ở đây
-                />
-              ),
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#ffc4a4',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },
             {
               title: 'Số lượng',
               dataIndex: 'quantity',
-              render: (text, product) => (
-                <Input
-                  type="number"
-                  min={0}
-                  onChange={(e) => handleProductChange(product.productId, e.target.value, product.price)} // Chú ý ở đây
-                />
-              ),
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#ffc4a4',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
+            },
+            {
+              title: 'Giá nhập',
+              dataIndex: 'price',
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#ffc4a4',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },
           ]}
-          dataSource={entryProducts}
+          dataSource={currentProducts}
+          pagination={false} // Tắt phân trang mặc định
           rowKey="productId"
-          pagination={{
-            pageSize: 6, // Số sản phẩm hiển thị trên mỗi trang
-            showSizeChanger: true, // Cho phép thay đổi số lượng sản phẩm hiển thị
-            pageSizeOptions: ['10', '20', '30'], // Các tùy chọn số sản phẩm trên mỗi trang
-            showTotal: (total) => `Tổng ${total} sản phẩm`, // Hiển thị tổng số sản phẩm
-          }}
         />
-          ) : (
-            <p>Không có sản phẩm nào thuộc nhà cung cấp này.</p>
-          )}
-          <Button type="primary" htmlType="submit">Nhập kho</Button>
-        </form>
-      </Modal>
+        <div style={{ marginTop: 16 }}>
+          <Button
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
+            Trang trước
+          </Button>
+          <span style={{ margin: '0 8px' }}>
+            Trang {currentPage} của {totalPages}
+          </span>
+          <Button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
+            Trang sau
+          </Button>
+        </div>
+      </>
+    );
+  };
+
+  // Hàm lấy thông tin chung của sản phẩm
+  const getProductDetails = (productId) => {
+    const product = products.find((item) => item._id === productId);
+    return product ? { name: product.name, code: product.code, image: product.image } : { name: 'Không tìm thấy', code: 'Không tìm thấy', image: null };
+  };
+
+  return (
+    <div>
+      {showAddEntry ? (
+        <WarehouseEntryForm onCancel={() => setShowAddEntry(false)} />
+      ) : (
+        <>
+          <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
+            <Input
+              placeholder="Tìm kiếm sản phẩm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ width: 500 }}
+            />
+            <Button type="primary" onClick={() => setShowAddEntry(true)}>
+              Tạo phiếu nhập kho mới
+            </Button>
+          </div>
+          <h3>Danh sách phiếu nhập kho:</h3>
+          <Table
+            columns={[
+              {
+                title: 'Mã phiếu',
+                dataIndex: 'entryCode',
+                onHeaderCell: () => ({
+                  style: {
+                    backgroundColor: '#F5F5DC',
+                    color: '#333',
+                    fontWeight: 'bold',
+                  },
+                }),
+              },
+              {
+                title: 'Nhà cung cấp',
+                dataIndex: 'supplier',
+                render: (supplierId, record) => {
+                  return getSupplierNameById(supplierId);
+                },
+                onHeaderCell: () => ({
+                  style: {
+                    backgroundColor: '#F5F5DC',
+                    color: '#333',
+                    fontWeight: 'bold',
+                  },
+                }),
+              },
+              {
+                title: 'Người nhập',
+                dataIndex: 'enteredBy',
+                render: (enteredBy) => getUserNameById(enteredBy),
+                onHeaderCell: () => ({
+                  style: {
+                    backgroundColor: '#F5F5DC',
+                    color: '#333',
+                    fontWeight: 'bold',
+                  },
+                }),
+              },
+              {
+                title: 'Ngày nhập',
+                dataIndex: 'createdAt',
+                render: (text) => new Date(text).toLocaleString(),
+                onHeaderCell: () => ({
+                  style: {
+                    backgroundColor: '#F5F5DC',
+                    color: '#333',
+                    fontWeight: 'bold',
+                  },
+                }),
+              },
+            ]}
+            dataSource={warehouseEntries}
+            rowKey="_id"
+            expandable={{
+              expandedRowRender,
+              rowExpandable: (record) => record.products && record.products.length > 0,
+            }}
+          />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+        </>
+      )}
     </div>
   );
 };

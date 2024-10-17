@@ -21,10 +21,10 @@ import ManageEmployees from '../component/employees/ManageEmployees';
 import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
 import OrderTracking from '../component/OrderTracking/OrderTracking';
 import ProductPage from '../component/products/ProductPage';
-import NhapHangPage from '../component/products/NhapHangPage';
-import PromotionManager from '../component/PromotionManager/PromotionManager';
+
 import PriceProduct from '../component/PriceProduct/PriceProduct';
 import NhapKho from '../component/warehouseManager/WarehouseManager';
+import PromotionProgramList from '../component/PromotionManager/PromotionProgramList';
 
 
 const { Header, Sider, Content } = Layout;
@@ -111,8 +111,8 @@ const WarehouseManager = () => {
             <Menu.Item key="13" onClick={() => handleNavigate(<SuppliersImport/>)}>Thêm nhà cung cấp</Menu.Item>
           </SubMenu>
           <SubMenu key="sub6" icon={<DropboxOutlined />} title="Quản lí chương trình khuyến mãi">
-            <Menu.Item key="14" onClick={() => handleNavigate(<PromotionManager/>)}>Danh sách chương trình</Menu.Item>
-            <Menu.Item key="15" onClick={() => handleNavigate('/AddPromotion')}>Thêm chương trình</Menu.Item>
+           
+            <Menu.Item key="14" onClick={() => handleNavigate(<PromotionProgramList />)}>Danh sách chương trình</Menu.Item>
           </SubMenu>
           <SubMenu key="sub7" icon={ <EyeOutlined />} title="Theo dõi đơn hàng">
             <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking/>)}>Theo dõi đơn hàng</Menu.Item>

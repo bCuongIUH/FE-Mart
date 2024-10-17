@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllUsers, getAllProducts } from '../../untills/api';
+import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllUsers } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
 import { Table, Input, Select, Button } from 'antd';
 const { Option } = Select;
-
-const initialWarehouseEntry = {
-  entryCode: '',
-  supplierId: '',
-  enteredBy: '',
-  totalAmount: 0,
-  products: [],
-};
 
 const WarehouseEntryForm = ({ onCancel }) => {
   const { user } = useContext(AuthContext);
@@ -20,7 +12,6 @@ const WarehouseEntryForm = ({ onCancel }) => {
   const [entryCode, setEntryCode] = useState('');
   const [entryProducts, setEntryProducts] = useState([]);
   const [enteredBy, setEnteredBy] = useState(user._id || '');
-  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -52,40 +43,36 @@ const WarehouseEntryForm = ({ onCancel }) => {
     fetchProductsBySupplier();
   }, [selectedSupplierId]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await getAllUsers();
-        setUsers(data);
-      } catch (error) {
-        console.error('Lỗi khi lấy người dùng:', error);
-      }
-    };
-    fetchUsers();
-  }, []);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Filter out products with quantity <= 0 or price <= 0
+    const validProducts = entryProducts.filter(product => product.quantity > 0 && product.price > 0);
+
+    if (validProducts.length === 0) {
+      console.error('Không có sản phẩm hợp lệ để tạo phiếu nhập kho.');
+      return;
+    }
+
     const entryData = {
       entryCode,
       enteredBy: user._id,
       supplierId: selectedSupplierId,
-      products: entryProducts,
+      products: validProducts,
     };
 
     try {
       const result = await createWarehouseEntry(entryData);
       console.log('Kết quả từ API:', result);
-      // Reset form or handle success
-      onCancel(); // Đóng form sau khi tạo phiếu
+      onCancel(); // Close form after creating entry
     } catch (error) {
       console.error('Lỗi khi tạo phiếu nhập kho:', error);
     }
   };
 
-  const handleProductChange = (product, quantity, price) => {
+  const handleProductChange = (productId, quantity, price) => {
     const updatedProducts = entryProducts.map((p) =>
-      p.productId === product._id ? { ...p, quantity: quantity || 0, price: price || 0 } : p
+      p.productId === productId ? { ...p, quantity: quantity || 0, price: price || 0 } : p
     );
     setEntryProducts(updatedProducts);
   };
@@ -115,6 +102,30 @@ const WarehouseEntryForm = ({ onCancel }) => {
           <Table
             columns={[
               {
+                title: 'STT',
+                render: (text, product, index) => index + 1,
+              },
+              {
+                title: 'Mã SP',
+                dataIndex: 'productId',
+                render: (text, product) => {
+                  const productDetails = products.find(item => item._id === product.productId);
+                  return <span>{productDetails ? productDetails.code : 'Không có mã'}</span>;
+                },
+              },
+              {
+                title: 'Hình ảnh',
+                dataIndex: 'productId',
+                render: (text, product) => {
+                  const productDetails = products.find(item => item._id === product.productId);
+                  return productDetails ? (
+                    <img src={productDetails.image} alt={productDetails.name} style={{ width: '50px', height: '50px' }} />
+                  ) : (
+                    <span>Không có hình</span>
+                  );
+                },
+              },
+              {
                 title: 'Tên sản phẩm',
                 dataIndex: 'productId',
                 render: (text, product) => {
@@ -129,7 +140,7 @@ const WarehouseEntryForm = ({ onCancel }) => {
                   <Input
                     type="number"
                     min={0}
-                    onChange={(e) => handleProductChange(product._id, product.quantity, e.target.value)}
+                    onChange={(e) => handleProductChange(product.productId, product.quantity, e.target.value)}
                   />
                 ),
               },
@@ -140,7 +151,7 @@ const WarehouseEntryForm = ({ onCancel }) => {
                   <Input
                     type="number"
                     min={0}
-                    onChange={(e) => handleProductChange(product._id, e.target.value, product.price)}
+                    onChange={(e) => handleProductChange(product.productId, e.target.value, product.price)}
                   />
                 ),
               },
