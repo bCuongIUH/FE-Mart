@@ -236,10 +236,10 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           style={{ marginBottom: "30px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
-            <Select.Option value="BuyXGetY">Buy X Get Y</Select.Option>
-            <Select.Option value="FixedDiscount">Fixed Discount</Select.Option>
+            <Select.Option value="BuyXGetY">Mua hàng tặng quà</Select.Option>
+            <Select.Option value="FixedDiscount">Tặng tiền theo hóa đơn</Select.Option>
             <Select.Option value="PercentageDiscount">
-              Percentage Discount
+              Giảm %
             </Select.Option>
           </Select>
         </Form.Item>

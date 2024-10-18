@@ -140,7 +140,12 @@ const PromotionProgramList = () => {
       setExpandedRowKeys([]); // Đóng dòng
     }
   };
-
+  const voucherTypeNames = {
+    BuyXGetY: "Mua hàng Tặng quà",
+    FixedDiscount: "Giảm giá cố định",
+    PercentageDiscount: "Giảm giá theo phần trăm"
+  };
+  
   // Bảng hiển thị voucher khi mở rộng một dòng
   const expandedRowRender = (record) => {
     const vouchers = voucherData[record._id] || [];
@@ -154,6 +159,7 @@ const PromotionProgramList = () => {
         title: "Loại voucher",
         dataIndex: "type",
         key: "type",
+        render: (text) => voucherTypeNames[text] || text,
       },
       {
         title: "Trạng thái",

@@ -9,28 +9,31 @@ function AllCart() {
   const { user } = useContext(AuthContext);
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('Cash'); // Thêm trạng thái cho phương thức thanh toán
-console.log(cart);
+  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchGioHang = async () => {
       if (!user || !user._id) {
         setError('Không tìm thấy thông tin người dùng');
+        setLoading(false);
         return;
       }
 
       try {
         const data = await getAllCart(user._id); 
+        if (!data || !data.items) {
+          throw new Error("Không có giỏ hàng.");
+        }
         setCart(data);
-        console.log('Dữ liệu giỏ hàng:', data); 
       } catch (error) {
-        setError("Giỏ hàng trống");
+        setError(error.response?.data?.message || "Giỏ hàng trống");
+      } finally {
+        setLoading(false); // Stop loading regardless of outcome
       }
     };
     fetchGioHang();
   }, [user]);
-
-console.log(cart);
 
   const handleCheckboxChange = (itemId) => {
     setSelectedItems((prev) => 
@@ -38,9 +41,10 @@ console.log(cart);
     );
   };
 
-  const totalAmount = cart?.items
-    .filter(item => selectedItems.includes(item._id))
-    .reduce((total, item) => total + item.totalPrice, 0);
+  const totalAmount = selectedItems.length > 0 ? 
+    cart?.items
+      .filter(item => selectedItems.includes(item._id))
+      .reduce((total, item) => total + item.totalPrice, 0) : 0;
 
   const handleCheckout = async () => {
     if (selectedItems.length === 0) {
@@ -49,7 +53,7 @@ console.log(cart);
     }
 
     try {
-      const bill = await createBill(user._id, paymentMethod); 
+      const bill = await createBill(user._id, paymentMethod, selectedItems); // Pass selectedItems
       alert(`Hóa đơn đã được tạo thành công. Tổng số tiền: ${totalAmount} VND. Phương thức thanh toán: ${paymentMethod}`);
     } catch (error) {
       alert('Có lỗi xảy ra khi tạo hóa đơn, vui lòng thử lại.');
@@ -64,6 +68,10 @@ console.log(cart);
   const closeModal = () => {
     setSelectedProduct(null); 
   };
+
+  if (loading) {
+    return <p>Đang tải giỏ hàng...</p>; // Loading message
+  }
 
   return (
     <div>
