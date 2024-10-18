@@ -67,14 +67,14 @@ const EditPromotionProgramModal = ({
           rules={[
             { required: true, message: "Vui lòng nhập tên chương trình!" },
           ]}
-          style={{ marginBottom: "-30px" }} // Giảm khoảng cách giữa các fields
+          style={{ marginBottom: "30px" }} // Giảm khoảng cách giữa các fields
         >
           <Input />
         </Form.Item>
         <Form.Item
           name="description"
           label="Mô Tả"
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Input.TextArea rows={4} />
         </Form.Item>
@@ -82,7 +82,7 @@ const EditPromotionProgramModal = ({
           name="startDate"
           label="Ngày Bắt Đầu"
           rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu!" }]}
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
@@ -90,7 +90,7 @@ const EditPromotionProgramModal = ({
           name="endDate"
           label="Ngày Kết Thúc"
           rules={[{ required: true, message: "Vui lòng chọn ngày kết thúc!" }]}
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <DatePicker format="YYYY-MM-DD" />
         </Form.Item>
@@ -98,7 +98,7 @@ const EditPromotionProgramModal = ({
           name="isActive"
           label="Kích Hoạt"
           valuePropName="checked" // Chuyển đổi giá trị sang boolean cho Switch
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Switch />
         </Form.Item>

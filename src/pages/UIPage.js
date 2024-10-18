@@ -88,26 +88,30 @@ console.log(products);
       </header>
 
             {/* thông tin  sản phẩm */}
-      <main className={styles.mainContent}>
-        <section className={styles.productList}>
-          {error && <p className={styles.errorMessage}>{error}</p>}
-          {products.length > 0 ? (
-            products.map(product => (
-              <button
-                key={product._id}
-                className={styles.productButton}
-                onClick={() => handleProductClick(product)}
-              >
-                <img src={product.image} alt={product.name} className={styles.productImage} />
-                <h2 className={styles.productName}>{product.description}</h2>
-                <p className={styles.productPrice} style={{color: 'red', marginTop: 'auto'}}>{product.lines[0]?.unitPrice} VNĐ</p>
-              </button>
-            ))
-          ) : (
-            <p>Đang tải sản phẩm...</p>
-          )}
-        </section>
-      </main>
+            <main className={styles.mainContent}>
+  <section className={styles.productList}>
+    {error && <p className={styles.errorMessage}>{error}</p>}
+    {products.length > 0 ? (
+      products.map((product) => (
+        <button
+          key={product._id}
+          className={styles.productButton}
+          onClick={() => handleProductClick(product)}
+        >
+          <img src={product.image} alt={product.name} className={styles.productImage} />
+          <h2 className={styles.productName}>{product.description}</h2>
+          {/* Safely accessing product.lines and unitPrice */}
+          <p className={styles.productPrice} style={{ color: 'red', marginTop: 'auto' }}>
+  {product.currentPrice ? `${product.currentPrice} VNĐ` : 'Giá không có sẵn'}
+</p>
+
+        </button>
+      ))
+    ) : (
+      <p>Đang tải sản phẩm...</p>
+    )}
+  </section>
+</main>
 
       <footer className={styles.footer}>
         <p>&copy; 2024 Shop Online. All rights reserved.</p>

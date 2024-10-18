@@ -9,7 +9,7 @@ import {
   Spin,
   message,
 } from "antd";
-import { createPromotionProgram } from "../../../services/promotionProgramService"; // Import hàm gọi API
+import { createPromotionProgram } from "../../../services/promotionProgramService"; 
 import moment from "moment";
 
 const AddPromotionProgramModal = ({
@@ -62,14 +62,14 @@ const AddPromotionProgramModal = ({
           rules={[
             { required: true, message: "Vui lòng nhập tên chương trình!" },
           ]}
-          style={{ marginBottom: "-40px" }} // Giảm khoảng cách giữa các fields
+          style={{ marginBottom: "40px" }} 
         >
           <Input />
         </Form.Item>
         <Form.Item
           name="description"
           label="Mô Tả"
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Input.TextArea rows={4} />
         </Form.Item>
@@ -78,7 +78,7 @@ const AddPromotionProgramModal = ({
             name="startDate"
             label="Ngày Bắt Đầu"
             rules={[{ required: true, message: "Vui lòng chọn ngày bắt đầu!" }]}
-            style={{ marginBottom: "-30px" }}
+            style={{ marginBottom: "30px" }}
           >
             <DatePicker format="YYYY-MM-DD" />
           </Form.Item>

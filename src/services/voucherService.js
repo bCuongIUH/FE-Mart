@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/voucher"; // URL API cho voucher
+const API_URL = "http://localhost:5000/api/voucher"; 
 
 // Cấu hình cho axios với token từ localStorage
 const config = {

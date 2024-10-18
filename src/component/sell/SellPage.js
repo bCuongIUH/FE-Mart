@@ -55,6 +55,7 @@ function SellPage() {
   };
   
 
+
  
 
   // Hàm tìm kiếm sản phẩm
@@ -104,13 +105,27 @@ function SellPage() {
     setQuantity(Number(event.target.value));
   };
 
-
+ 
   const addToCart = () => {
-    if (selectedProduct) {
-      if (quantity > selectedProduct.quantity) {
-        message.warning("Số lượng yêu cầu vượt quá số lượng tồn kho!");
-        return;
-      }
+    if (!selectedProduct) {
+      message.warning("Chưa chọn sản phẩm!");
+      return;
+    }
+  
+    // Check if currentPrice exists and is valid
+    if (selectedProduct.currentPrice == null || selectedProduct.currentPrice <= 0) {
+      message.warning("Sản phẩm có giá trị bằng 0 hoặc không hợp lệ không thể thêm vào giỏ hàng!");
+      return;
+    }
+  
+    // Check if requested quantity exceeds available stock
+    if (quantity > selectedProduct.quantity) {
+      message.warning("Số lượng yêu cầu vượt quá số lượng tồn kho!");
+      return;
+    } else {
+      message.warning("Chưa chọn sản phẩm!");
+    
+  
   
       const existingProductIndex = cart.findIndex(item => item._id === selectedProduct._id);
       if (existingProductIndex !== -1) {

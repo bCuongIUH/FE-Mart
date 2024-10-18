@@ -225,7 +225,7 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           name="code"
           label="Mã voucher"
           rules={[{ required: true, message: "Vui lòng nhập mã voucher" }]}
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Input />
         </Form.Item>
@@ -233,7 +233,7 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           name="type"
           label="Loại voucher"
           rules={[{ required: true, message: "Vui lòng chọn loại voucher" }]}
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
             <Select.Option value="BuyXGetY">Buy X Get Y</Select.Option>
@@ -247,7 +247,7 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           name="isActive"
           label="Kích hoạt"
           valuePropName="checked"
-          style={{ marginBottom: "-30px" }}
+          style={{ marginBottom: "30px" }}
         >
           <Switch />
         </Form.Item>

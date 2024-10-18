@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry, getAllUsers } from '../../untills/api';
+import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
-import { Table, Input, Select, Button } from 'antd';
+import { Table, Input, Select, Button, message } from 'antd'; // Import message from Ant Design
 const { Option } = Select;
 
 const WarehouseEntryForm = ({ onCancel }) => {
@@ -11,7 +11,7 @@ const WarehouseEntryForm = ({ onCancel }) => {
   const [products, setProducts] = useState([]);
   const [entryCode, setEntryCode] = useState('');
   const [entryProducts, setEntryProducts] = useState([]);
-  const [enteredBy, setEnteredBy] = useState(user._id || '');
+  const [enteredBy] = useState(user._id || '');
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -50,7 +50,7 @@ const WarehouseEntryForm = ({ onCancel }) => {
     const validProducts = entryProducts.filter(product => product.quantity > 0 && product.price > 0);
 
     if (validProducts.length === 0) {
-      console.error('Không có sản phẩm hợp lệ để tạo phiếu nhập kho.');
+      message.warning('Không có sản phẩm hợp lệ để tạo phiếu nhập kho.');
       return;
     }
 
@@ -63,9 +63,11 @@ const WarehouseEntryForm = ({ onCancel }) => {
 
     try {
       const result = await createWarehouseEntry(entryData);
+      message.success('Nhập kho thành công!'); // Show success message
       console.log('Kết quả từ API:', result);
       onCancel(); // Close form after creating entry
     } catch (error) {
+      message.error('Lỗi khi tạo phiếu nhập kho.'); // Show error message
       console.error('Lỗi khi tạo phiếu nhập kho:', error);
     }
   };

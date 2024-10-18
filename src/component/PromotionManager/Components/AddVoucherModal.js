@@ -34,7 +34,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "productXId"]}
               label="Sản phẩm mua"
               rules={[{ required: true, message: "Vui lòng chọn sản phẩm X" }]}
-              style={{ marginBottom: "-50px" }}
+              style={{ marginBottom: "50px" }}
             >
               <Select placeholder="Chọn sản phẩm mua">
                 {products.map((product) => (
@@ -48,7 +48,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "quantityX"]}
               label="Số lượng mua"
               rules={[{ required: true, message: "Vui lòng nhập số lượng X" }]}
-              style={{ marginBottom: "-50px" }}
+              style={{ marginBottom: "50px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -56,7 +56,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "productYId"]}
               label="Sản phẩm tặng"
               rules={[{ required: true, message: "Vui lòng chọn sản phẩm tặng" }]}
-              style={{ marginBottom: "-50px" }}
+              style={{ marginBottom: "50px" }}
             >
               <Select placeholder="Chọn sản phẩm tặng">
                 {products.map((product) => (
@@ -70,7 +70,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "quantityY"]}
               label="Số lượng tặng"
               rules={[{ required: true, message: "Vui lòng nhập số lượng tặng" }]}
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -88,7 +88,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
                   message: "Vui lòng nhập giá trị đơn hàng tối thiểu",
                 },
               ]}
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -98,7 +98,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               rules={[
                 { required: true, message: "Vui lòng nhập số tiền giảm giá" },
               ]}
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -116,7 +116,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
                   message: "Vui lòng nhập giá trị đơn hàng tối thiểu",
                 },
               ]}
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -126,14 +126,14 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               rules={[
                 { required: true, message: "Vui lòng nhập phần trăm giảm giá" },
               ]}
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
             <Form.Item
               name={["conditions", "maxDiscountAmount"]}
               label="Số tiền giảm giá tối đa"
-              style={{ marginBottom: "-30px" }}
+              style={{ marginBottom: "30px" }}
             >
               <Input type="number" />
             </Form.Item>
@@ -152,14 +152,14 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
       cancelText="Hủy"
       onCancel={onCancel}
       onOk={handleOk}
-      style={{ marginTop: '-90px' }}
+      style={{ marginTop: '20px' }}
     >
       <Form form={form} onFinish={onSubmit} layout="vertical">
         <Form.Item
           name="code"
           label="Mã voucher"
           rules={[{ required: true, message: "Vui lòng nhập mã voucher" }]}
-          style={{ marginBottom: "-50px" }}
+          style={{ marginBottom: "50px" }}
         >
           <Input />
         </Form.Item>
@@ -167,7 +167,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
           name="type"
           label="Loại voucher"
           rules={[{ required: true, message: "Vui lòng chọn loại voucher" }]}
-          style={{ marginBottom: "-50px" }}
+          style={{ marginBottom: "50px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
             <Select.Option value="BuyXGetY">Product promote</Select.Option>
@@ -181,7 +181,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
           name="isActive"
           label="Kích hoạt"
           valuePropName="checked"
-          style={{ marginBottom: "-50px" }}
+          style={{ marginBottom: "50px" }}
         >
           <Switch />
         </Form.Item>
