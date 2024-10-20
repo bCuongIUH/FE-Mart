@@ -134,7 +134,18 @@ const PriceProduct = () => {
       acc[product.productId] = product.price;  
       return acc;  
     }, {});  
-
+    const handlePriceChange = (productId, value) => {
+      if (value < 0) {
+        message.error('Giá không được là số âm!');
+        return; // Không cập nhật giá nếu nhập âm
+      }
+      
+      setProductPrices((prevPrices) => ({
+        ...prevPrices,
+        [productId]: value, 
+      }));
+    };
+    
     return (  
       <div>  
         <h4>Danh sách sản phẩm</h4>  
@@ -152,38 +163,75 @@ const PriceProduct = () => {
               title: 'Mã sản phẩm',  
               dataIndex: 'code',  
               key: 'code',  
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#F5F5DC',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },  
             {  
               title: 'Tên sản phẩm',  
               dataIndex: 'name',  
               key: 'name',  
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#F5F5DC',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
             },  
             {  
               title: 'Hình ảnh',  
               dataIndex: 'image',  
               key: 'image',  
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#F5F5DC',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
               render: (image) => <img src={image} alt="product" style={{ width: 50 }} />,  
             },  
             {  
               title: 'Giá hiện tại',  
               dataIndex: 'currentPrice',  
               key: 'currentPrice',  
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#F5F5DC',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
               render: (text) => (  
                 <span>{text ? text.toLocaleString() : 'Chưa cập nhật'} VNĐ</span>  
               ),  
             },  
-            {  
-              title: 'Giá mới',  
-              key: 'newPrice',  
-              render: (text, product) => (  
+            {
+              title: 'Giá mới',
+              key: 'newPrice',
+              onHeaderCell: () => ({
+                style: {
+                  backgroundColor: '#F5F5DC',
+                  color: '#333',
+                  fontWeight: 'bold',
+                },
+              }),
+              render: (text, product) => (
                 <Input  
                   type="number"  
+                  min={1} 
                   placeholder="Nhập giá mới"  
                   defaultValue={productPricesForList[product.key] || ''}  
                   onChange={(e) => handlePriceChange(product.key, e.target.value)}   
                 />  
-              ),  
-            },  
+              ),
+            },
+            
           ]}  
           pagination={false}  
         />  

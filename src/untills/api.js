@@ -106,7 +106,7 @@ export const getAllProducts = async () => {
 // Lấy sản phẩm theo ID
 export const getProductById = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/products/${id}`, config);
+    const response = await axios.get(`${API_URL}/products/product${id}`, config);
     return response.data;
   } catch (error) {
     throw error;
