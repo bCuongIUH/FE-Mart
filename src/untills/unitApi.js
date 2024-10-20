@@ -103,7 +103,7 @@ export const getAllUnitList = async () => {
   // Lấy danh sách đơn vị theo unitListId
 export const getUnitsByUnitListId = async (unitListId) => {
     try {
-        const response = await axios.post(`${API_URL}/units/getUnit`, { unitListId }); // Sử dụng body
+        const response = await axios.post(`${API_URL}/units/getUnit`, { unitListId });
         return response.data;
     } catch (error) {
         throw error;
@@ -113,4 +113,15 @@ export const getUnitsByUnitListId = async (unitListId) => {
 export const addConversionUnitToList = async (data) => {
     const response = await axios.post(`${API_URL}/units/add-conversion-unit`, data);
     return response.data;
+};
+
+
+export const getConversionRatesByUnitListId = async (unitListId) => {
+  try {
+      const response = await axios.post(`${API_URL}/units/getUnit/all`, { unitListId });
+      return response.data; // Trả về dữ liệu nhận được từ server
+  } catch (error) {
+      console.error('Lỗi khi lấy danh sách quy đổi:', error);
+      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
+  }
 };

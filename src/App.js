@@ -20,6 +20,8 @@ import SignupContext from "./untills/context/SignupContext";
 import SellPage from './component/sell/SellPage';
 import StatisticsChart from "./component/Statistical/Statistical";
 import ProductPage from "./component/products/ProductPage";
+import CreateUnitList from "./component/units/CreateUnitList";
+import UpdateConversionRate from "./component/units/UpdateConversionRate";
 
 
 
@@ -62,6 +64,9 @@ function App() {
              <Route path="/ManagerSales" element={<SellPage />} />
              <Route path="/statistics" element={<StatisticsChart />} />
              
+                    <Route path="/123" element={<CreateUnitList />} />
+                    <Route path="/update-conversion-rate" element={<UpdateConversionRate />} />
+                
            
           </Routes>
           </SignupContext>

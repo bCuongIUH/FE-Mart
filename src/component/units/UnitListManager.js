@@ -1,9 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Table, Button, Form, Input, Modal, message } from 'antd';
-import { createUnitList, getAllUnitList } from '../../untills/unitApi';
+import { createUnitList, getAllUnitList, getConversionRatesByUnitListId, updateConversionRate } from '../../untills/unitApi';
 import { AuthContext } from '../../untills/context/AuthContext';
-import './UnitListManager.css'; // Import file CSS
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import './UnitListManager.css';
+
 const UnitListManager = () => {
     const { user } = useContext(AuthContext);
     const [unitListName, setUnitListName] = useState('');
@@ -11,10 +12,20 @@ const UnitListManager = () => {
     const [unitLists, setUnitLists] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [expandedRowKeys, setExpandedRowKeys] = useState([]); // Trạng thái cho các hàng mở rộng
+    
+    const [visible, setVisible] = useState(false);
+    const [unitListId, setUnitListId] = useState('');
+    const [fromUnitName, setFromUnitName] = useState('');
+    const [toUnitName, setToUnitName] = useState('');
+    const [factor, setFactor] = useState('');
+
+    // State quản lý danh sách tỷ lệ quy đổi cho từng bảng đơn vị
+    const [conversionRatesMap, setConversionRatesMap] = useState({});
+    const [expandedRowKey, setExpandedRowKey] = useState(null);
 
     useEffect(() => {
         const fetchUnitLists = async () => {
+            setLoading(true);
             try {
                 const data = await getAllUnitList();
                 setUnitLists(data.unitLists || []);
@@ -27,6 +38,18 @@ const UnitListManager = () => {
 
         fetchUnitLists();
     }, []);
+
+    const fetchConversionRates = async (unitListId) => {
+        setLoading(true);
+        try {
+            const data = await getConversionRatesByUnitListId(unitListId);
+            setConversionRatesMap(prev => ({ ...prev, [unitListId]: data.conversionRates || [] }));
+        } catch (error) {
+            message.error('Lỗi khi lấy danh sách quy đổi');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleCreateUnitList = async () => {
         try {
@@ -46,106 +69,50 @@ const UnitListManager = () => {
         }
     };
 
-    const showModal = () => {
+    const handleUpdateConversionRate = async (e) => {
+        e.preventDefault();
+        try {
+            const data = { unitListId, fromUnitName, toUnitName, factor };
+            await updateConversionRate(data);
+            message.success('Cập nhật tỷ lệ quy đổi thành công');
+            setVisible(false);
+            setFromUnitName('');
+            setToUnitName('');
+            setFactor('');
+            setUnitListId('');
+        } catch (error) {
+            message.error('Lỗi khi cập nhật quy đổi');
+        }
+    };
+
+    const handleEdit = (record) => {
+        setUnitListName(record.name);
+        setUnitListDescription(record.description);
         setIsModalVisible(true);
     };
 
-    const handleCancel = () => {
-        setIsModalVisible(false);
-        setUnitListName('');
-        setUnitListDescription('');
+    const handleDelete = async (record) => {
+        // Thêm logic xóa bảng đơn vị ở đây
     };
 
-    //chính sửa
-    const handleEdit = (record) => {
-        // Thực hiện hành động chỉnh sửa
-        message.info(`Chỉnh sửa bảng đơn vị tính: ${record.name}`);
+    const showConversionRateModal = (record) => {
+        setUnitListId(record._id);
+        setVisible(true);
     };
 
-    //xóa
-    const handleDelete = (record) => {
-        // Thực hiện hành động xóa
-        message.info(`Xóa bảng đơn vị tính: ${record.name}`);
-    };
-
-
-    const expandedRowRender = (record) => {
-        
-
-        return (
-            <Table
-                
-                pagination={false}
-                columns={[
-                    {
-                        title: 'Đơn vị cơ bản',
-                        dataIndex: 'label',
-                        key: 'label',
-                        onHeaderCell: () => ({
-                            style: {
-                              backgroundColor: '#F5F5DC',
-                              color: '#333',
-                              fontWeight: 'bold',
-                            },
-                          }),
-                    },
-                    {
-                        title: 'Đơn vị quy đổi',
-                        dataIndex: 'label',
-                        key: 'label',
-                        onHeaderCell: () => ({
-                            style: {
-                              backgroundColor: '#F5F5DC',
-                              color: '#333',
-                              fontWeight: 'bold',
-                            },
-                          }),
-                    },
-                    {
-                        title: 'Gía trị quy đổi',
-                        dataIndex: 'label',
-                        key: 'label',
-                        onHeaderCell: () => ({
-                            style: {
-                              backgroundColor: '#F5F5DC',
-                              color: '#333',
-                              fontWeight: 'bold',
-                            },
-                          }),
-                    },
-                    {
-                        title: 'Sản phẩm áp dụng',
-                        dataIndex: 'value',
-                        key: 'value',
-                        onHeaderCell: () => ({
-                            style: {
-                              backgroundColor: '#F5F5DC',
-                              color: '#333',
-                              fontWeight: 'bold',
-                            },
-                          }),
-                    },
-                ]}
-                rowKey="label"
-                size="small"
-            />
-        );
-    };
-
-    const onExpand = (expanded, record) => {
-        if (expanded) {
-            // Nếu mở hàng mới, đặt hàng hiện tại là hàng duy nhất mở
-            setExpandedRowKeys([record._id]);
+    const toggleExpandedRow = (key) => {
+        if (expandedRowKey === key) {
+            setExpandedRowKey(null);
         } else {
-            // Nếu đóng hàng, xóa hàng khỏi danh sách mở
-            setExpandedRowKeys([]);
+            fetchConversionRates(key); // Gọi API để lấy tỷ lệ quy đổi khi mở rộng
+            setExpandedRowKey(key);
         }
     };
 
     return (
         <div>
             <div className="button-container-unit">
-                <Button type="primary" onClick={showModal}>
+                <Button type="primary" onClick={() => setIsModalVisible(true)}>
                     Tạo Bảng Đơn Vị Tính
                 </Button>
             </div>
@@ -154,7 +121,11 @@ const UnitListManager = () => {
                 title="Tạo Bảng Đơn Vị Tính"
                 visible={isModalVisible}
                 onOk={handleCreateUnitList}
-                onCancel={handleCancel}
+                onCancel={() => {
+                    setIsModalVisible(false);
+                    setUnitListName('');
+                    setUnitListDescription('');
+                }}
                 okText="Tạo"
                 cancelText="Hủy"
             >
@@ -164,7 +135,6 @@ const UnitListManager = () => {
                             value={unitListName}
                             onChange={(e) => setUnitListName(e.target.value)}
                             placeholder="Nhập tên bảng"
-                            
                         />
                     </Form.Item>
                     <Form.Item label="Mô tả">
@@ -191,12 +161,6 @@ const UnitListManager = () => {
                         dataIndex: 'description',
                         key: 'description',
                     },
-                    // {
-                    //     title: 'Người Tạo',
-                    //     dataIndex: 'createdBy',
-                    //     key: 'createdBy',
-                    //     render: (text) => text ? text : 'Chưa có',
-                    // },
                     {
                         title: 'Trạng Thái',
                         dataIndex: 'isActive',
@@ -221,12 +185,85 @@ const UnitListManager = () => {
                         ),
                     },
                 ]}
-                expandedRowRender={expandedRowRender}
-                onExpand={onExpand}
-                expandedRowKeys={expandedRowKeys}
+                expandable={{
+                    expandedRowRender: (record) => {
+                        const conversionRates = conversionRatesMap[record._id] || [];
+                        return (
+                            <div>
+                                <h3>Chi Tiết Quy Đổi</h3>
+                                <Button onClick={() => showConversionRateModal(record)} style={{ marginBottom: 16 }}>
+                                    Thêm Đơn Vị
+                                </Button>
+                                <Table
+                                    dataSource={conversionRates}
+                                    columns={[
+                                        {
+                                            title: 'Đơn Vị Nguồn',
+                                            dataIndex: 'fromUnitName',
+                                            key: 'fromUnitName',
+                                        },
+                                        {
+                                            title: 'Đơn Vị Quy Đổi',
+                                            dataIndex: 'toUnitName',
+                                            key: 'toUnitName',
+                                        },
+                                        {
+                                            title: 'Giá Trị Quy Đổi',
+                                            dataIndex: 'factor',
+                                            key: 'factor',
+                                        },
+                                        {
+                                            title: 'Sản Phẩm Được Áp Dụng',
+                                            dataIndex: 'products',
+                                            key: 'products',
+                                            render: (products) => (products && products.length > 0 ? products.join(', ') : 'Không có sản phẩm'),
+                                        },
+                                    ]}
+                                    rowKey="_id"
+                                />
+                            </div>
+                        );
+                    },
+                    rowExpandable: record => true,
+                    expandedRowKeys: expandedRowKey ? [expandedRowKey] : [],
+                    onExpand: (expanded, record) => {
+                        toggleExpandedRow(record._id);
+                    },
+                }}
                 rowKey="_id"
                 loading={loading}
             />
+
+            <Modal
+                title="Thêm đơn vị quy đổi"
+                visible={visible}
+                onOk={handleUpdateConversionRate}
+                onCancel={() => setVisible(false)}
+            >
+                <Form layout="vertical">
+                    <Form.Item label="Đơn Vị Nguồn">
+                        <Input
+                            value={fromUnitName}
+                            onChange={(e) => setFromUnitName(e.target.value)}
+                            placeholder="Nhập tên đơn vị nguồn"
+                        />
+                    </Form.Item>
+                    <Form.Item label="Đơn Vị Đích">
+                        <Input
+                            value={toUnitName}
+                            onChange={(e) => setToUnitName(e.target.value)}
+                            placeholder="Nhập tên đơn vị đích"
+                        />
+                    </Form.Item>
+                    <Form.Item label="Giá Trị Quy Đổi">
+                        <Input
+                            value={factor}
+                            onChange={(e) => setFactor(e.target.value)}
+                            placeholder="Nhập giá trị quy đổi"
+                        />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
