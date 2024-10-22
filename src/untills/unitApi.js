@@ -86,3 +86,16 @@ export const getUnitLinesByHeaderId = async (headerId) => {
   const response = await axios.get(`${API_URL}/units/crud/unit-lines/header/${headerId}`);
   return response.data;
 };
+
+
+
+
+export const getDetailsByLineId = async (lineId) => {
+  try {
+      const response = await axios.get(`${API_URL}/units/crud/lines/${lineId}/details`);
+      return response.data;
+  } catch (error) {
+      console.error("Lỗi khi lấy chi tiết theo Line ID:", error);
+      throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
+  }
+};

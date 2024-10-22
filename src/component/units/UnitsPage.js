@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Input, Modal, message, Table } from "antd";
-import { createUnitList, createUnitLine, createUnitDetail, getAllUnitHeaders, getUnitLinesByHeaderId } from "../../untills/unitApi"; 
+import { createUnitList, createUnitLine, createUnitDetail, getAllUnitHeaders, getUnitLinesByHeaderId, getDetailsByLineId } from "../../untills/unitApi"; 
 import './UnitManager.css'; // Import file CSS
 
 const UnitManager = () => {
     const [headers, setHeaders] = useState([]);
-    const [lines, setLines] = useState({}); // State to store lines by header ID
+    const [lines, setLines] = useState({});
+    const [details, setDetails] = useState({}); // State để lưu trữ chi tiết của từng dòng
 
     const [currentHeaderId, setCurrentHeaderId] = useState(null);
     const [currentLineId, setCurrentLineId] = useState(null);
@@ -14,7 +15,7 @@ const UnitManager = () => {
     const [detailModalVisible, setDetailModalVisible] = useState(false);
     const [headerModalVisible, setHeaderModalVisible] = useState(false); // Modal cho tiêu đề
 
-    // State to manage expanded headers
+    // State để quản lý hàng đã mở rộng
     const [expandedRows, setExpandedRows] = useState({});
 
     useEffect(() => {
@@ -22,13 +23,13 @@ const UnitManager = () => {
             try {
                 const headersData = await getAllUnitHeaders();
                 setHeaders(headersData);
-                
+
                 // Fetch lines for each header after loading headers
                 const linesData = {};
                 for (const header of headersData) {
                     linesData[header._id] = await getUnitLinesByHeaderId(header._id);
                 }
-                setLines(linesData); // Set all lines for each header
+                setLines(linesData);
             } catch (error) {
                 message.error("Lỗi khi tải dữ liệu");
             }
@@ -42,7 +43,7 @@ const UnitManager = () => {
             const header = await createUnitList(values);
             setHeaders((prevHeaders) => [...prevHeaders, header]);
             message.success("Tiêu đề đơn vị đã được tạo thành công!");
-            setHeaderModalVisible(false); // Đóng modal sau khi tạo thành công
+            setHeaderModalVisible(false);
         } catch (error) {
             message.error("Lỗi khi tạo tiêu đề đơn vị");
         }
@@ -51,13 +52,12 @@ const UnitManager = () => {
     const handleCreateLine = async (values) => {
         try {
             const line = await createUnitLine({ ...values, headerId: currentHeaderId });
-            // Cập nhật dòng mới vào danh sách dòng của header hiện tại
             setLines((prev) => ({
                 ...prev,
-                [currentHeaderId]: [...(prev[currentHeaderId] || []), line], // Thêm dòng mới vào danh sách
+                [currentHeaderId]: [...(prev[currentHeaderId] || []), line],
             }));
             message.success("Dòng đã được tạo thành công!");
-            setLineModalVisible(false); // Đóng modal sau khi tạo dòng thành công
+            setLineModalVisible(false);
         } catch (error) {
             message.error("Lỗi khi tạo dòng đơn vị");
         }
@@ -66,8 +66,12 @@ const UnitManager = () => {
     const handleCreateDetail = async (values) => {
         try {
             const detail = await createUnitDetail({ ...values, lineId: currentLineId });
+            setDetails((prev) => ({
+                ...prev,
+                [currentLineId]: [...(prev[currentLineId] || []), detail],
+            }));
             message.success("Chi tiết đã được tạo thành công!");
-            setDetailModalVisible(false); // Đóng modal sau khi tạo chi tiết thành công
+            setDetailModalVisible(false);
         } catch (error) {
             message.error("Lỗi khi tạo chi tiết đơn vị");
         }
@@ -81,6 +85,18 @@ const UnitManager = () => {
             ...prev,
             [id]: !isExpanded,
         }));
+    };
+
+    const fetchDetailsByLineId = async (lineId) => {
+        try {
+            const detailData = await getDetailsByLineId(lineId); // Gọi API để lấy chi tiết
+            setDetails((prev) => ({
+                ...prev,
+                [lineId]: detailData,
+            }));
+        } catch (error) {
+            message.error("Lỗi khi tải chi tiết");
+        }
     };
 
     const columns = [
@@ -106,33 +122,16 @@ const UnitManager = () => {
             key: 'status',
             render: (status) => status || "Chưa xác định",
         },
-        {
-            title: 'Hành Động',
-            key: 'action',
-            render: (_, record) => (
-                <Button
-                    type="primary"
-                    onClick={() => {
-                        setCurrentHeaderId(record._id);
-                        setLineModalVisible(true); // Mở modal để thêm dòng
-                    }}
-                >
-                    Thêm Dòng
-                </Button>
-            ),
-        },
     ];
 
     return (
         <div className="unit-manager">
             <h1>Quản Lý Đơn Vị</h1>
 
-            {/* Nút tạo tiêu đề đơn vị */}
             <Button type="primary" onClick={() => setHeaderModalVisible(true)}>
                 Thêm Bảng Đơn Vị
             </Button>
 
-            {/* Modal Thêm Tiêu Đề */}
             <Modal
                 title="Thêm Tiêu Đề Đơn Vị"
                 visible={headerModalVisible}
@@ -150,45 +149,71 @@ const UnitManager = () => {
                 </Form>
             </Modal>
 
-            {/* Danh Sách Tiêu Đề */}
             <Table
-                dataSource={headers.map(header => ({ ...header, key: header._id }))}
+                dataSource={headers.map(header => ({ ...header, key: header._id }))} 
                 columns={columns}
                 pagination={false}
                 expandable={{
                     expandedRowRender: (record) => (
-                        <Table
-                            dataSource={lines[record._id]?.map(line => ({ ...line, key: line._id })) || []}
-                            columns={[
-                                { title: 'Tên Dòng', dataIndex: 'name', key: 'name' },
-                                { title: 'Mô Tả', dataIndex: 'description', key: 'description' },
-                                {
-                                    title: 'Hành Động',
-                                    key: 'action',
-                                    render: (_, line) => (
-                                        <Button
-                                            type="primary"
-                                            onClick={() => {
-                                                setCurrentLineId(line._id);
-                                                setDetailModalVisible(true);
-                                            }}
-                                        >
-                                            Thêm Chi Tiết
-                                        </Button>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <h4>Danh Sách Dòng</h4>
+                                <Button
+                                    type="primary"
+                                    onClick={() => {
+                                        setCurrentHeaderId(record._id);
+                                        setLineModalVisible(true);
+                                    }}
+                                >
+                                    Thêm Dòng
+                                </Button>
+                            </div>
+                            <Table
+                                dataSource={lines[record._id]?.map(line => ({ ...line, key: line._id })) || []}
+                                columns={[
+                                    { title: 'Tên Dòng', dataIndex: 'name', key: 'name' },
+                                    { title: 'Mô Tả', dataIndex: 'description', key: 'description' },
+                                    {
+                                        title: 'Hành Động',
+                                        key: 'action',
+                                        render: (_, line) => (
+                                            <Button
+                                                type="primary"
+                                                onClick={() => {
+                                                    setCurrentLineId(line._id);
+                                                    fetchDetailsByLineId(line._id); // Lấy chi tiết khi nhấn nút
+                                                    setDetailModalVisible(true);
+                                                }}
+                                            >
+                                                Xem Chi Tiết
+                                            </Button>
+                                        ),
+                                    },
+                                ]}
+                                pagination={false}
+                                expandable={{
+                                    expandedRowRender: (line) => (
+                                        <Table
+                                            dataSource={details[line._id]?.map(detail => ({ ...detail, key: detail._id })) || []}
+                                            columns={[
+                                                { title: 'Tên Chi Tiết', dataIndex: 'detailName', key: 'detailName' },
+                                                { title: 'Mô Tả', dataIndex: 'description', key: 'description' },
+                                            ]}
+                                            pagination={false}
+                                        />
                                     ),
-                                },
-                            ]}
-                            pagination={false}
-                        />
+                                    rowExpandable: (line) => true, // Allow expandable row
+                                }}
+                            />
+                        </div>
                     ),
                     rowExpandable: (record) => true, // Allow expandable row
                 }}
                 onRow={(record) => ({
-                    onClick: () => toggleHeader(record._id), // Toggle expand/collapse on row click
+                    onClick: () => toggleHeader(record._id),
                 })}
             />
 
-            {/* Modal Thêm Dòng */}
             <Modal
                 title="Thêm Dòng"
                 visible={lineModalVisible}
@@ -206,7 +231,6 @@ const UnitManager = () => {
                 </Form>
             </Modal>
 
-            {/* Modal Thêm Chi Tiết */}
             <Modal
                 title="Thêm Chi Tiết"
                 visible={detailModalVisible}
