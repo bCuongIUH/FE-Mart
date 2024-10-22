@@ -15,113 +15,74 @@ const API_URL = "http://localhost:5000/api";
 
 export const createUnitList = async (data) => {
     try {
-      const response = await axios.post(`${API_URL}/units/unit-lists`, data);
+      const response = await axios.post(`${API_URL}/units/unit-headers`, data);
       return response.data;
     } catch (error) {
       console.error('Lỗi khi tạo bảng đơn vị tính:', error.response?.data || error.message);
       throw error;
     }
   };
-  
-  // Tạo đơn vị tính mới
-  export const createUnit = async (data) => {
+
+  export const createUnitLine = async (lineData) => {
     try {
-      const response = await axios.post(`${API_URL}/units`, data);
+      const response = await axios.post(`${API_URL}/units/unit-lines`, lineData);
+      console.log('Tạo dòng đơn vị thành công:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi tạo đơn vị tính:', error.response?.data || error.message);
-      throw error;
+      console.error('Lỗi khi tạo dòng đơn vị:', error.response.data);
     }
   };
   
-  // Thêm đơn vị tính vào bảng đơn vị tính
-  export const addUnitToList = async (data) => {
+  export const createUnitDetail = async (detailData) => {
     try {
-      const response = await axios.post(`${API_URL}/units/unit-lists/add-unit`, data);
+      const response = await axios.post(`${API_URL}/units/unit-details`, detailData);
+      console.log('Tạo chi tiết đơn vị thành công:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Lỗi khi thêm đơn vị tính vào bảng:', error.response?.data || error.message);
-      throw error;
-    }
-  };
-  
-  // Quy đổi giữa các đơn vị
-  export const convertUnit = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/units/convert`, data);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi quy đổi giữa các đơn vị:', error.response?.data || error.message);
-      throw error;
-    }
-  };
-  
-  // Cập nhật quy đổi giữa các đơn vị
-  export const updateConversionRate = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/units/conversion-rate`, data);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi cập nhật quy đổi:', error.response?.data || error.message);
-      throw error;
-    }
-  };
-  
-  // Thêm đơn vị vào sản phẩm
-  export const addUnitToProduct = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/units/add-unit-to-product`, data);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi thêm đơn vị vào sản phẩm:', error.response?.data || error.message);
-      throw error;
-    }
-  };
-  
-  // Quy đổi số lượng theo đơn vị tính
-  export const getConvertedQuantity = async (data) => {
-    try {
-      const response = await axios.post(`${API_URL}/units/products/get-converted-quantity`, data);
-      return response.data;
-    } catch (error) {
-      console.error('Lỗi khi quy đổi số lượng:', error.response?.data || error.message);
-      throw error;
-    }
-  };
-  
- 
-// Lấy tất ds unit
-export const getAllUnitList = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/units`, config);
-      return response.data;
-    } catch (error) {
-      throw error;
+      console.error('Lỗi khi tạo chi tiết đơn vị:', error.response.data);
     }
   };
 
-  // Lấy danh sách đơn vị theo unitListId
-export const getUnitsByUnitListId = async (unitListId) => {
-    try {
-        const response = await axios.post(`${API_URL}/units/getUnit`, { unitListId });
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-//
-export const addConversionUnitToList = async (data) => {
-    const response = await axios.post(`${API_URL}/units/add-conversion-unit`, data);
-    return response.data;
-};
 
-
-export const getConversionRatesByUnitListId = async (unitListId) => {
+  
+// Hàm lấy tất cả UnitHeader
+export const getAllUnitHeaders = async () => {
   try {
-      const response = await axios.post(`${API_URL}/units/getUnit/all`, { unitListId });
-      return response.data; // Trả về dữ liệu nhận được từ server
+    const response = await axios.get(`${API_URL}/units/crud/unit-headers`, config);
+    console.log('Lấy tất cả UnitHeader:', response.data);
+    return response.data;
   } catch (error) {
-      console.error('Lỗi khi lấy danh sách quy đổi:', error);
-      throw error; // Ném lại lỗi để xử lý ở nơi gọi hàm này
+    console.error('Lỗi khi lấy tất cả UnitHeader:', error.response?.data || error.message);
+    throw error;
   }
+};
+
+// Hàm lấy tất cả UnitLine
+export const getAllUnitLines = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/units/crud/unit-lines`, config);
+    console.log('Lấy tất cả UnitLine:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy tất cả UnitLine:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Hàm lấy tất cả UnitDetail
+export const getAllUnitDetails = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/units/crud/unit-details`, config);
+    console.log('Lấy tất cả UnitDetail:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy tất cả UnitDetail:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+export const getUnitLinesByHeaderId = async (headerId) => {
+  const response = await axios.get(`${API_URL}/units/crud/unit-lines/header/${headerId}`);
+  return response.data;
 };

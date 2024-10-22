@@ -6,13 +6,13 @@ import { Button, Modal, message, Select, Input, Card, Row, Col, Table } from "an
 import { ShoppingCartOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
-const { Search } = Input; // Ô tìm kiếm
+const { Search } = Input; 
 
 function SellPage() {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]); // Danh sách sản phẩm đã lọc
-  const [categories, setCategories] = useState([]); // Danh sách danh mục
-  const [selectedCategory, setSelectedCategory] = useState(null); // Danh mục đã chọn
+  const [filteredProducts, setFilteredProducts] = useState([]); 
+  const [categories, setCategories] = useState([]); 
+  const [selectedCategory, setSelectedCategory] = useState(null); 
   const [searchText, setSearchText] = useState(""); 
   const [cart, setCart] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
