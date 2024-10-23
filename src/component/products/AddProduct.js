@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, Row, Col, Card, Upload, message } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import { createProduct, getCategories, getAllSuppliers } from '../../untills/api'; // Import hàm lấy nhà cung cấp
+import { createProduct, getCategories, getAllSuppliers } from '../../untills/api'; 
 import './AddProduct.css'; 
+import { getAllUnitLines } from '../../untills/unitApi';
 
 const { Option } = Select;
 
@@ -11,6 +12,7 @@ const AddProduct = ({ onCancel }) => {
   const [fileList, setFileList] = useState([]);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]); 
+  const [unitLines, setUnitLines] = useState([]); 
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -26,10 +28,9 @@ const AddProduct = ({ onCancel }) => {
       }
     };
 
-   
-
     fetchCategories();
   }, []);
+
   useEffect(() => {
     async function fetchSuppliers() {
       try {
@@ -41,8 +42,24 @@ const AddProduct = ({ onCancel }) => {
     }
     fetchSuppliers();
   }, []);
-console.log(suppliers);
 
+  // Hàm lấy tất cả đơn vị dòng
+  useEffect(() => {
+    const fetchUnitLines = async () => {
+      try {
+        const response = await getAllUnitLines(); // Gọi hàm lấy dữ liệu đơn vị dòng
+        if (Array.isArray(response)) {
+          setUnitLines(response); // Lưu dữ liệu vào state
+        } else {
+          message.error('Dữ liệu đơn vị dòng không hợp lệ!');
+        }
+      } catch (error) {
+        message.error('Lỗi khi lấy đơn vị dòng: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
+      }
+    };
+
+    fetchUnitLines();
+  }, []);
 
   const onFinish = async (values) => {
     try {
@@ -52,6 +69,7 @@ console.log(suppliers);
       formData.append('barcode', values.barcode);
       formData.append('categoryId', values.categoryId);
       formData.append('supplierId', values.supplierId); // Thêm ID nhà cung cấp
+      formData.append('unitLineId', values.unitLineId); // Thêm ID đơn vị dòng
       formData.append('description', values.description);
 
       if (fileList.length > 0) {
@@ -140,6 +158,22 @@ console.log(suppliers);
                 {suppliers.map(supplier => ( 
                   <Option key={supplier._id} value={supplier._id}>
                     {supplier.name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col span={8}>
+            <Form.Item
+              name="unitLineId" // Thêm trường cho đơn vị dòng
+              label="Đơn vị dòng"
+              rules={[{ required: true, message: 'Chọn đơn vị dòng!' }]}
+              className="form-item"
+            >
+              <Select placeholder="Chọn đơn vị dòng">
+                {unitLines.map(unitLine => (
+                  <Option key={unitLine._id} value={unitLine._id}>
+                    {unitLine.name} {/* Hiển thị tên đơn vị dòng */}
                   </Option>
                 ))}
               </Select>

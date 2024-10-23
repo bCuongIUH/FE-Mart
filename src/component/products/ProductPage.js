@@ -53,6 +53,7 @@ const ProductPage = () => {
     
     fetchAllData();
   }, []);
+console.log("2",products);
 
 
   // Lấy sản phẩm và định dạng dữ liệu

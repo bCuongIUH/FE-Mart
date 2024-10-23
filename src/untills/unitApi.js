@@ -44,7 +44,7 @@ export const createUnitList = async (data) => {
   };
   export const updateUnitDetail = async (id, detailData) => {
     try {
-        const response = await axios.put(`${API_URL}/units/unit-details/${id}`, detailData);
+        const response = await axios.put(`${API_URL}/units/crud/details/${id}`, detailData);
         console.log('Cập nhật chi tiết đơn vị thành công:', response.data);
         return response.data; // Trả về dữ liệu chi tiết đã cập nhật
     } catch (error) {
@@ -52,9 +52,12 @@ export const createUnitList = async (data) => {
         throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm này
     }
 };
+
+
+
 export const deleteUnitDetail = async (id) => {
   try {
-      const response = await axios.delete(`${API_URL}/units/unit-details/${id}`);
+      const response = await axios.delete(`${API_URL}/units/crud/details/${id}`);
       console.log('Xóa chi tiết đơn vị thành công:', response.data);
       return response.data; // Trả về thông điệp thành công
   } catch (error) {
@@ -101,14 +104,6 @@ export const getAllUnitDetails = async () => {
   }
 };
 
-//lấy line theo header
-export const getUnitLinesByHeaderId = async (headerId) => {
-  const response = await axios.get(`${API_URL}/units/crud/unit-lines/header/${headerId}`);
-  return response.data;
-};
-
-
-
 export const getDetailsByLineId = async (lineId) => {
   try {
     const response = await axios.get(`${API_URL}/units/crud/lines/${lineId}/details`); 
@@ -118,3 +113,13 @@ export const getDetailsByLineId = async (lineId) => {
     throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
   }
 };
+
+
+//lấy line theo header
+export const getUnitLinesByHeaderId = async (headerId) => {
+  const response = await axios.get(`${API_URL}/units/crud/unit-lines/header/${headerId}`);
+  return response.data;
+};
+
+
+
