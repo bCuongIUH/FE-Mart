@@ -26,6 +26,7 @@ import PriceProduct from '../component/PriceProduct/PriceProduct';
 import NhapKho from '../component/warehouseManager/WarehouseManager';
 import PromotionProgramList from '../component/PromotionManager/PromotionProgramList';
 import UnitManager from '../component/units/UnitsPage';
+// import CreatePriceList from '../component/priceListV2/CreatePriceList';
 
 
 
