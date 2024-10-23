@@ -1,127 +1,18 @@
-// import React, { useEffect, useState } from 'react';
-// import { Button, Descriptions, Tag, Row, Col, Card, Image, message, Switch } from 'antd';
-// import { getCategories, updateProductStatus } from '../../untills/api';
-// import Barcode from './Barcode'; 
-
-// const ProductDetail = ({ product, onBack }) => {
-//     const [categories, setCategories] = useState([]);
-//     const [isAvailable, setIsAvailable] = useState(product.isAvailable);
-
-//     useEffect(() => {
-//         const fetchCategories = async () => {
-//             try {
-//                 const response = await getCategories();
-//                 if (Array.isArray(response.categories)) {
-//                     setCategories(response.categories);
-//                 } else {
-//                     message.error('Dữ liệu danh mục không hợp lệ!');
-//                 }
-//             } catch (error) {
-//                 message.error('Lỗi khi lấy danh mục: ' + (error.response?.data.message || 'Vui lòng thử lại!'));
-//             }
-//         };
-
-//         fetchCategories();
-//     }, []);
-
-//     const handleSwitchChange = async (checked, productId) => {
-//         if (product.quantity === 0 && checked) {
-//             message.warning('Không thể cập nhật trạng thái thành Đang bán vì sản phẩm hiện tại không còn hàng!');
-//             return;
-//         }
-
-//         if (checked && (!product.currentPrice || product.currentPrice <= 0)) {
-//             message.warning('Không thể cập nhật trạng thái thành Đang bán vì giá sản phẩm không hợp lệ!');
-//             return;
-//         }
-
-//         setIsAvailable(checked);
-//         try {
-//             await updateProductStatus(productId, checked);
-//             message.success(`Trạng thái sản phẩm đã ${checked ? 'cập nhật thành Đang bán' : 'cập nhật thành Ngưng bán'}`);
-//         } catch (error) {
-//             message.error('Cập nhật trạng thái không thành công!');
-//             setIsAvailable(!checked);
-//         }
-//     };
-
-//     return (
-//         <div>
-//             <h2>Chi tiết sản phẩm</h2>
-//             <Row gutter={16}>
-//                 {/* Cột bên trái: Thông tin chi tiết sản phẩm chiếm 2 phần */}
-//                 <Col span={16}>
-//                     <Card title="Thông tin Sản phẩm">
-//                         <Image
-//                             src={product.image}
-//                             alt={product.nameProduct}
-//                             width={100}
-//                             height={100}
-//                             style={{ marginBottom: 16 }}
-//                         />
-//                         <Descriptions column={1}>
-//                             <Descriptions.Item label="Mã">{product.code}</Descriptions.Item>
-//                             <Descriptions.Item label="Mã vạch">{product.barcode}</Descriptions.Item>
-//                             <Descriptions.Item label="Tên sản phẩm">{product.name}</Descriptions.Item>
-//                             <Descriptions.Item label="Phân loại">
-//                                 {categories.find(category => category._id === product.category)?.name || 'Không xác định'}
-//                             </Descriptions.Item>
-//                         </Descriptions>
-                        
-                       
-//                         <div style={{ textAlign: 'center', marginTop: -100 }}>
-//                             <Barcode code={product.barcode} />
-//                         </div>
-//                     </Card>
-//                 </Col>
-
-//                 {/* Cột bên phải: Trạng thái bán và Chương trình khuyến mãi */}
-//                 <Col span={8}>
-//                     <Card title="Trạng thái bán">
-//                         <Descriptions column={1}>
-//                             <Descriptions.Item label="Trạng thái">
-//                                 <Tag color={isAvailable ? "green" : "red"}>
-//                                     {isAvailable ? 'Đang bán' : 'Ngưng bán'}
-//                                 </Tag>
-//                                 <Switch 
-//                                     checked={isAvailable} 
-//                                     onChange={(checked) => handleSwitchChange(checked, product.key)}
-//                                     style={{ marginLeft: 16 }} 
-//                                 />
-//                             </Descriptions.Item>
-//                             <Descriptions.Item label="Số lượng">{product.quantity}</Descriptions.Item>
-//                             <Descriptions.Item label="Giá bán">{product.currentPrice.toLocaleString()} đ</Descriptions.Item>
-//                         </Descriptions>
-//                     </Card>
-
-//                     <Card title="Chương trình khuyến mãi" style={{ marginTop: 16 }}>
-//                         <Descriptions column={1}>
-//                             <Descriptions.Item label="Khuyến mãi hiện tại">
-//                                 Không có khuyến mãi
-//                             </Descriptions.Item>
-//                         </Descriptions>
-//                     </Card>
-//                 </Col>
-//             </Row>
-
-//             <Button type="primary" onClick={onBack} style={{ marginTop: 16 }}>
-//                 Quay lại danh sách
-//             </Button>
-//         </div>
-//     );
-// };
-
-// export default ProductDetail;
 import React, { useEffect, useState } from 'react';
 import { Button, Descriptions, Tag, Row, Col, Card, Image, message, Switch, Select } from 'antd';
+import Barcode from './Barcode';
 import { getCategories, updateProductStatus } from '../../untills/api';
-import Barcode from './Barcode'; 
+import { getDetailsByLineId } from '../../untills/unitApi';
+
+const { Option } = Select;
 
 const ProductDetail = ({ product, onBack }) => {
     const [categories, setCategories] = useState([]);
     const [isAvailable, setIsAvailable] = useState(product.isAvailable);
-    const [selectedUnit, setSelectedUnit] = useState(product.units[0]); // Khởi tạo với đơn vị đầu tiên
-    const [quantity, setQuantity] = useState(product.units[0].value); // Giả sử value của đơn vị là số lượng
+    const [details, setDetails] = useState([]);
+    const [selectedDetailId, setSelectedDetailId] = useState(null);
+    const [quantity, setQuantity] = useState(product.quantity);
+    const [displayQuantity, setDisplayQuantity] = useState(0);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -140,32 +31,50 @@ const ProductDetail = ({ product, onBack }) => {
         fetchCategories();
     }, []);
 
-    const handleSwitchChange = async (checked, productId) => {
-        if (product.quantity === 0 && checked) {
-            message.warning('Không thể cập nhật trạng thái thành Đang bán vì sản phẩm hiện tại không còn hàng!');
-            return;
-        }
+    useEffect(() => {
+        const fetchDetails = async () => {
+            if (product.units.length > 0) {
+                const lineId = product.units[0].unitLine; 
+                try {
+                    const detailsData = await getDetailsByLineId(lineId);
+                    setDetails(detailsData);
 
-        if (checked && (!product.currentPrice || product.currentPrice <= 0)) {
-            message.warning('Không thể cập nhật trạng thái thành Đang bán vì giá sản phẩm không hợp lệ!');
-            return;
-        }
+                    // Chọn chi tiết đầu tiên
+                    if (detailsData.length > 0) {
+                        const firstDetailId = detailsData[0]._id;
+                        setSelectedDetailId(firstDetailId);
+                        const value = detailsData[0].value || 1; 
+                        setDisplayQuantity(quantity / value);
+                    }
+                } catch (error) {
+                    message.error('Lỗi khi lấy thông tin chi tiết.');
+                }
+            }
+        };
 
+        fetchDetails();
+    }, [product]);
+
+    const handleSwitchChange = async (checked) => {
         setIsAvailable(checked);
-        try {
-            await updateProductStatus(productId, checked);
-            message.success(`Trạng thái sản phẩm đã ${checked ? 'cập nhật thành Đang bán' : 'cập nhật thành Ngưng bán'}`);
-        } catch (error) {
-            message.error('Cập nhật trạng thái không thành công!');
-            setIsAvailable(!checked);
+        const updatedStatus = await updateProductStatus(product._id, { isAvailable: checked });
+        if (updatedStatus) {
+            message.success('Cập nhật trạng thái thành công!');
+        } else {
+            message.error('Cập nhật trạng thái thất bại!');
         }
     };
 
-    // Hàm xử lý khi chọn đơn vị
-    const handleUnitChange = (value) => {
-        const selected = product.units.find(unit => unit._id === value);
-        setSelectedUnit(selected);
-        setQuantity(selected.value); // Cập nhật số lượng dựa trên đơn vị đã chọn
+    const handleDetailChange = (detailId) => {
+        setSelectedDetailId(detailId);
+        
+        const selectedDetail = details.find(detail => detail._id === detailId);
+        if (selectedDetail) {
+            const value = selectedDetail.value || 1; // Tránh chia cho 0
+            setDisplayQuantity(quantity / value);
+        } else {
+            setDisplayQuantity(0); // Reset nếu không tìm thấy chi tiết
+        }
     };
 
     return (
@@ -176,7 +85,7 @@ const ProductDetail = ({ product, onBack }) => {
                     <Card title="Thông tin Sản phẩm">
                         <Image
                             src={product.image}
-                            alt={product.nameProduct}
+                            alt={product.name}
                             width={100}
                             height={100}
                             style={{ marginBottom: 16 }}
@@ -204,24 +113,31 @@ const ProductDetail = ({ product, onBack }) => {
                                 </Tag>
                                 <Switch 
                                     checked={isAvailable} 
-                                    onChange={(checked) => handleSwitchChange(checked, product.key)}
+                                    onChange={handleSwitchChange}
                                     style={{ marginLeft: 16 }} 
                                 />
                             </Descriptions.Item>
-                            <Descriptions.Item label="Số lượng">
+                            <Descriptions.Item label="Số Lượng">
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <span>
+                                    {displayQuantity.toFixed(2)} 
+                                </span>
                                 <Select
-                                    defaultValue={product.units[0]._id} // Giá trị mặc định
-                                    style={{ width: 120, marginBottom: 16 }}
-                                    onChange={handleUnitChange}
+                                    defaultValue={details.length > 0 ? details[0]._id : null}
+                                    style={{ width: '200px', marginLeft: 10 }}
+                                    onChange={handleDetailChange}
+                                    value={selectedDetailId} 
                                 >
-                                    {product.units.map(unit => (
-                                        <Select.Option key={unit._id} value={unit._id}>
-                                            {unit.name}
-                                        </Select.Option>
+                                    {details.map(detail => (
+                                        <Option key={detail._id} value={detail._id}>
+                                            {`${detail.name}`} 
+                                        </Option>
                                     ))}
                                 </Select>
-                                <span>{quantity} {selectedUnit.name}</span> {/* Hiển thị số lượng và đơn vị */}
-                            </Descriptions.Item>
+                            </div>
+                        </Descriptions.Item>
+
+
                             <Descriptions.Item label="Giá bán">{product.currentPrice.toLocaleString()} đ</Descriptions.Item>
                         </Descriptions>
                     </Card>
