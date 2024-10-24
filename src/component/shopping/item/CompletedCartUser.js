@@ -22,7 +22,7 @@ function CompletedCartUser() {
         const updatedOrders = data.map(order => {
           const totalPrice = (order.items || []).reduce((total, item) => {
             if (item.product) {
-              return total + item.unitPrice * item.quantity; 
+              return total + item.currentPrice * item.quantity; 
             }
             return total;
           }, 0);
@@ -85,7 +85,7 @@ function CompletedCartUser() {
                       <div className={styles.productInfo}>
                         <p>Tên sản phẩm: {item.product.name}</p>
                         <p>Số lượng: {item.quantity}</p>
-                        <p>Giá: {item.unitPrice} VND</p>
+                        <p>Giá: {item.currentPrice} VND</p>
                       </div>
                     </div>
                   ) : (

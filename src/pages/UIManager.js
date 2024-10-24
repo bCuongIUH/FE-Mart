@@ -101,7 +101,7 @@ const WarehouseManager = () => {
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
             <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>
-            <Menu.Item key="6" onClick={() => handleNavigate('/AddEmployee')}>Thêm nhân viên</Menu.Item>
+            <Menu.Item key="6" onClick={() => handleNavigate()}>Thêm nhân viên</Menu.Item>
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
             {/* <Menu.Item key="7" onClick={() => handleNavigate()}>Kho tổng</Menu.Item> */}

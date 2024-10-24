@@ -35,12 +35,7 @@ const ShoppingCart = () => {
     const handleComponentChange = (component) => {
         setActiveComponent(component); 
     };
-// //mua sp theo số lượng
-// // {
-// //     "userId" :"66ec5996073fa0a23b3c2834",
-// //     "productId" : "66f1dae68412a467ee5fc772",
-// //     "quantity" :15
-// // }
+
     return (
         <div className="profile-page">
             <header className="profile-header">
@@ -89,7 +84,7 @@ const ShoppingCart = () => {
                     <header className="main-header">
                         <nav className="info-options">
                             <a href="#" onClick={() => handleComponentChange('all')}>Tất Cả</a>
-                            <a href="#" onClick={() => handleComponentChange('pending')}>Chờ thanh toán</a>
+                            {/* <a href="#" onClick={() => handleComponentChange('pending')}>Chờ thanh toán</a> */}
                             <a href="#" onClick={() => handleComponentChange('shipping')}>Chờ vận chuyển</a>
                             <a href="#" onClick={() => handleComponentChange('completed')}>Hoàn thành</a>
                             <a href="#" onClick={() => handleComponentChange('refund')}>Hoàn trả</a>
@@ -100,7 +95,7 @@ const ShoppingCart = () => {
                     </header>
                     <section className="placed-products">
                         {activeComponent === 'all' && <AllCart/>}
-                        {activeComponent === 'pending' && <div>Đây là sản phẩm chờ thanh toán</div>}
+                        {/* {activeComponent === 'pending' && <div>Đây là sản phẩm chờ thanh toán</div>} */}
                         {activeComponent === 'shipping' && <ShipperCart/>}
                         {activeComponent === 'completed' && <CompletedCartUser/>}
                         {activeComponent === 'refund' && <ReturnedCart/>}

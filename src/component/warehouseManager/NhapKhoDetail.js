@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { getAllSuppliers, getProductsBySupplier, createWarehouseEntry } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
-import { Table, Input, Select, Button, message } from 'antd'; // Import message from Ant Design
+import { Table, Input, Select, Button, message } from 'antd';
 const { Option } = Select;
 
 const WarehouseEntryForm = ({ onCancel }) => {
@@ -31,7 +31,7 @@ const WarehouseEntryForm = ({ onCancel }) => {
         try {
           const data = await getProductsBySupplier(selectedSupplierId);
           setProducts(data);
-          setEntryProducts(data.map(product => ({ productId: product._id, quantity: 0, price: 0 })));
+          setEntryProducts(data.map(product => ({ productId: product._id, quantity: 0, price: product.price || 0 }))); // Initialize price
         } catch (error) {
           console.error('Lỗi khi lấy sản phẩm:', error);
         }
@@ -46,8 +46,8 @@ const WarehouseEntryForm = ({ onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Filter out products with quantity <= 0 or price <= 0
-    const validProducts = entryProducts.filter(product => product.quantity > 0 && product.price > 0);
+    // Filter products with quantity > 0
+    const validProducts = entryProducts.filter(product => product.quantity > 0);
 
     if (validProducts.length === 0) {
       message.warning('Không có sản phẩm hợp lệ để tạo phiếu nhập kho.');
@@ -56,25 +56,27 @@ const WarehouseEntryForm = ({ onCancel }) => {
 
     const entryData = {
       entryCode,
-      enteredBy: user._id,
+      enteredBy,
       supplierId: selectedSupplierId,
       products: validProducts,
     };
 
     try {
       const result = await createWarehouseEntry(entryData);
-      message.success('Nhập kho thành công!'); // Show success message
+      message.success('Nhập kho thành công!');
       console.log('Kết quả từ API:', result);
       onCancel(); // Close form after creating entry
     } catch (error) {
-      message.error('Lỗi khi tạo phiếu nhập kho.'); // Show error message
+      message.error('Lỗi khi tạo phiếu nhập kho.');
       console.error('Lỗi khi tạo phiếu nhập kho:', error);
     }
   };
 
   const handleProductChange = (productId, quantity, price) => {
     const updatedProducts = entryProducts.map((p) =>
-      p.productId === productId ? { ...p, quantity: quantity || 0, price: price || 0 } : p
+      p.productId === productId 
+        ? { ...p, quantity: quantity !== undefined ? quantity : p.quantity, price: price !== undefined ? price : p.price } 
+        : p
     );
     setEntryProducts(updatedProducts);
   };
@@ -136,24 +138,34 @@ const WarehouseEntryForm = ({ onCancel }) => {
                 },
               },
               {
+                title: 'Số lượng tồn kho',
+                dataIndex: 'productId',
+                render: (text, product) => {
+                  const productDetails = products.find(item => item._id === product.productId);
+                  return <span>{productDetails ? productDetails.quantity : 'Không có số lượng'}</span>;
+                },
+              },
+              {
                 title: 'Giá nhập',
                 dataIndex: 'price',
                 render: (text, product) => (
                   <Input
                     type="number"
                     min={0}
-                    onChange={(e) => handleProductChange(product.productId, product.quantity, e.target.value)}
+                    value={entryProducts.find(p => p.productId === product.productId)?.price || 0}
+                    onChange={(e) => handleProductChange(product.productId, undefined, e.target.value)}
                   />
                 ),
               },
               {
-                title: 'Số lượng',
+                title: 'Số lượng nhập',
                 dataIndex: 'quantity',
                 render: (text, product) => (
                   <Input
                     type="number"
                     min={0}
-                    onChange={(e) => handleProductChange(product.productId, e.target.value, product.price)}
+                    value={entryProducts.find(p => p.productId === product.productId)?.quantity}
+                    onChange={(e) => handleProductChange(product.productId, e.target.value)}
                   />
                 ),
               },

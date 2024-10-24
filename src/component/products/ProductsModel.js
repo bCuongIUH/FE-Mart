@@ -104,7 +104,7 @@ function ProductsModal({ product, onClose, onBuyNow }) {
   const { user } = useContext(AuthContext);
   const [quantity, setQuantity] = useState(1);
   const maxQuantity = product.quantity || 0; // Lấy số lượng từ product.quantity
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(null); // Chỉ cần lưu cart như null hoặc object
 
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
@@ -115,22 +115,45 @@ function ProductsModal({ product, onClose, onBuyNow }) {
 
   const onAddToCart = async () => {
     try {
-      if (!user || !user._id) {
-        return message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
-      }
+        if (!user || !user._id) {
+            return message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
+        }
 
-      if (!product || !product._id) {
-        return message.error("Sản phẩm không hợp lệ");
-      }
+        if (!product || !product._id) {
+            return message.error("Sản phẩm không hợp lệ");
+        }
 
-      const cartData = await getAddToCart(user._id, product._id, quantity);
-      setCart(cartData.items);
+        if (!quantity || quantity < 1) {
+            return message.error("Số lượng không hợp lệ");
+        }
 
-      message.success("Sản phẩm đã được thêm vào giỏ hàng");
+        // Debugging log
+        console.log("Product Details:", {
+            userId: user._id,
+            productId: product._id,
+            quantity: quantity,
+            currentPrice: product.currentPrice 
+        });
+
+        // Kiểm tra giá trị currentPrice
+        if (typeof product.currentPrice !== 'number' || isNaN(product.currentPrice)) {
+            return message.error("Giá sản phẩm không hợp lệ");
+        }
+
+        const totalPrice = product.currentPrice * quantity;
+
+        // Kiểm tra giá trị totalPrice
+        console.log("Total Price:", totalPrice);
+
+        const cartData = await getAddToCart(user._id, product._id, quantity, product.currentPrice, product.unit);
+        setCart(cartData.items);
+        message.success("Sản phẩm đã được thêm vào giỏ hàng");
     } catch (error) {
-      message.error("Lỗi khi thêm sản phẩm vào giỏ hàng");
+        console.error("Error adding to cart:", error);
+        message.error("Lỗi khi thêm sản phẩm vào giỏ hàng");
     }
-  };
+};
+
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -158,10 +181,7 @@ function ProductsModal({ product, onClose, onBuyNow }) {
       </Modal.Header>
       <Modal.Body>
         <div className="modalContent" style={{ display: "flex" }}>
-          <div
-            className="imageContainer"
-            style={{ flex: 1, marginRight: "20px" }}
-          >
+          <div className="imageContainer" style={{ flex: 1, marginRight: "20px" }}>
             <img
               src={product.image}
               alt={product.name}
@@ -175,16 +195,9 @@ function ProductsModal({ product, onClose, onBuyNow }) {
               * Hình ảnh chỉ mang tính chất minh họa *
             </p>
           </div>
-          <div
-            className="modalDetails"
-            style={{ flex: 1, display: "flex", flexDirection: "column" }}
-          >
-            <h2 style={{ fontSize: "24px", marginBottom: "10px" }}>
-              {product.name}
-            </h2>
-            <p style={{ fontSize: "18px", marginBottom: "10px" }}>
-              {product.description}
-            </p>
+          <div className="modalDetails" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+            <h2 style={{ fontSize: "24px", marginBottom: "10px" }}>{product.name}</h2>
+            <p style={{ fontSize: "18px", marginBottom: "10px" }}>{product.description}</p>
             <p style={{ fontSize: "22px", marginBottom: "15px" }}>
               {product.currentPrice ? (
                 <span style={{ fontWeight: "bold" }}>

@@ -63,9 +63,10 @@ const Actions = () => {
 
   // Hàm xử lý đăng xuất
   const handleLogout = () => {
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token");
     localStorage.removeItem("user");
-    navigate("/"); // Chuyển hướng về trang login sau khi đăng xuất
+    navigate("/"); 
+    window.location.reload();
   };
 
   return (

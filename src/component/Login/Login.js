@@ -27,7 +27,7 @@ function Login({ onClose, onSwitchToRegister }) {
         if (data.user.role === 'admin') {
           navigate('/UIManager');
         } else {
-          navigate('/UIPage');
+          navigate('/');
         }
       } else {
         setErrorMessage(response.data.message || 'Đăng nhập thất bại');

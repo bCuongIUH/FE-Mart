@@ -102,6 +102,15 @@ export const getAllProducts = async () => {
     throw error;
   }
 };
+export const getAllProductsPOP = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/products/POP`, config);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 // Lấy sản phẩm theo ID
 export const getProductById = async (id) => {
@@ -338,12 +347,13 @@ export const createCart = async (suppliersData) => {
   }
 };
 // Hàm thêm sản phẩm vào giỏ hàng
-export const getAddToCart = async (userId, productId, quantity) => {
+export const getAddToCart = async (userId, productId, quantity,currentPrice ) => {
   try {
     const response = await axios.post(`${API_URL}/cart/add`, {
       userId,
       productId,
-      quantity
+      quantity,
+      currentPrice 
     });
     return response.data; 
   } catch (error) {

@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { createBill, getAllCart } from '../../../untills/api';
 import { AuthContext } from '../../../untills/context/AuthContext';
+import { Radio, Button, message } from 'antd'; // Import Ant Design components
 import styles from './AllCart.module.css'; 
 
 function AllCart() {
@@ -10,7 +11,7 @@ function AllCart() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('Cash');
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchGioHang = async () => {
@@ -29,7 +30,7 @@ function AllCart() {
       } catch (error) {
         setError(error.response?.data?.message || "Giỏ hàng trống");
       } finally {
-        setLoading(false); // Stop loading regardless of outcome
+        setLoading(false);
       }
     };
     fetchGioHang();
@@ -48,15 +49,22 @@ function AllCart() {
 
   const handleCheckout = async () => {
     if (selectedItems.length === 0) {
-      alert('Vui lòng chọn sản phẩm để thanh toán.');
+      message.warning('Vui lòng chọn sản phẩm để thanh toán.');
       return;
     }
 
     try {
-      const bill = await createBill(user._id, paymentMethod, selectedItems); // Pass selectedItems
-      alert(`Hóa đơn đã được tạo thành công. Tổng số tiền: ${totalAmount} VND. Phương thức thanh toán: ${paymentMethod}`);
+      await createBill(user._id, paymentMethod, selectedItems);
+      message.success(`Hóa đơn đã được tạo thành công. Tổng số tiền: ${totalAmount} VND. Phương thức thanh toán: ${paymentMethod}`);
+
+      // Cập nhật giỏ hàng sau khi thanh toán thành công
+      setCart((prevCart) => ({
+        ...prevCart,
+        items: prevCart.items.filter(item => !selectedItems.includes(item._id))
+      }));
+      setSelectedItems([]); // Reset selected items
     } catch (error) {
-      alert('Có lỗi xảy ra khi tạo hóa đơn, vui lòng thử lại.');
+      message.error('Có lỗi xảy ra khi tạo hóa đơn, vui lòng thử lại.');
       console.error('Lỗi khi tạo hóa đơn:', error);
     }
   };
@@ -70,7 +78,7 @@ function AllCart() {
   };
 
   if (loading) {
-    return <p>Đang tải giỏ hàng...</p>; // Loading message
+    return <p>Đang tải giỏ hàng...</p>;
   }
 
   return (
@@ -117,16 +125,22 @@ function AllCart() {
 
           {/* Thêm tùy chọn chọn phương thức thanh toán */}
           <label htmlFor="paymentMethod">Chọn phương thức thanh toán:</label>
-          <select 
-            id="paymentMethod" 
+          <Radio.Group 
             value={paymentMethod} 
             onChange={(e) => setPaymentMethod(e.target.value)} 
+            style={{ marginBottom: '10px', display: 'block' }} // Đảm bảo chúng nằm trên cùng
           >
-            <option value="Cash">Tiền mặt</option>
-            <option value="Card">Thẻ</option>
-          </select>
+            <Radio value="Cash">Tiền mặt</Radio>
+            <Radio value="Card">Thẻ</Radio>
+          </Radio.Group>
 
-          <button onClick={handleCheckout}>Thanh toán</button>
+          <Button 
+            type="primary" 
+            style={{ backgroundColor: '#1890ff', borderColor: '#1890ff' }} 
+            onClick={handleCheckout}
+          >
+            Thanh toán
+          </Button>
         </div>
       )}
       {selectedProduct && (
@@ -154,4 +168,4 @@ function AllCart() {
   );
 }
 
-export default AllCart;
+export default AllCart; 

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   createDirectSaleBill,
-  getAllProducts,
+  getAllProductsPOP,
   getCategories,
 } from "../../untills/api";
 import { AuthContext } from "../../untills/context/AuthContext";
@@ -48,11 +48,11 @@ function SellPage() {
   const navigate = useNavigate();
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [isVoucherVisible, setIsVoucherVisible] = useState(false);
-  
+
   useEffect(() => {
     const fetchProductsAndCategories = async () => {
       try {
-        const productList = await getAllProducts();
+        const productList = await getAllProductsPOP();
         setProducts(productList);
         setFilteredProducts(productList);
 
@@ -240,81 +240,66 @@ function SellPage() {
   
   };
   
-  
-
-  // const confirmPayment = async () => {
-  //   try {
-  //     const items = cart.map((item) => ({
-  //       product: item._id,
-  //       name: item.name,
-  //       quantity: item.quantity,
-  //       currentPrice: item.currentPrice,
-  //       unit: item.unit.name,
-  //       totalPrice: item.currentPrice * item.quantity,
-  //     }));
-  //     console.log("Phương thức thanh toán:", paymentMethod);
-  //     // Gửi phương thức thanh toán như là một phần của yêu cầu
-  //     const response = await createDirectSaleBill(paymentMethod, items);
-  //     console.log("Hóa đơn tạo thành công:", response);
-  
-  //     setCart([]);
-  //     setTotalPrice(0);
-  //     setIsCheckoutModalOpen(false);
-  //     message.success("Thanh toán thành công!");
-  //   } catch (error) {
-  //     console.error("Lỗi khi thanh toán:", error);
-  //     message.error("Thanh toán thất bại! Vui lòng thử lại.");
-  //   }
-  // };
-
   // Ví dụ hàm để chọn voucher
 const handleVoucherSelection = (voucher) => {
   setSelectedVoucher(voucher); // Cập nhật selectedVoucher khi người dùng chọn
 };
+console.log("log",products);
 
-  const confirmPayment = async () => {
-    try {
-      const items = cart.map((item) => ({
+const confirmPayment = async () => {
+  try {
+    const items = cart.map((item) => {
+      // Lấy giá trị đơn vị tính (value)
+      const unitValue = item.units[0].details[0].value; // Giả sử chỉ có một đơn vị tính và một chi tiết
+
+      // Tính toán số lượng thực tế
+      const actualQuantity = item.quantity * unitValue;
+
+      return {
         product: item._id,
         name: item.name,
-        quantity: item.quantity,
+        quantity: actualQuantity, // Sử dụng số lượng thực tế
         currentPrice: item.currentPrice,
-        unit: item.unit.name,
-        totalPrice: item.currentPrice * item.quantity,
-      }));
-  
-      console.log("Phương thức thanh toán:", paymentMethod);
-  
-      // Tính toán tổng giá trị đơn hàng
-      let totalOrderPrice = items.reduce((total, item) => total + item.totalPrice, 0);
-      
-      // Kiểm tra voucher và áp dụng nếu có
-      if (selectedVoucher) {
-        const { conditions } = selectedVoucher;
-        const validCondition = conditions.find(condition => totalOrderPrice >= condition.minOrderValue);
-  
-        if (validCondition) {
-          // Nếu điều kiện hợp lệ, áp dụng giảm giá
-          totalOrderPrice -= validCondition.discountAmount;
-          console.log(`Giảm giá ${validCondition.discountAmount} VND với voucher ${selectedVoucher.code}`);
-        } else {
-          message.warning("Giá trị đơn hàng không đủ để áp dụng voucher này.");
-        }
+        unitDetailId: item.unitDetailId,
+        totalPrice: item.currentPrice * actualQuantity, // Tính tổng giá trị dựa trên số lượng thực tế
+        createBy: user._id
+      };
+    });
+
+    console.log("Phương thức thanh toán:", paymentMethod);
+
+    // Tính toán tổng giá trị đơn hàng
+    let totalOrderPrice = items.reduce((total, item) => total + item.totalPrice, 0);
+
+    // Kiểm tra voucher và áp dụng nếu có
+    if (selectedVoucher) {
+      const { conditions } = selectedVoucher;
+      const validCondition = conditions.find(condition => totalOrderPrice >= condition.minOrderValue);
+
+      if (validCondition) {
+        // Nếu điều kiện hợp lệ, áp dụng giảm giá
+        totalOrderPrice -= validCondition.discountAmount;
+        console.log(`Giảm giá ${validCondition.discountAmount} VND với voucher ${selectedVoucher.code}`);
+      } else {
+        message.warning("Giá trị đơn hàng không đủ để áp dụng voucher này.");
       }
-  
-      // Gửi yêu cầu thanh toán với tổng giá trị đã cập nhật
-      const response = await createDirectSaleBill(paymentMethod, items, totalOrderPrice);
-      console.log("Hóa đơn tạo thành công:", response);
-  
-      setCart([]);
-      setTotalPrice(0);
-      setIsCheckoutModalOpen(false);
-      message.success("Thanh toán thành công!");
-    } catch (error) {
-      console.error("Lỗi khi thanh toán:", error);
-      message.error("Thanh toán thất bại! Vui lòng thử lại.");
     }
-  };
+
+    // Gửi yêu cầu thanh toán với tổng giá trị đã cập nhật
+    const response = await createDirectSaleBill(paymentMethod, items, totalOrderPrice);
+    console.log("Hóa đơn tạo thành công:", response);
+
+    // Xóa giỏ hàng và reset tổng giá trị
+    setCart([]);
+    setTotalPrice(0);
+    setIsCheckoutModalOpen(false);
+    message.success("Thanh toán thành công!");
+  } catch (error) {
+    console.error("Lỗi khi thanh toán:", error);
+    message.error("Thanh toán thất bại! Vui lòng thử lại.");
+  }
+};
+
 
   const handleBack = () => {
     navigate(-1);

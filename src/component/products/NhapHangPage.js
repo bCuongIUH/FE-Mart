@@ -3,6 +3,7 @@ import { Table, Button, Input, Dropdown, Menu, Tag, message } from 'antd';
 import { getAllProducts, createPhieuKho, nhapHang } from '../../untills/api';
 import NhapHangInput from './NhapHangInput';
 
+
 const NhapHangPage = () => {
   const [data, setData] = useState([]); 
   const [searchTerm, setSearchTerm] = useState(''); 
@@ -10,6 +11,7 @@ const NhapHangPage = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); 
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [entryId, setEntryId] = useState(null); 
+
 
   useEffect(() => {
     const fetchProducts = async () => {
