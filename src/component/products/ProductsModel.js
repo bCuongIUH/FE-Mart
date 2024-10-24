@@ -1,111 +1,17 @@
-// import { useContext, useState } from 'react';
-// import { getAddToCart } from '../../untills/api'; 
-// import styles from './ProductsModel.module.css';
-// import { AuthContext } from '../../untills/context/AuthContext';
-
-// function ProductsModal({ product, onClose, onBuyNow }) {
-//   const { user } = useContext(AuthContext); 
-//   const [quantity, setQuantity] = useState(1); 
-//   const maxQuantity = product.quantity || 0; 
-//   const [cart, setCart] = useState([]);
-
-//   const handleClickOutside = (e) => {
-//     if (e.target.classList.contains(styles.modalOverlay)) {
-//       onClose();
-//     }
-//   };
-
-//   const onAddToCart = async () => {
-//     try {
-//       if (!user || !user._id) {
-//         return console.error('User chưa đăng nhập');
-//       }
-
-//       if (!product || !product._id) {
-//         return console.error('Sản phẩm không hợp lệ');
-//       }
-//       const cartData = await getAddToCart(user._id, product._id, quantity);
-
-//       setCart(cartData.items);
-//       console.log('Sản phẩm đã thêm vào giỏ hàng:', cartData);
-
-//     } catch (error) {
-//       console.error('Lỗi khi thêm sản phẩm vào giỏ hàng:', error);
-//     }
-//   };
-
-//   const handleQuantityChange = (e) => {
-//     const value = parseInt(e.target.value);
-//     if (value > 0 && value <= maxQuantity) {
-//       setQuantity(value);
-//     }
-//   };
-
-//   const incrementQuantity = () => {
-//     if (quantity < maxQuantity) {
-//       setQuantity(prev => prev + 1);
-//     }
-//   };
-
-//   const decrementQuantity = () => {
-//     if (quantity > 1) {
-//       setQuantity(prev => prev - 1);
-//     }
-//   };
-
-//   return (
-//     <div className={styles.modalOverlay} onClick={handleClickOutside}>
-//       <div className={styles.modalContent}>
-//         <button className={styles.closeButton} onClick={onClose}>&times;</button>
-//         <div className={styles.modalBody}>
-//           <img src={product.image} alt={product.name} className={styles.modalImage} />
-//           <div className={styles.modalDetails}>
-//             <h2 className={styles.modalTitle}>{product.name}</h2>
-//             <p className={styles.modalDescription}>{product.description}</p>
-//             <p className={styles.modalPrice}>{product.currentPrice} VNĐ</p>
-//             <div className={styles.quantityControl}>
-//               <p><strong>Số lượng có sẵn:</strong> {maxQuantity}</p>
-//               <div className={styles.quantityButtons}>
-//                 <button onClick={decrementQuantity} disabled={quantity <= 1}>-</button>
-//                 <input
-//                   type="number"
-//                   value={quantity}
-//                   onChange={handleQuantityChange}
-//                   min="1"
-//                   max={maxQuantity}
-//                   className={styles.quantityInput}
-//                 />
-//                 <button onClick={incrementQuantity} disabled={quantity >= maxQuantity}>+</button>
-//               </div>
-//             </div>
-//             <div className={styles.modalActions}>
-//               <button className={styles.addToCartButton} onClick={onAddToCart}>
-//                 Thêm vào giỏ hàng
-//               </button>
-//               <button className={styles.buyNowButton} onClick={() => onBuyNow(product)}>
-//                 Mua Ngay
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default ProductsModal;
 import { useContext, useState } from "react";
-import { getAddToCart } from "../../untills/api";
+import { addToCartForUser, getAddToCart } from "../../untills/api";
 import { AuthContext } from "../../untills/context/AuthContext";
 import { message } from "antd"; // Import message từ Ant Design
 import { Modal, Button } from "react-bootstrap"; // Import Modal từ React-Bootstrap
 
-function ProductsModal({ product, onClose, onBuyNow }) {
+function ProductsModal({ product, onClose }) {
   const { user } = useContext(AuthContext);
   const [quantity, setQuantity] = useState(1);
-  const maxQuantity = product.quantity || 0; // Lấy số lượng từ product.quantity
-  const [cart, setCart] = useState(null); // Chỉ cần lưu cart như null hoặc object
+  const maxQuantity = product.quantity || 0;
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [cart, setCart] = useState([]);
 
+  // Hàm để định dạng giá thành VND
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
       style: "currency",
@@ -113,47 +19,47 @@ function ProductsModal({ product, onClose, onBuyNow }) {
     });
   };
 
+  // Hàm để tính toán giá dựa trên đơn vị được chọn
+  const getTotalPrice = () => {
+    if (!selectedUnit || !product.currentPrice) return product.currentPrice;
+    return product.currentPrice * selectedUnit.value;
+  };
+
   const onAddToCart = async () => {
     try {
-        if (!user || !user._id) {
-            return message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
-        }
+      if (!user || !user._id) {
+        return message.error("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
+      }
 
-        if (!product || !product._id) {
-            return message.error("Sản phẩm không hợp lệ");
-        }
+      if (!product || !product._id) {
+        return message.error("Sản phẩm không hợp lệ");
+      }
 
-        if (!quantity || quantity < 1) {
-            return message.error("Số lượng không hợp lệ");
-        }
+      // Xác định giá trị currentPrice
+      const currentPrice = selectedUnit
+        ? product.currentPrice * selectedUnit.value
+        : product.currentPrice;
 
-        // Debugging log
-        console.log("Product Details:", {
-            userId: user._id,
-            productId: product._id,
-            quantity: quantity,
-            currentPrice: product.currentPrice 
-        });
+      // Xác định đơn vị nếu có
+      const unit = selectedUnit ? selectedUnit.name : null;
+      const unitValue = selectedUnit ? selectedUnit.value : null;
 
-        // Kiểm tra giá trị currentPrice
-        if (typeof product.currentPrice !== 'number' || isNaN(product.currentPrice)) {
-            return message.error("Giá sản phẩm không hợp lệ");
-        }
+      // Gọi hàm addToCartForUser với currentPrice và unit đã xác định
+      const cartData = await addToCartForUser(
+        user._id,
+        product._id,
+        quantity,
+        currentPrice,
+        unit, // Truyền đơn vị (unit) nếu có
+        unitValue
+      );
+      setCart(cartData.items);
 
-        const totalPrice = product.currentPrice * quantity;
-
-        // Kiểm tra giá trị totalPrice
-        console.log("Total Price:", totalPrice);
-
-        const cartData = await getAddToCart(user._id, product._id, quantity, product.currentPrice, product.unit);
-        setCart(cartData.items);
-        message.success("Sản phẩm đã được thêm vào giỏ hàng");
+      message.success("Sản phẩm đã được thêm vào giỏ hàng");
     } catch (error) {
-        console.error("Error adding to cart:", error);
-        message.error("Lỗi khi thêm sản phẩm vào giỏ hàng");
+      message.error("Lỗi khi thêm sản phẩm vào giỏ hàng");
     }
-};
-
+  };
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
@@ -174,14 +80,28 @@ function ProductsModal({ product, onClose, onBuyNow }) {
     }
   };
 
+  const handleUnitClick = (unit) => {
+    setSelectedUnit(unit);
+  };
+
+  // Đảm bảo sự kiện đóng modal chỉ được kích hoạt khi người dùng nhấp vào nút Đóng
+  const handleModalClick = (e) => {
+    e.stopPropagation(); // Dừng sự kiện đóng modal khi click vào bên trong
+  };
+
   return (
     <Modal show={true} onHide={onClose} centered size="lg">
       <Modal.Header closeButton>
         <Modal.Title>{product.name}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body onClick={handleModalClick}>
+        {" "}
+        {/* Thêm sự kiện onClick cho Modal Body */}
         <div className="modalContent" style={{ display: "flex" }}>
-          <div className="imageContainer" style={{ flex: 1, marginRight: "20px" }}>
+          <div
+            className="imageContainer"
+            style={{ flex: 1, marginRight: "20px" }}
+          >
             <img
               src={product.image}
               alt={product.name}
@@ -195,17 +115,20 @@ function ProductsModal({ product, onClose, onBuyNow }) {
               * Hình ảnh chỉ mang tính chất minh họa *
             </p>
           </div>
-          <div className="modalDetails" style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-            <h2 style={{ fontSize: "24px", marginBottom: "10px" }}>{product.name}</h2>
-            <p style={{ fontSize: "18px", marginBottom: "10px" }}>{product.description}</p>
+          <div
+            className="modalDetails"
+            style={{ flex: 1, display: "flex", flexDirection: "column" }}
+          >
+            <h2 style={{ fontSize: "24px", marginBottom: "10px" }}>
+              {product.name}
+            </h2>
+            <p style={{ fontSize: "18px", marginBottom: "10px" }}>
+              {product.description}
+            </p>
             <p style={{ fontSize: "22px", marginBottom: "15px" }}>
-              {product.currentPrice ? (
-                <span style={{ fontWeight: "bold" }}>
-                  {formatPrice(product.currentPrice)}
-                </span>
-              ) : (
-                <span>Giá không có sẵn</span>
-              )}
+              <span style={{ fontWeight: "bold" }}>
+                {formatPrice(getTotalPrice())}
+              </span>
             </p>
             <div style={{ marginBottom: "20px" }}>
               <p>
@@ -216,8 +139,8 @@ function ProductsModal({ product, onClose, onBuyNow }) {
                   onClick={decrementQuantity}
                   disabled={quantity <= 1}
                   style={{
-                    backgroundColor: "#0046ad", // Màu xanh
-                    borderColor: "#0046ad", // Màu xanh cho viền
+                    backgroundColor: "#0046ad",
+                    borderColor: "#0046ad",
                   }}
                 >
                   -
@@ -238,22 +161,60 @@ function ProductsModal({ product, onClose, onBuyNow }) {
                   onClick={incrementQuantity}
                   disabled={quantity >= maxQuantity}
                   style={{
-                    backgroundColor: "#0046ad", // Màu xanh
-                    borderColor: "#0046ad", // Màu xanh cho viền
+                    backgroundColor: "#0046ad",
+                    borderColor: "#0046ad",
                   }}
                 >
                   +
                 </Button>
               </div>
             </div>
+
+            {/* Kiểm tra nếu sản phẩm có đơn vị */}
+            {product.units && product.units.length > 0 && (
+              <div>
+                <p>
+                  <strong>Chọn đơn vị:</strong>
+                </p>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  {product.units[0].details.map((unit) => (
+                    <div
+                      key={unit._id}
+                      style={{
+                        padding: "10px 20px",
+                        border: `2px solid ${
+                          selectedUnit && selectedUnit._id === unit._id
+                            ? "#0046ad"
+                            : "#cccccc"
+                        }`,
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                        textAlign: "center",
+                        minWidth: "80px",
+                        color: "black",
+                      }}
+                      onClick={() => handleUnitClick(unit)}
+                    >
+                      {unit.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <p style={{ marginTop: "10px" }}>
+              <strong>Danh mục:</strong> {product.category.name}
+            </p>
+            <p>
+              <strong>Nhà cung cấp:</strong> {product.supplier.name}
+            </p>
           </div>
         </div>
       </Modal.Body>
       <Modal.Footer>
         <Button
           style={{
-            backgroundColor: "#0046ad", // Màu xanh cho nút
-            borderColor: "#0046ad", // Màu xanh cho viền nút
+            backgroundColor: "#0046ad",
+            borderColor: "#0046ad",
           }}
           onClick={onAddToCart}
         >
@@ -261,8 +222,8 @@ function ProductsModal({ product, onClose, onBuyNow }) {
         </Button>
         <Button
           style={{
-            backgroundColor: "#0046ad", // Màu xanh cho nút
-            borderColor: "#0046ad", // Màu xanh cho viền nút
+            backgroundColor: "#0046ad",
+            borderColor: "#0046ad",
           }}
           onClick={onClose}
         >

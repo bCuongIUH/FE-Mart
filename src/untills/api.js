@@ -104,7 +104,7 @@ export const getAllProducts = async () => {
 };
 export const getAllProductsPOP = async () => {
   try {
-    const response = await axios.get(`${API_URL}/products/POP`, config);
+    const response = await axios.get(`${API_URL}/products/pop`, config);
     return response.data;
   } catch (error) {
     throw error;
@@ -337,12 +337,19 @@ export const createWarehouseEntry = async (entryData) => {
 
 
 // Tạo mới ncc
-export const createCart = async (suppliersData) => {
+export const addToCartForUser = async (userId,productId,quantity,currentPrice,unit, unitValue ) => {
   try {
-    const response = await axios.post(`${API_URL}/cart/add`, suppliersData, config);
+    const response = await axios.post(`${API_URL}/cart/add`, {
+      userId,
+      productId,
+      quantity,
+      currentPrice, 
+      unit, // Bổ sung unit vào request body
+      unitValue, // Bổ sung unitValue vào request body
+    });
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi thêm vào giỏ hàng:', error.response?.data || error.message);
+    console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
     throw error;
   }
 };

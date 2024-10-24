@@ -8,7 +8,7 @@ const CompletedCart = () => {
   const [billData, setBillData] = useState([]);
   const [list, setList] = useState([]);
   const [selectedBill, setSelectedBill] = useState(null); 
-  const [users, setUsers] = useState([]); // State để lưu danh sách người dùng
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false); 
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Countdown from "./Countdown";
 import Slider from "react-slick";
 import ProductCard from "../ProductCard/ProductCard";
-import { getAllProducts } from "../../untills/api";
+import { getAllProductsPOP } from "../../untills/api";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -13,7 +13,7 @@ const DealOfTheDay = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const filteredProducts = await getAllProducts();
+        const filteredProducts = await getAllProductsPOP();
         setProducts(filteredProducts);
         setLoading(false);
       } catch (error) {

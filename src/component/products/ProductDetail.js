@@ -86,8 +86,8 @@ const ProductDetail = ({ product, onBack }) => {
                         <Image
                             src={product.image}
                             alt={product.name}
-                            width={100}
-                            height={100}
+                            width={200}
+                            height={200}
                             style={{ marginBottom: 16 }}
                         />
                         <Descriptions column={1}>

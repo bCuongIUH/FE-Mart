@@ -96,7 +96,7 @@ const Search = () => {
                   </div>
                   <div className="info">
                     <Link
-                      to={`/product-details/${product._id}`}
+                      to={`/UIPage/${product._id}`}
                       onClick={() => {
                         setShowSearchResult(false);
                         setShowCloseBtn(false);

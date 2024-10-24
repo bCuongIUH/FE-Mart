@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   createDirectSaleBill,
+  getAllProducts,
   getAllProductsPOP,
   getCategories,
 } from "../../untills/api";
@@ -55,6 +56,8 @@ function SellPage() {
         const productList = await getAllProductsPOP();
         setProducts(productList);
         setFilteredProducts(productList);
+
+      
 
         const categoryList = await getCategories();
         console.log("Categories fetched: ", categoryList);
@@ -248,48 +251,20 @@ console.log("log",products);
 
 const confirmPayment = async () => {
   try {
-    const items = cart.map((item) => {
-      // Lấy giá trị đơn vị tính (value)
-      const unitValue = item.units[0].details[0].value; // Giả sử chỉ có một đơn vị tính và một chi tiết
+    const items = cart.map((item) => ({
+      product: item._id,
+      name: item.name,
+      quantity: item.unit ? item.unit.value * item.quantity : item.quantity,
+      currentPrice: item.currentPrice,
+      unit: item.unit.name, // Thêm thông tin đơn vị vào hóa đơn
+      totalPrice: item.unit
+        ? item.unit.value * item.currentPrice * item.quantity
+        : item.currentPrice * item.quantity,
+    }));
 
-      // Tính toán số lượng thực tế
-      const actualQuantity = item.quantity * unitValue;
+    const response = await createDirectSaleBill(paymentMethod, items);
+    // console.log(items);
 
-      return {
-        product: item._id,
-        name: item.name,
-        quantity: actualQuantity, // Sử dụng số lượng thực tế
-        currentPrice: item.currentPrice,
-        unitDetailId: item.unitDetailId,
-        totalPrice: item.currentPrice * actualQuantity, // Tính tổng giá trị dựa trên số lượng thực tế
-        createBy: user._id
-      };
-    });
-
-    console.log("Phương thức thanh toán:", paymentMethod);
-
-    // Tính toán tổng giá trị đơn hàng
-    let totalOrderPrice = items.reduce((total, item) => total + item.totalPrice, 0);
-
-    // Kiểm tra voucher và áp dụng nếu có
-    if (selectedVoucher) {
-      const { conditions } = selectedVoucher;
-      const validCondition = conditions.find(condition => totalOrderPrice >= condition.minOrderValue);
-
-      if (validCondition) {
-        // Nếu điều kiện hợp lệ, áp dụng giảm giá
-        totalOrderPrice -= validCondition.discountAmount;
-        console.log(`Giảm giá ${validCondition.discountAmount} VND với voucher ${selectedVoucher.code}`);
-      } else {
-        message.warning("Giá trị đơn hàng không đủ để áp dụng voucher này.");
-      }
-    }
-
-    // Gửi yêu cầu thanh toán với tổng giá trị đã cập nhật
-    const response = await createDirectSaleBill(paymentMethod, items, totalOrderPrice);
-    console.log("Hóa đơn tạo thành công:", response);
-
-    // Xóa giỏ hàng và reset tổng giá trị
     setCart([]);
     setTotalPrice(0);
     setIsCheckoutModalOpen(false);
