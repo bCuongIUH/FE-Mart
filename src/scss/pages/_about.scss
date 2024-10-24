@@ -1,0 +1,241 @@
+.about-content {
+  // ===== Our Team ===== //
+  #our-team {
+    padding: 100px 0;
+
+    .section-title {
+      padding-bottom: 50px;
+
+      h2 {
+        font-weight: 400;
+      }
+    }
+
+    .team-item {
+      position: relative;
+      margin-bottom: 30px;
+      height: 300px;
+      width: 100%;
+
+      &:hover {
+        .item-front {
+          transform: perspective(600px) rotateY(-180deg);
+        }
+
+        .item-back {
+          transform: perspective(600px) rotateY(0deg);
+        }
+      }
+
+      .item-img {
+        height: 100%;
+      }
+
+      .item-front,
+      .item-back {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        padding: 0 5px;
+        overflow: hidden;
+        backface-visibility: hidden;
+        transition: transform 0.6s linear;
+      }
+
+      .item-front {
+        transform: perspective(600px) rotateY(0deg);
+      }
+
+      .item-back {
+        background-color: $primary-color;
+        transform: perspective(600px) rotateY(180deg);
+        @include flex-display(flex, column, center, center);
+
+        .item-info {
+          @include flex-display(flex, column, center, center);
+
+          h5,
+          p {
+            text-align: center;
+          }
+
+          h5 {
+            font-size: 18px;
+            font-weight: 600;
+          }
+
+          p {
+            font-size: 14px;
+          }
+
+          .social-media {
+            width: 70px;
+
+            li {
+              a {
+                color: #000;
+                transition: all 0.4s ease;
+
+                svg {
+                  font-size: 18px;
+                }
+
+                &:hover {
+                  color: #fff;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .become-member-link {
+      @include flex-display(flex, column, center, center);
+      height: 100%;
+
+      a {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 18px;
+        margin-bottom: 25px;
+        color: $text-color;
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  // ===== Awards and Recognition ===== //
+  #awards-and-recognition {
+    padding: 100px 0;
+    background-color: $secondary-bgColor;
+
+    .section-title {
+      padding-bottom: 65px;
+
+      h2 {
+        margin-bottom: 50px;
+        font-weight: 400;
+      }
+
+      p {
+        color: $text-color;
+        font-size: 18px;
+      }
+    }
+
+    .awards {
+      padding: 0 20px;
+
+      .awards-img {
+        padding: 0 40px;
+      }
+
+      .award-3, .award-4 {
+        padding: 0 60px;
+      }
+    }
+  }
+}
+
+// ===== Responsive Design ===== //
+@media screen and (max-width: 1399.98px) {
+  .about-content {
+    #team-bg-img {
+      height: 355px !important;
+    }
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  .about-content {
+    #our-team {
+      .team-item {
+        height: 220px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .about-content {
+    #team-bg-img {
+      height: 260px !important;
+    }
+
+    #awards-and-recognition {
+      .awards {
+        .awards-img {
+          padding: 0px;
+        }
+
+        .award-1 {
+          margin-right: 20px;
+        }
+
+        .award-2, .award-5 {
+          margin-right: 10px;
+        }
+  
+        .award-3, .award-4 {
+          padding: 0 30px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .about-content {
+    #team-bg-img {
+      height: 195px !important;
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  .about-content {
+    #team-bg-img {
+      height: 150px !important;
+    }
+
+    #awards-and-recognition {
+      .section-title {
+        p {
+          font-size: 15px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .about-content {
+    #our-team {
+      .section-title {
+        h2 {
+          text-align: center;
+        }
+      }
+
+      .team-item {
+        height: 150px;
+
+        .item-back {
+          h5 {
+            font-size: 15px !important;
+          }
+
+          p {
+            font-size: 13px !important;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+#breadcrumb {
+  background-color: $secondary-bgColor;
+  padding: 20px 0;
+
+  ul {
+    font-size: 14px;
+
+    li {
+      padding: 0 9px 0 12px;
+      position: relative;
+
+      &:first-of-type {
+        padding-left: 0;
+      }
+
+      &:not(:first-of-type) {
+        &::before {
+          content: "/";
+          position: absolute;
+          left: -1px;
+          top: 0;
+        }
+      }
+
+      a {
+        text-decoration: none;
+        transition: all 0.3s ease;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+}

@@ -74,3 +74,14 @@ export const changePromotionStatus = async (id, isActive) => {
     throw error;
   }
 };
+
+// Lấy danh sách các chương trình khuyến mãi đang hoạt động
+export const getActivePromotionPrograms = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/active`, config);
+    return response.data;
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi lấy danh sách chương trình khuyến mãi đang hoạt động:", error);
+    throw error;
+  }
+};

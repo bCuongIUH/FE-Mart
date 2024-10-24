@@ -1,0 +1,159 @@
+#wishlist {
+  padding: 90px 0 110px;
+
+  .title {
+    padding-bottom: 50px;
+  }
+
+  .wishlist-product-item {
+    thead {
+      @extend %table-header;
+    }
+
+    tbody {
+      tr {
+        border-bottom: $primary-border;
+
+        td {
+          text-align: center;
+
+          a,
+          .remove-btn button {
+            text-decoration: none;
+            transition: all 0.3s ease;
+
+            &:hover {
+              color: $primary-color;
+            }
+          }
+
+          .product-img {
+            width: 100px;
+            padding: 20px 0;
+          }
+
+          .product-name {
+            a {
+              font-size: 15px;
+            }
+          }
+
+          .add-to-cart-btn {
+            justify-content: flex-end;
+
+            button {
+              @extend %primary-btn;
+              height: 46px;
+              padding: 0 40px;
+            }
+
+            .disabledBtn {
+              @extend %disabled-btn;
+            }
+          }
+        }
+
+        .img-td,
+        .btn-td {
+          display: flex;
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  .empty-alert-wrapper {
+    @extend %empty-alert;
+  }
+
+  .back-to-shop-link {
+    padding-top: 40px;
+
+    a {
+      @extend %primary-btn;
+      text-decoration: none;
+      height: 46px;
+      width: 194px;
+      justify-content: center;
+      color: #000;
+
+      span {
+        margin-right: 7px;
+        font-size: 18px;
+
+        svg {
+          margin-bottom: 3px;
+        }
+      }
+    }
+  }
+}
+
+// ===== Responsive Design ===== //
+@media screen and (max-width: 991.98px) {
+  #wishlist {
+    .wishlist-product-item {
+      table {
+        th,
+        td {
+          display: block;
+          float: left;
+        }
+
+        th {
+          width: 100%;
+          padding-top: 10px;
+        }
+
+        thead {
+          display: none;
+        }
+
+        tr {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          padding: 15px 0;
+        }
+
+        td {
+          .product-img {
+            width: 70px !important;
+            padding: 0 !important;
+          }
+        }
+      }
+
+      tbody {
+        .add-to-cart-btn {
+          button {
+            height: 38px !important;
+            font-size: 14px;
+            padding: 0 20px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  #wishlist {
+    .wishlist-product-item {
+      table {
+        tr {
+          flex-direction: column;
+          padding: 20px 0;
+
+          td {
+            .product-name,
+            .add-to-cart-btn {
+              padding: 10px 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}

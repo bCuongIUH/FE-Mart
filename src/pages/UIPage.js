@@ -1,35 +1,55 @@
-import React, { useState, useEffect, useContext } from 'react';
-import styles from './UIPage.module.css'; 
-import { AuthContext } from '../untills/context/AuthContext';
-import { getAllProducts } from '../untills/api';
-import ProductsModal from '../component/products/ProductsModel'
+
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../untills/context/AuthContext";
+import { getAllProducts } from "../untills/api";
+import ProductsModal from "../component/products/ProductsModel";
+import ProductCard from "../component/ProductCard/ProductCard"; // Import ProductCard để sử dụng
+import { message, Pagination } from "antd";
+import { useParams } from "react-router-dom";
+import Header from "../component/Header/Header";
+import Footer from "../component/Footer/Footer";
 
 function UIPage() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // Tất cả sản phẩm
+  const [filteredProducts, setFilteredProducts] = useState([]); // Sản phẩm đã lọc theo danh mục
   const [error, setError] = useState(null);
-  const { user, logout } = useContext(AuthContext);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const { user } = useContext(AuthContext);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-console.log(products);
-
+  const { id } = useParams(); 
+  console.log(id);
+  // Trạng thái phân trang
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const itemsPerPage = 10; // Số sản phẩm mỗi trang
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await getAllProducts();
-        setProducts(data);
+        const data = await getAllProducts(); // Lấy tất cả sản phẩm
+        setProducts(data); // Lưu tất cả sản phẩm vào state
+
+        // Lọc sản phẩm theo category id từ URL
+        if (id) {
+          const filtered = data.filter((product) => product.category === id); // Lọc sản phẩm theo category id
+          setFilteredProducts(filtered); // Lưu danh sách sản phẩm đã lọc vào state
+        } else {
+          setFilteredProducts(data); // Nếu không có id, hiển thị tất cả sản phẩm
+        }
       } catch (error) {
-        setError('Lỗi khi lấy dữ liệu sản phẩm');
+        setError("Lỗi khi lấy dữ liệu sản phẩm");
         console.error(error);
       }
     };
 
     fetchProducts();
-  }, []);
+  }, [id]); // Thực hiện lại khi id thay đổi
 
   const handleProductClick = (product) => {
-    setSelectedProduct(product);
+    const userInStorage = localStorage.getItem("user");
+    if (!userInStorage) {
+      message.warning("Bạn phải đăng nhập để xem chi tiết sản phẩm");
+    } else {
+      setSelectedProduct(product);
+    }
   };
 
   const handleCloseModal = () => {
@@ -37,102 +57,80 @@ console.log(products);
   };
 
   const handleAddToCart = (product) => {
-    // Implement add to cart logic
-    console.log('bỏ vào giỏ, mua :))', product);
+    console.log("Thêm vào giỏ hàng:", product);
     handleCloseModal();
   };
 
   const handleBuyNow = (product) => {
-    // Implement buy now logic
-    console.log('mua sản phẩm thành công 1:', product);
+    console.log("Mua sản phẩm:", product);
     handleCloseModal();
   };
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
+  // Xử lý phân trang ở frontend
+  const handlePageChange = (page) => {
+    setCurrentPage(page); // Cập nhật trang hiện tại
   };
 
-  const handleLogout = () => {
-    logout();
-    window.location.href = '/';
-  };
+  // Lấy sản phẩm của trang hiện tại
+  const indexOfLastProduct = currentPage * itemsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  ); // Lấy sản phẩm theo trang
 
   return (
-    <div className={styles.uiPage}>
-      <header className={styles.header}>
-        <h1>SOPPE</h1>
-        <nav className={styles.headerNav}>
-          <a href="/">Trang Chủ</a>
-          <a href="/shoppingCart">Giỏ Hàng</a>
-          <a href="/contact">Liên Hệ</a>
-
-          <div className={styles.account}>
-            <img
-              src="https://res.cloudinary.com/dhpqoqtgx/image/upload/v1726249497/ke78gjlzmk0epm2mv77s.jpg" // ảnh default
-              alt="User Avatar"
-              className={styles.avatar}
-              onClick={toggleDropdown}
-            />
-            {showDropdown && (
-              <div className={styles.dropdown}>
-                <ul className={styles.dropdownList}>
-                  <li className={styles.dropdownItem}><a href="/profile">Thông tin</a></li>
-                  <li className={styles.dropdownItem}><a href="/settings">Cài đặt</a></li>
-                  <li className={styles.dropdownItem}><a href="/change-password">Cập nhật mật khẩu</a></li>
-                  <li className={styles.dropdownLogout} onClick={handleLogout}>Đăng xuất</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </nav>
+    <>
+      <header>
+        <Header />
       </header>
+      <div style={{ fontFamily: "Arial, sans-serif" }}>
+        <main style={{ padding: "20px 50px" }}>
+          <section>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <div style={productGridStyle}>
+              {currentProducts.map((product) => (
+                <div key={product._id} className="item">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
 
-            {/* thông tin  sản phẩm */}
-            <main className={styles.mainContent}>
-  <section className={styles.productList}>
-    {error && <p className={styles.errorMessage}>{error}</p>}
-    {products.length > 0 ? (
-      products.map((product) => (
-        <button
-          key={product._id}
-          className={styles.productButton}
-          onClick={() => handleProductClick(product)}
-        >
-          <img src={product.image} alt={product.name} className={styles.productImage} />
-          <h2 className={styles.productName}>{product.description}</h2>
-          {/* Safely accessing product.lines and unitPrice */}
-          <p className={styles.productPrice} style={{ color: 'red', marginTop: 'auto' }}>
-  {product.currentPrice ? `${product.currentPrice} VNĐ` : 'Giá không có sẵn'}
-</p>
+            {/* Phân trang */}
+            <div style={{ marginTop: "20px", textAlign: "center" }}>
+              <Pagination
+                current={currentPage} // Trang hiện tại
+                total={filteredProducts.length} // Tổng số sản phẩm đã lọc
+                pageSize={itemsPerPage} // Số sản phẩm mỗi trang
+                onChange={handlePageChange} // Hàm xử lý khi chuyển trang
+                showSizeChanger={false} // Ẩn tuỳ chọn thay đổi số sản phẩm mỗi trang
+              />
+            </div>
+          </section>
+        </main>
 
-        </button>
-      ))
-    ) : (
-      <p>Đang tải sản phẩm...</p>
-    )}
-  </section>
-</main>
-
-      <footer className={styles.footer}>
-        <p>&copy; 2024 Shop Online. All rights reserved.</p>
-        <div className={styles.footerLinks}>
-          <a href="/">Trang Chủ</a>
-          <a href="/products">Sản Phẩm</a>
-          <a href="/contact">Liên Hệ</a>
-          <a href="/about">Giới Thiệu</a>
-        </div>
+        {selectedProduct && (
+          <ProductsModal
+            product={selectedProduct}
+            onClose={handleCloseModal}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+          />
+        )}
+      </div>
+      <footer>
+        <Footer />
       </footer>
+    </>
 
-      {selectedProduct && (
-        <ProductsModal 
-          product={selectedProduct} 
-          onClose={handleCloseModal} 
-          onAddToCart={handleAddToCart} 
-          onBuyNow={handleBuyNow} 
-        />
-      )}
-    </div>
   );
 }
 
+const productGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(5, 1fr)", // 5 sản phẩm mỗi hàng
+  gap: "20px",
+};
+
 export default UIPage;
+

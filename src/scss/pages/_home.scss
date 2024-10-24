@@ -1,0 +1,670 @@
+.home-content {
+  // ===== Banner ===== //
+  #home-banner {
+    background-color: $main-bgColor;
+    padding: 30px 0;
+
+    .home-banner-content {
+      @include flex-display(flex, row, flex-start, space-between);
+
+      .banner-left {
+        max-width: calc(100% - 390px);
+        padding-right: 30px;
+
+        .banner-slider {
+          position: relative;
+
+          .slide-item {
+            height: 415px;
+
+            img {
+              animation: sliderAnimation 1s;
+            }
+
+            @keyframes sliderAnimation {
+              0% {
+                opacity: 0;
+              }
+              100% {
+                opacity: 1;
+              }
+            }
+          }
+
+          .slider-btns {
+            .left-btn,
+            .right-btn {
+              @include flex-display(flex, row, center, center);
+              background-color: transparent;
+              position: absolute;
+              top: 50%;
+              transform: translateY(-50%);
+              transition: all 0.3s ease;
+              width: 40px;
+              height: 40px;
+
+              &:hover {
+                background-color: $primary-color;
+              }
+
+              svg {
+                font-size: 20px;
+              }
+            }
+
+            .left-btn {
+              left: 0;
+            }
+
+            .right-btn {
+              right: 0;
+            }
+          }
+        }
+      }
+
+      .banner-right-imgs {
+        max-width: 390px;
+
+        .banner-img-wrapper {
+          padding-bottom: 30px;
+        }
+      }
+    }
+  }
+
+  // ===== Advantages ===== //
+  #advantages {
+    background-color: $main-bgColor;
+    padding: 0 0 30px;
+
+    .advantages-items-wrapper {
+      padding: 30px;
+      border: $primary-border;
+
+      ul {
+        @include flex-display(flex, row, center, space-around);
+        margin: 0;
+        padding: 0;
+
+        .advantages-item {
+          text-align: center;
+
+          span svg {
+            font-size: 40px;
+            color: $primary-color;
+            margin-bottom: 20px;
+          }
+
+          p {
+            margin: 0;
+            font-size: 14px;
+            color: $text-color;
+          }
+        }
+      }
+    }
+  }
+
+  // ===== Deal of the day ===== //
+  #deal-of-the-day {
+    background-color: $main-bgColor;
+    padding: 40px 0;
+
+    .section-header {
+      @extend %home-section-header;
+      background-color: transparent;
+
+      .title {
+        @extend %home-section-header-title;
+        h4 {
+          margin: 2px 70px 0 0;
+        }
+      }
+
+      .countdown {
+        background-color: $label-color;
+        color: #fff;
+        width: 275px;
+        padding: 4px 0 4px 28px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 3px;
+
+        .text p {
+          margin: 0 20px 0 0;
+        }
+
+        .items {
+          .colon-symbol {
+            margin: 0 5px;
+          }
+        }
+      }
+
+      .view-all {
+        a {
+          @extend %home-section-header-link-and-btns;
+        }
+      }
+    }
+  }
+
+  // ===== Categories ===== //
+  #categories {
+    .top-categories-list {
+      padding: 80px 0;
+
+      .section-title {
+        @extend %home-section-header-title;
+      }
+
+      .categories-wrapper {
+        padding-top: 20px;
+
+        a {
+          text-decoration: none;
+        }
+
+        .category-item {
+          border: 1px solid #bfbfbf;
+          text-align: center;
+          padding-bottom: 20px;
+          transition: all 0.3s ease;
+
+          &:hover {
+            border: 1px solid $primary-color;
+
+            .category-title h6 {
+              color: $primary-color;
+            }
+          }
+
+          .category {
+            &-img {
+              padding: 20px;
+            }
+
+            &-title {
+              h6 {
+                color: $text-color;
+                transition: all 0.3s ease;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .section-header {
+      @extend %home-section-header;
+
+      .left-side {
+        .section-title {
+          @extend %home-section-header-title;
+        }
+      }
+
+      .right-side {
+        a {
+          @extend %home-section-header-link-and-btns;
+        }
+
+        .section-buttons-and-link {
+          @include flex-display(flex, row, center, space-between);
+          width: 390px;
+          margin: 0;
+          padding: 0;
+        }
+      }
+    }
+
+    .consumer-electronics,
+    .clothings,
+    .garden-and-kitchen {
+      padding-bottom: 40px;
+    }
+  }
+
+  // ===== Ads-2 ===== //
+  #ads-2 {
+    padding-bottom: 80px;
+  }
+
+  // ===== Download app ===== //
+  #download-app {
+    .download-app-wrapper {
+      background-color: $secondary-bgColor;
+      padding: 80px 0 0;
+
+      .app-img {
+        padding-left: 120px;
+
+        img {
+          width: auto;
+        }
+      }
+
+      .download-app-content {
+        padding-right: 230px;
+
+        .text {
+          h3 {
+            margin-bottom: 12px;
+            font-size: 30px;
+            font-weight: 300;
+          }
+
+          p {
+            color: $text-color;
+            margin-bottom: 30px;
+          }
+        }
+
+        .subscribe-wrapper {
+          padding-bottom: 30px;
+
+          @extend %subscribe-form;
+        }
+
+        .small-imgs {
+          .small-img-wrapper {
+            padding-right: 20px;
+          }
+        }
+      }
+    }
+  }
+
+  // ===== New arrivals ===== //
+  #new-arrivals {
+    padding: 100px 0 50px;
+
+    .section-header {
+      @extend %home-section-header;
+      margin-bottom: 60px;
+
+      .left-side {
+        .section-title {
+          @extend %home-section-header-title;
+        }
+      }
+
+      .right-side {
+        .section-buttons-and-link {
+          @include flex-display(flex, row, center, space-between);
+          width: 666px;
+          margin: 0;
+          padding: 0;
+
+          a {
+            @extend %home-section-header-link-and-btns;
+          }
+        }
+      }
+    }
+
+    .product-item {
+      @include flex-display(flex, row, center, space-between);
+      margin-bottom: 30px;
+
+      &-img {
+        width: 160px;
+      }
+
+      &-price {
+        @extend %product-price;
+        border-top: 0;
+        padding-top: 0;
+
+        span {
+          font-size: 17px;
+          font-weight: 400;
+          color: #840000;
+        }
+      }
+
+      &-title {
+        @extend %product-title;
+
+        h6 {
+          margin: 0;
+        }
+      }
+
+      &-rating {
+        padding: 5px 0;
+        @extend %product-rating;
+        width: 84px;
+
+        span {
+          font-size: 13px;
+        }
+      }
+
+      .product-item-right-content {
+        padding-left: 10px;
+      }
+    }
+  }
+}
+
+// ======= Responsive Design ======= //
+@media screen and (max-width: 1399.98px) {
+  .home-content {
+    #home-banner {
+      .banner-left {
+        max-width: calc(100% - 282px) !important;
+
+        .slide-item {
+          height: 337px !important;
+        }
+      }
+
+      .banner-right-imgs {
+        max-width: 350px !important;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  .home-content {
+    #home-banner {
+      padding: 30px 0 20px;
+
+      .banner-left {
+        .slide-item {
+          height: 308px !important;
+        }
+      }
+    }
+
+    #categories {
+      .top-categories-list {
+        .category-item {
+          margin-bottom: 25px;
+        }
+      }
+    }
+
+    #download-app {
+      .download-app-wrapper {
+        .app-img {
+          padding-left: 0px;
+        }
+
+        .download-app-content {
+          padding: 30px 20px 0px 5px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .home-content {
+    // === banner === //
+    #home-banner {
+      .home-banner-content {
+        flex-direction: column;
+
+        .banner-left {
+          max-width: 100% !important;
+          padding-right: 0px;
+        }
+
+        .banner-right-imgs {
+          display: flex;
+          max-width: 100% !important;
+
+          .banner-img-wrapper {
+            padding-top: 20px;
+
+            &:first-of-type {
+              padding-right: 10px;
+            }
+
+            &:last-of-type {
+              padding-left: 10px;
+            }
+          }
+        }
+      }
+    }
+
+    // === advantages === //
+    #advantages {
+      .advantages-items-wrapper {
+        ul {
+          flex-wrap: wrap;
+          justify-content: flex-start;
+
+          li {
+            padding: 10px 25px 20px;
+          }
+        }
+      }
+    }
+
+    // === ads-1 === //
+    #ads-1 {
+      .ads-img {
+        padding-top: 26px;
+      }
+    }
+
+    // === categories === //
+    #categories {
+      .section-header,
+      .section-title {
+        h4 {
+          font-size: 20px !important;
+        }
+      }
+    }
+
+    // === ads-2 === //
+    #ads-2 {
+      .bed-img,
+      .iphone-img {
+        margin-top: 25px;
+      }
+
+      .iphone-img {
+        margin-top: 30px;
+      }
+    }
+
+    // === download app === //
+    #download-app {
+      .download-app-wrapper {
+        .app-img {
+          padding-left: 30px;
+        }
+
+        .download-app-content {
+          padding: 30px 220px 35px 40px;
+        }
+      }
+    }
+
+    // === new arrivals === //
+    #new-arrivals {
+      padding: 80px 0 40px;
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px 20px;
+        margin-bottom: 40px;
+
+        h4 {
+          font-size: 20px !important;
+        }
+
+        .right-side {
+          .section-buttons-and-link {
+            justify-content: flex-start;
+            width: auto;
+            padding-top: 5px;
+            flex-wrap: wrap;
+
+            li {
+              padding-right: 22px;
+            }
+          }
+        }
+      }
+
+      .product-item {
+        justify-content: flex-start;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.99px) {
+  .home-content {
+    #home-banner {
+      .banner-left {
+        .slide-item {
+          height: 100% !important;
+        }
+      }
+    }
+
+    #advantages {
+      .advantages-items-wrapper {
+        ul {
+          li {
+            padding: 10px 26px 20px;
+          }
+        }
+      }
+    }
+
+    #deal-of-the-day {
+      .section-header {
+        padding: 12px 0px;
+
+        .left-side {
+          flex-direction: column;
+
+          .title {
+            h4 {
+              margin: 2px 68px 7px 0;
+              font-size: 22px;
+            }
+          }
+
+          .countdown {
+            width: 252px;
+            font-size: 16px;
+          }
+        }
+
+        .right-side {
+          padding: 43px 0 0;
+        }
+      }
+    }
+
+    #download-app {
+      .download-app-wrapper {
+        .app-img {
+          padding-left: 5px;
+
+          img {
+            width: 100%;
+          }
+        }
+
+        .download-app-content {
+          padding: 30px 35px 35px 40px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 575.99px) {
+  .home-content {
+    #advantages {
+      .advantages-items-wrapper {
+        padding: 20px;
+
+        ul {
+          flex-direction: column;
+
+          li {
+            padding: 0 0 40px;
+
+            &:first-of-type {
+              padding-top: 20px;
+            }
+
+            .advantages-item {
+              @include flex-display(flex, row, center, flex-start);
+
+              .icon-wrapper svg {
+                margin: 0 25px 5px 0;
+                font-size: 46px;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    #categories {
+      .section-header {
+        margin-bottom: 25px;
+      }
+
+      .top-categories-list {
+        padding: 80px 0 60px;
+      }
+
+      .consumer-electronics,
+      .clothings,
+      .garden-and-kitchen {
+        padding-bottom: 60px;
+      }
+    }
+
+    #deal-of-the-day {
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        .left-side {
+          .countdown {
+            width: 232px;
+            padding: 4px 0 4px 15px;
+          }
+        }
+
+        .right-side {
+          padding: 10px 0 0;
+        }
+      }
+    }
+
+    #download-app {
+      .download-app-content {
+        padding: 30px 20px 35px 20px !important;
+
+        .text {
+          h3 {
+            font-size: 20px !important;
+          }
+
+          p {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+  }
+}

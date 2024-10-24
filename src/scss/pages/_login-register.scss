@@ -1,0 +1,146 @@
+#login,
+#register {
+  background-color: $secondary-bgColor;
+  padding: 100px 0;
+
+  .links {
+    padding-bottom: 30px;
+
+    a {
+      display: inline-block;
+      padding: 0 15px;
+      font-size: 28px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  }
+
+  .account-wrapper {
+    background-color: #fff;
+    padding: 30px;
+    margin: 0 50px;
+
+    h6 {
+      font-weight: 400;
+      margin-bottom: 25px;
+    }
+
+    .inputs-wrapper {
+      padding-bottom: 25px;
+
+      input[type="password"],
+      input[type="text"] {
+        @extend %input;
+      }
+
+      .error-border {
+        border: 1px solid red !important;
+      }
+
+      p{
+        margin-bottom: 0;
+        font-size: 13px;
+      }
+    }
+
+    .checkbox-input-wrapper {
+      @extend %checkbox;
+      padding-bottom: 25px;
+
+      label {
+        font-size: 14px;
+
+        &::before {
+          margin-right: 10px !important;
+        }
+      }
+    }
+
+    .submit-btn {
+      padding: 0 0 40px;
+
+      input[type="submit"] {
+        @extend %primary-btn;
+      }
+    }
+
+    .social-media {
+      @extend %social-media;
+
+      small {
+        display: inline-block;
+        margin-bottom: 12px;
+      }
+
+      li {
+        a {
+          width: 110px;
+        }
+      }
+    }
+  }
+}
+
+// ===== Responsive Design ===== //
+@media screen and (max-width: 1399.98px) {
+  #login,
+  #register {
+    .social-media {
+      li {
+        a {
+          width: 88px !important;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  #login,
+  #register {
+    .account-wrapper {
+      margin: 0 !important;
+
+      .social-media {
+        li {
+          a {
+            width: 90px !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  #login,
+  #register {
+    .social-media {
+      li {
+        a {
+          width: 100px !important;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 470px) {
+  #login,
+  #register {
+    .login-area,
+    .register-area {
+      padding: 30px 20px;
+
+      .social-media {
+        ul {
+          li {
+            a {
+              width: 55px !important;
+            }
+          }
+        }
+      }
+    }
+  }
+}

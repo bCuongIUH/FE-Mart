@@ -1,0 +1,26 @@
+// partials
+@import './partials/variables';
+@import './partials/mixins';
+@import './partials/extends';
+@import './partials/global';
+
+// components
+@import './components/header';
+@import './components/product-card';
+@import './components/subscribe';
+@import './components/footer';
+@import './components/back-to-top-btn';
+@import './components/breadcrumb';
+@import './components/navigation-list';
+
+// pages
+@import './pages/home';
+@import './pages/about';
+@import './pages/shop';
+@import './pages/contact';
+@import './pages/login-register';
+@import './pages/compare';
+@import './pages/wishlist.scss';
+@import './pages/shopping-cart';
+@import './pages/checkout';
+@import './pages/product-details';

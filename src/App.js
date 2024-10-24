@@ -53,6 +53,14 @@ function App() {
                 </RequireAuth>
               }
             />
+            <Route
+              path="/UIPage/:id"
+              element={
+                <RequireAuth>
+                  <UIPage />
+                </RequireAuth>
+              }
+            />
              <Route path="/ManagerPage" element={<ProductPage />} />
              <Route path="/Profile" element={<Profile />} /> 
              <Route path="/user-info" element={<UserInfo />} /> 

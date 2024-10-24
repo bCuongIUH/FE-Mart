@@ -1,0 +1,56 @@
+// All
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  font-family: "Work Sans", sans-serif;
+}
+
+// Html and Body
+html,
+body {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+// Button
+button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+input[type="submit"],
+button {
+  cursor: pointer;
+}
+
+// input
+input[type="text"],
+input[type="password"] {
+  font-size: 14px;
+  padding: 0 20px;
+  outline: none;
+  background-color: $main-bgColor;
+}
+
+// image{
+img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+// react-toastify
+.Toastify__toast-container {
+  z-index: 9999999;
+
+  .Toastify__toast-body {
+    font-size: 14px;
+  }
+}

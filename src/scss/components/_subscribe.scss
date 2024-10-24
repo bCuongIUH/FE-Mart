@@ -1,0 +1,28 @@
+#subscribe {
+  padding: 65px 20px 50px;
+  border-top: $primary-border;
+  border-bottom: $primary-border;
+
+  .subscribe {
+    &-text {
+      h3 {
+        font-weight: 600;
+        margin-bottom: 5px;
+        font-size: 24px;
+      }
+
+      p {
+        font-size: 14px;
+        color: $text-color;
+      }
+    }
+
+    &-form {
+      @extend %subscribe-form;
+
+      input[type="submit"] {
+        padding: 13px 45px;
+      }
+    }
+  }
+}
