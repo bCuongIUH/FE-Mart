@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getAllStocks } from '../../untills/stockApi';
-import { getAllProducts } from '../../untills/api';
-import { Table } from 'antd';
+import { Table, message } from 'antd';
+
 const { Column } = Table;
 
 const StockList = () => {
     const [stocks, setStocks] = useState([]);
-    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -17,12 +16,9 @@ const StockList = () => {
                 const stockData = await getAllStocks();
                 console.log('Stock Data:', stockData);
                 setStocks(stockData.stocks || []);
-
-                const productData = await getAllProducts();
-                console.log('Product Data:', productData);
-                setProducts(productData.products || []);
             } catch (error) {
                 setError(error.message);
+                message.error(error.message); // Display error message
             } finally {
                 setLoading(false);
             }
@@ -31,29 +27,30 @@ const StockList = () => {
         fetchStocks();
     }, []);
 
-    const stockData = stocks.map(stock => {
-        const productIdStr = stock.productId.trim();
-        const product = products.find(p => p._id.trim() === productIdStr);
-
-        console.log('Checking productId:', productIdStr, 'Found product:', product);
+    
+    const processedStocks = stocks.map(stock => {
+      
+        const convertedValue = Math.floor(stock.conversionValue * stock.quantity); 
 
         return {
-            productId: stock.productId,
-            code: stock.productCode,
-            productName: stock.productName ,
-            image:stock.image ,
-            unit: stock.stocks.map(s => s.unit).join(', '),
-            quantity: stock.stocks.map(s => s.quantity).join(', '),
+            ...stock,
+            convertedValue,
         };
     });
 
     return (
-        <Table dataSource={stockData} loading={loading} rowKey="productId">
-            <Column title="Mã SP" dataIndex="code" key="code" />
+        <Table dataSource={processedStocks} loading={loading} rowKey="productId">
+            <Column title="Mã SP" dataIndex="productCode" key="productCode" />
             <Column title="Tên sản phẩm" dataIndex="productName" key="productName" />
-            <Column title="Hình ảnh" dataIndex="image" key="image" render={image => <img src={image} alt="product" style={{ width: 50, height: 50 }} />} />
-            <Column title="Đơn vị" dataIndex="unit" key="unit" />
+            {/* <Column 
+                title="Hình ảnh" 
+                dataIndex="image" 
+                key="image" 
+                render={image => <img src={image} alt="product" style={{ width: 50, height: 50, objectFit: 'cover' }} />} 
+            /> */}
+            <Column title="Đơn vị tính" dataIndex="unit" key="unit" />
             <Column title="Số lượng tồn" dataIndex="quantity" key="quantity" />
+            <Column title="Số lượng cơ bản" dataIndex="convertedValue" key="convertedValue" render={value => value} /> {/* No decimal places */}
         </Table>
     );
 };

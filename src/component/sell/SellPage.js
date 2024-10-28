@@ -53,7 +53,7 @@ function SellPage() {
   useEffect(() => {
     const fetchProductsAndCategories = async () => {
       try {
-        const productList = await getAllProductsPOP();
+        const productList = await getAllProducts();
         setProducts(productList);
         setFilteredProducts(productList);
 

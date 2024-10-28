@@ -27,6 +27,7 @@ import NhapKho from '../component/warehouseManager/WarehouseManager';
 import PromotionProgramList from '../component/PromotionManager/PromotionProgramList';
 // import UnitManager from '../component/units/UnitsPage';
 import StockList from '../component/Stock/StockList';
+import ProductPrices from '../component/PriceProduct/ProductPrices';
 // import CreatePriceList from '../component/priceListV2/CreatePriceList';
 
 
@@ -108,7 +109,7 @@ const WarehouseManager = () => {
             {/* <Menu.Item key="7" onClick={() => handleNavigate()}>Kho tổng</Menu.Item> */}
             <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>
             <Menu.Item key="9" onClick={() => handleNavigate(<StockList/>)}>Tồn kho</Menu.Item>
-            <Menu.Item key="10" onClick={() => handleNavigate('/')}>Kiểm kê kho</Menu.Item>
+            <Menu.Item key="10" onClick={() => handleNavigate(<ProductPrices/>)}>Kiểm kê kho</Menu.Item>
             <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
           </SubMenu>
           <SubMenu key="sub5" icon={<DesktopOutlined />} title="Quản lí nhà cung cấp">

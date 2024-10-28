@@ -43,6 +43,7 @@ const AddProduct = ({ onCancel }) => {
     const isCodeDuplicate = addedProducts.some(product => product.code === code);
     const isBarcodeDuplicate = addedProducts.some(product => product.barcode === barcode);
     const isNameDuplicate = addedProducts.some(product => product.name === name);
+    
 
     if (isCodeDuplicate) {
       message.error('Mã sản phẩm đã tồn tại!');
