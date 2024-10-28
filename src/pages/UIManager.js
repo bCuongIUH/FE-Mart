@@ -18,14 +18,15 @@ import SuppliersImport from '../component/suppliers/item/suppliersImport';
 import StatisticsChart from '../component/Statistical/Statistical';
 import CompletedCart from '../component/shopping/item/completedCart';
 import ManageEmployees from '../component/employees/ManageEmployees';
-import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
+// import AllProductsWarehouse from '../component/warehouseManager/item/AllProductsWarehouse';
 import OrderTracking from '../component/OrderTracking/OrderTracking';
 import ProductPage from '../component/products/ProductPage';
 
 import PriceProduct from '../component/PriceProduct/PriceProduct';
 import NhapKho from '../component/warehouseManager/WarehouseManager';
 import PromotionProgramList from '../component/PromotionManager/PromotionProgramList';
-import UnitManager from '../component/units/UnitsPage';
+// import UnitManager from '../component/units/UnitsPage';
+import StockList from '../component/Stock/StockList';
 // import CreatePriceList from '../component/priceListV2/CreatePriceList';
 
 
@@ -97,7 +98,7 @@ const WarehouseManager = () => {
             {/* <Menu.Item key="3" onClick={() => handleNavigate(<ManagerPage/>)}>Danh sách sản phẩm</Menu.Item> */}
             <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage />)}>Danh sách sản phẩm</Menu.Item>
             <Menu.Item key="4" onClick={() => handleNavigate(<PriceProduct/>)}>Thiết lập giá</Menu.Item>
-            <Menu.Item key="20" onClick={() => handleNavigate(<UnitManager/>)}>Đơn vị tính</Menu.Item>
+            {/* <Menu.Item key="20" onClick={() => handleNavigate(<UnitManager/>)}>Đơn vị tính</Menu.Item> */}
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
             <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>
@@ -106,7 +107,7 @@ const WarehouseManager = () => {
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
             {/* <Menu.Item key="7" onClick={() => handleNavigate()}>Kho tổng</Menu.Item> */}
             <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>
-            <Menu.Item key="9" onClick={() => handleNavigate()}>Quản lí xuất kho</Menu.Item>
+            <Menu.Item key="9" onClick={() => handleNavigate(<StockList/>)}>Tồn kho</Menu.Item>
             <Menu.Item key="10" onClick={() => handleNavigate('/')}>Kiểm kê kho</Menu.Item>
             <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
           </SubMenu>

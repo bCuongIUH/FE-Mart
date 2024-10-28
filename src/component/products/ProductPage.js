@@ -162,12 +162,12 @@ console.log("2",products);
   };
 
   //quy đổi giá
-  function formatPriceInVND(price) {
-    if (typeof price !== 'number') {
-      return '0 đ'; 
-    }
-    return price.toLocaleString('vi-VN') + ' đ';
-  }
+  // function formatPriceInVND(price) {
+  //   if (typeof price !== 'number') {
+  //     return '0 đ'; 
+  //   }
+  //   return price.toLocaleString('vi-VN') + ' đ';
+  // }
   return (
     <>
       {isAddingNewProduct ? ( 
@@ -231,12 +231,12 @@ console.log("2",products);
                 key: 'status',
                 render: (status) => <Tag color={status.color}>{status.text}</Tag> 
               },
-              { 
-                title: 'Giá', 
-                dataIndex: 'currentPrice', 
-                key: 'currentPrice',
-                render: (value) => formatPriceInVND(value), // Format the price
-              }, 
+              // { 
+              //   title: 'Giá', 
+              //   dataIndex: 'currentPrice', 
+              //   key: 'currentPrice',
+              //   render: (value) => formatPriceInVND(value),
+              // }, 
             ]}
             dataSource={data.filter(item => item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase()))}
           />

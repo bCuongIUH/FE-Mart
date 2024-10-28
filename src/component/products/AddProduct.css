@@ -1,28 +1,40 @@
 .form-item {
-    margin-bottom: 0; /* Không có khoảng cách giữa các trường */
+    margin-bottom: 0; 
   }
   
   .ant-form-item-label {
-    margin-bottom: 4px; /* Giảm khoảng cách giữa nhãn và trường nhập */
+    margin-bottom: 4px;
   }
   
   .ant-form-item-control {
-    margin-top: 0; /* Đảm bảo không có khoảng cách trên trường nhập */
+    margin-top: 0; 
   }
   
   /* Nếu cần điều chỉnh toàn bộ Form */
   .ant-form {
-    margin: 0; /* Loại bỏ margin trên Form nếu có */
+    margin: 0;
   }
   
   /* Điều chỉnh kích thước chữ của nhãn */
   .ant-form-item-label > label {
-    font-size: 14px; /* Kích thước chữ của nhãn */
+    font-size: 14px;
   }
   
-  /* Điều chỉnh kích thước chữ cho Input và Select nếu cần */
+ 
   .ant-input,
   .ant-select-selector {
-    font-size: 14px; /* Kích thước chữ trong Input và Select */
+    font-size: 14px; 
+  }
+  .ant-col {
+    padding: 0 8px; 
+  }
+  
+  .ant-form-item {
+    margin-bottom: 8px;
+  }
+  
+  /* Điều chỉnh chiều rộng của cột */
+  .ant-col span {
+    flex: 1; 
   }
   

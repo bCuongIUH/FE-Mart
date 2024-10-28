@@ -1,0 +1,29 @@
+.autoCompleteInput {
+    width: 100%; 
+    max-width: 150px;
+  }
+.autoCompleteInput .ant-select-dropdown {
+    max-height: 200px; 
+    overflow-y: auto;
+}
+.shortInput {
+    width: 20%;
+    margin: 0 10px;
+  }
+.headerWH{
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+}
+.textInfoWH{
+    font-size: 16px;
+    font-weight: 600;
+    margin-right: 10px;   
+}
+.buttonContainerWH {
+    display: flex;
+    justify-content: flex-end; 
+    margin-top: 20px; 
+    gap: 10px; 
+  }
+  

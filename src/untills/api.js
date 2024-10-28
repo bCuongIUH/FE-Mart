@@ -102,6 +102,16 @@ export const getAllProducts = async () => {
     throw error;
   }
 };
+export const getProductByCode = async (code) => {
+  try {
+    const response = await axios.get(`${API_URL}/products/code/${code}`, config); // Gọi API với mã sản phẩm
+    return response.data; // Trả về dữ liệu sản phẩm
+  } catch (error) {
+    console.error('Error fetching product by code:', error); // Ghi log lỗi
+    throw error; // Ném lỗi ra nếu có lỗi xảy ra
+  }
+};
+
 export const getAllProductsPOP = async () => {
   try {
     const response = await axios.get(`${API_URL}/products/pop`, config);
@@ -110,7 +120,14 @@ export const getAllProductsPOP = async () => {
     throw error;
   }
 };
-
+export const getProductsByCategory = async (categoryId) => {
+  try {
+    const response = await axios.get(`${API_URL}/products/category/${categoryId}`);
+    return response.data; // Trả về danh sách sản phẩm
+  } catch (error) {
+    throw new Error(error.response?.data.message || 'Lỗi khi lấy danh sách sản phẩm theo danh mục');
+  }
+};
 
 // Lấy sản phẩm theo ID
 export const getProductById = async (id) => {
@@ -152,67 +169,11 @@ export const updateProductStatus = async (id, newStatus) => {
       console.error('Lỗi khi cập nhật:', error.response?.data?.message || error.message);
   }
 };
-//thêm bảng giá header
-export const createPriceList = async (data) => {
-  try {
-    const response = await axios.post(`${API_URL}/price-list`, data);
-    return response.data; 
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi khi thêm bảng giá');
-  }
-};
 
-//lấy ds bảng giá 
-export const getAllPriceLists = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/price-list`);
-    return response.data; 
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi lấy bảng giá');
-  }
-};
-// Thêm giá sản phẩm vào bảng giá
-export const addPricesToPriceList = async (priceListId, products) => {
-  try {
-    const response = await axios.post(`${API_URL}/price-list/addprice`, {
-      priceListId,
-      products,
-    });
-    return response.data; 
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi cập nhập bảng giá');
-  }
-};
- export const getPriceListById = async (priceListId) => {
-  try {
-    const response = await axios.get(`${API_URL}/price-list/${priceListId}`);
-    return response.data; // Đảm bảo rằng bạn trả về đúng dữ liệu
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi khi lấy thông tin bảng giá');
-  }
-};
-//ngưng hoạt động bảng giá
-export const deactivatePriceList = async (priceListId) => {
-  try {
-    const response = await axios.post(`${API_URL}/price-list/deactivate`, { priceListId });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi khi ngừng hoạt động bảng giá');
-  }
-};
-//kích hoạt bảng giá
-export const activatePriceList = async (priceListId) => {
-  try {
-    const response = await axios.post(`${API_URL}/price-list/activate`, { priceListId });
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data.message || 'Lỗi khi kích hoạt bảng giá');
-  }
-};
 
 
 // Mật khẩu
-// Gửi yêu cầu quên mật khẩu
+// Gửi yêu cầu quên mật khẩull
 export const forgotPassword = async (email) => {
   try {
     const response = await axios.post(`${API_URL}/auth/forgot-password`, { email }, config);
