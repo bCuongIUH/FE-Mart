@@ -1,58 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { getAllStocks } from '../../untills/stockApi';
-import { Table, message } from 'antd';
+import React, { useEffect, useState } from "react";
+import { getAllStocks } from "../../untills/stockApi";
+import { getProductByCode } from "../../untills/api";
+import { Table, Input, Button } from "antd";
 
 const { Column } = Table;
 
 const StockList = () => {
-    const [stocks, setStocks] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [stocks, setStocks] = useState([]);
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchCode, setSearchCode] = useState("");
 
-    useEffect(() => {
-        const fetchStocks = async () => {
-            setLoading(true);
-            try {
-                const stockData = await getAllStocks();
-                console.log('Stock Data:', stockData);
-                setStocks(stockData.stocks || []);
-            } catch (error) {
-                setError(error.message);
-                message.error(error.message); // Display error message
-            } finally {
-                setLoading(false);
-            }
-        };
+  const handleSearch = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const productData = await getProductByCode(searchCode);
+      console.log("Product Data:", productData);
+      setProduct(productData);
 
-        fetchStocks();
-    }, []);
+      const stockData = await getAllStocks();
+      console.log("Stock Data:", stockData);
+      setStocks(stockData.stocks || []);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    
-    const processedStocks = stocks.map(stock => {
-      
-        const convertedValue = Math.floor(stock.conversionValue * stock.quantity); 
+  // Tạo stockData với conversionValue
+  const stockData = stocks
+    .filter((stock) => stock.productCode === product?.code)
+    .flatMap((stock) => {
+      return stock.stocks.map((s) => {
+        // Lấy conversionValue dựa trên unit
+        let conversionValue = 1;
+        if (s.unit === product?.baseUnit.name) {
+          conversionValue = product.baseUnit.conversionValue;
+        } else {
+          const matchingUnit = product?.conversionUnits.find(
+            (unit) => unit.name === s.unit
+          );
+          conversionValue = matchingUnit?.conversionValue || 1;
+        }
 
         return {
-            ...stock,
-            convertedValue,
+          productId: stock.productId,
+          code: stock.productCode,
+          productName: product?.name,
+          image: product?.image,
+          unit: s.unit,
+          quantity: s.quantity,
+          conversionValue: conversionValue, // Thêm conversionValue
         };
+      });
     });
 
-    return (
-        <Table dataSource={processedStocks} loading={loading} rowKey="productId">
-            <Column title="Mã SP" dataIndex="productCode" key="productCode" />
-            <Column title="Tên sản phẩm" dataIndex="productName" key="productName" />
-            {/* <Column 
-                title="Hình ảnh" 
-                dataIndex="image" 
-                key="image" 
-                render={image => <img src={image} alt="product" style={{ width: 50, height: 50, objectFit: 'cover' }} />} 
-            /> */}
-            <Column title="Đơn vị tính" dataIndex="unit" key="unit" />
-            <Column title="Số lượng tồn" dataIndex="quantity" key="quantity" />
-            <Column title="Số lượng cơ bản" dataIndex="convertedValue" key="convertedValue" render={value => value} /> {/* No decimal places */}
-        </Table>
-    );
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          width: "100%",
+          marginBottom: 16,
+          marginTop: 20,
+        }}
+      >
+        <Input
+          placeholder="Nhập mã sản phẩm"
+          value={searchCode}
+          onChange={(e) => setSearchCode(e.target.value)}
+          style={{ width: "70%", height: "40px", marginRight: "2%" }}
+        />
+        <Button
+          type="primary"
+          onClick={handleSearch}
+          disabled={!searchCode}
+          style={{ width: "20%", height: "40px" }}
+        >
+          Tìm kiếm
+        </Button>
+      </div>
+      {error && <p style={{ color: "red" }}>Lỗi: {error}</p>}
+      <Table
+        dataSource={stockData}
+        loading={loading}
+        rowKey={(record) => `${record.productId}-${record.unit}`}
+        style={{ marginTop: 16 }}
+      >
+        <Column title="Mã SP" dataIndex="code" key="code" />
+        <Column
+          title="Tên sản phẩm"
+          dataIndex="productName"
+          key="productName"
+        />
+        <Column
+          title="Hình ảnh"
+          dataIndex="image"
+          key="image"
+          render={(image) => (
+            <img src={image} alt="product" style={{ width: 50, height: 50 }} />
+          )}
+        />
+        <Column title="Đơn vị" dataIndex="unit" key="unit" />
+        <Column
+          title="Giá trị quy đổi"
+          dataIndex="conversionValue"
+          key="conversionValue"
+        />
+        <Column title="Số lượng tồn" dataIndex="quantity" key="quantity" />
+      </Table>
+    </div>
+  );
 };
 
 export default StockList;

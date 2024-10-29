@@ -23,7 +23,7 @@ function UIPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await getAllProductsPOP(); // Lấy tất cả sản phẩm
+        const data = await getAllProducts(); // Lấy tất cả sản phẩm
         setProducts(data); // Lưu tất cả sản phẩm vào state
 
         // Lọc sản phẩm theo category id từ URL

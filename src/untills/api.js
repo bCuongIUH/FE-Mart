@@ -104,7 +104,7 @@ export const getAllProducts = async () => {
 };
 export const getProductByCode = async (code) => {
   try {
-    const response = await axios.get(`${API_URL}/products/code/${code}`, config); // Gọi API với mã sản phẩm
+    const response = await axios.get(`${API_URL}/products/code/${code}`, config); 
     return response.data; // Trả về dữ liệu sản phẩm
   } catch (error) {
     console.error('Error fetching product by code:', error); // Ghi log lỗi

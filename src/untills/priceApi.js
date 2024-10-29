@@ -102,3 +102,21 @@ export const updatePriceList = async (priceListId, updatedData) => {
     throw new Error(error.response?.data.message || 'Lỗi khi cập nhật bảng giá');
   }
 };
+
+export const deletePriceFromPriceList = async (
+  priceListId,
+  productId,
+  priceId
+) => {
+  try {
+    const response = await axios.delete(
+      `${API_URL}/price-list/${priceListId}/product/${productId}/price/${priceId}`,
+      config
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+    error.response?.data.message || "Lỗi khi xóa giá khỏi bảng giá"
+  );
+}
+};
