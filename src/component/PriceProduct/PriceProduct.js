@@ -71,52 +71,69 @@ const PriceProduct = () => {
   const handleSearch = () => {
     setLoading(true);
     setError(null);
-
+  
     try {
       setFlagFilter(0);
+  
+      // Nếu mã tìm kiếm trống, xóa kết quả và dừng xử lý
       if (!searchCode) {
         setFilteredProducts([]);
         setFlagFilter(1);
         return;
       }
+  
       // Tìm sản phẩm theo mã
-      const filtered = products.filter(
+      let filtered = products.filter(
         (product) => product.code.toLowerCase() === searchCode.toLowerCase()
       );
-
+  
+      // Nếu không tìm thấy sản phẩm theo mã, hiển thị thông báo lỗi
       if (filtered.length === 0) {
         setError("Không tìm thấy sản phẩm với mã này.");
         return;
-      } else {
-        // Kiểm tra nếu sản phẩm chỉ nằm trong bảng giá hiện tại hoặc không thuộc bảng giá nào
-        const product = filtered[0];
-        const isInCurrentPriceListOnly = priceLists.every(
-          (priceList) =>
-            priceList._id === recordColumn.key ||
-            !priceList.products.some(
-              (p) => p.productId.toString() === product._id.toString()
-            )
-        );
-
-        if (!isInCurrentPriceListOnly) {
-          // Nếu sản phẩm thuộc bảng giá khác, hiển thị thông báo
-          setFilteredProducts([]);
-          message.warning(
-            "Sản phẩm này đã nằm trong một bảng giá khác và không thể thêm vào bảng giá hiện tại."
-          );
-          return;
-        }
-
-        // Cập nhật sản phẩm đã lọc để hiển thị
-        setFilteredProducts(filtered);
-        console.log(filtered);
       }
+  
+      // Lọc các sản phẩm không thuộc bảng giá khác trong khoảng thời gian trùng lặp
+      filtered = filtered.filter((product) => {
+        // Kiểm tra nếu sản phẩm tồn tại trong bảng giá khác có khoảng thời gian trùng
+        const isOverlappingInOtherPriceList = priceLists.some((priceList) => {
+          const isInOtherPriceList = priceList._id !== recordColumn.key; // Khác bảng giá hiện tại
+          const isProductInPriceList = priceList.products.some(
+            (p) => p.productId.toString() === product._id.toString()
+          );
+          const isOverlappingTime =
+            priceList.startDate <= recordColumn.endDate &&
+            priceList.endDate >= recordColumn.startDate;
+  
+          // Trả về true nếu có bảng giá khác chứa sản phẩm trong thời gian trùng lặp và đang có hiệu lực
+          const isActivePriceList = new Date() >= new Date(priceList.startDate) && new Date() <= new Date(priceList.endDate);
+  
+          return isInOtherPriceList && isProductInPriceList && isOverlappingTime && isActivePriceList;
+        });
+  
+        // Loại bỏ sản phẩm nếu tồn tại trong bảng giá khác có thời gian trùng và đang có hiệu lực
+        return !isOverlappingInOtherPriceList;
+      });
+  
+      // Nếu tất cả sản phẩm bị loại bỏ do trùng thời gian, hiển thị cảnh báo và dừng
+      if (filtered.length === 0) {
+        message.warning("Sản phẩm này đã nằm trong một bảng giá khác có thời gian hiệu lực và không thể thêm vào bảng giá hiện tại.");
+        setError(
+          "Sản phẩm này đã nằm trong một bảng giá khác có thời gian hiệu lực và không thể thêm vào bảng giá hiện tại."
+        );
+        return;
+      }
+  
+      // Cập nhật danh sách sản phẩm tìm được để hiển thị
+      setFilteredProducts(filtered);
+      console.log(filtered);
     } catch (error) {
       setError("Đã xảy ra lỗi trong quá trình tìm kiếm.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchAllData();

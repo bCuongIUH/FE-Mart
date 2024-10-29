@@ -22,7 +22,15 @@ export const getVoucherByPromotionProgramId = async (promotionProgramId) => {
     throw new Error("Lỗi khi lấy danh sách voucher");
   }
 };
-
+//lấy toàn bộ vocher đang hoạt động
+export const getAllActiveVouchers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/promotion/list/active`, config);
+    return response.data;
+  } catch (error) {
+    throw new Error("Lỗi khi lấy danh sách voucher đang hoạt động");
+  }
+};
 // API: Tạo mới voucher
 export const createVoucher = async (voucherData) => {
   try {

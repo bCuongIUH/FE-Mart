@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, message, Row, Col, InputNumber, Input, Select } from "antd";
+import { Button, Modal, message, Row, Col, InputNumber, Input, Select, Tooltip } from "antd";
 import { getAllPriceProduct } from "../../untills/priceApi";
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import { ShoppingCartOutlined, GiftOutlined } from "@ant-design/icons";
 import CartTable from "./CartTable"; // CartTable Component
-
+import { getAllActiveVouchers } from "../../services/voucherService";
+import VoucherDetail from "./VoucherDetail";
+import "../sell/SellPage.css";
 const { Option } = Select;
 
 const ProductPrices = () => {
@@ -15,10 +17,12 @@ const ProductPrices = () => {
   const [searchText, setSearchText] = useState("");
   const [cart, setCart] = useState([]);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false); 
   const [selectedUnit, setSelectedUnit] = useState({});
   const [selectedPrice, setSelectedPrice] = useState({});
   const [selectedQuantity, setSelectedQuantity] = useState({});
   const [inputQuantity, setInputQuantity] = useState({});
+  const [vouchers, setVouchers] = useState([]);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -53,14 +57,15 @@ const ProductPrices = () => {
         } else {
           setError(data.message);
         }
+        const voucherData = await getAllActiveVouchers();
+        setVouchers(voucherData);
       } catch (err) {
         setError(err.message);
       }
     };
     fetchPrices();
   }, []);
-  console.log("prices", prices);
-  
+
   const handleUnitChange = (productId, unit) => {
     setSelectedUnit((prevUnits) => ({ ...prevUnits, [productId]: unit.unitName }));
     setSelectedPrice((prevPrices) => ({ ...prevPrices, [productId]: unit.price }));
@@ -135,8 +140,10 @@ const ProductPrices = () => {
     setFilteredPrices(updatedPrices);
   };
 
-  const formatCurrency = (value) =>
-    value.toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  const formatCurrency = (value) => {
+    return value.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "VNĐ");
+  };
+  
 
   return (
     <div style={{ display: "flex", padding: "20px" }}>
@@ -156,7 +163,7 @@ const ProductPrices = () => {
             position: "sticky",
             top: 0,
             backgroundColor: "#fff",
-            zIndex: 1,  
+            zIndex: 1,
             padding: "10px",
             boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
           }}
@@ -274,6 +281,20 @@ const ProductPrices = () => {
             removeFromCart={removeFromCart}
           />
         </div>
+        {vouchers.length > 0 && (
+            <Tooltip title="Chương trình khuyến mãi hiện có">
+              <GiftOutlined
+                style={{
+                  fontSize: "24px",
+                  marginLeft: "10px",
+                  color: "#ff4d4f",
+                  cursor: "pointer",
+                }}
+                className={vouchers.length > 0 ? "blink-icon" : ""}
+                onClick={() => setIsVoucherModalOpen(true)} 
+              />
+            </Tooltip>
+          )}
 
         <Button
           type="primary"
@@ -287,6 +308,30 @@ const ProductPrices = () => {
           Thanh toán
         </Button>
 
+        {/* Voucher Modal */}
+        <Modal
+        
+            title="Chương trình khuyến mãi"
+            visible={isVoucherModalOpen}
+            onCancel={() => setIsVoucherModalOpen(false)}
+            footer={[
+              <Button key="close" onClick={() => setIsVoucherModalOpen(false)}>
+                Đóng
+              </Button>,
+            ]}
+            >
+            {vouchers.length > 0 ? (
+              <ul>
+                {vouchers.map((voucher, index) => (
+                  <VoucherDetail key={index} voucher={voucher} />
+                ))}
+              </ul>
+            ) : (
+              <p>Không có chương trình khuyến mãi hiện tại.</p>
+            )}
+          </Modal>
+
+        {/* Checkout Modal */}
         <Modal
           title="Xác nhận thanh toán"
           visible={isCheckoutModalOpen}
