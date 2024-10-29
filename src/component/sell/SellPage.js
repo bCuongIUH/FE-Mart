@@ -59,7 +59,8 @@ const ProductPrices = () => {
     };
     fetchPrices();
   }, []);
-
+  console.log("prices", prices);
+  
   const handleUnitChange = (productId, unit) => {
     setSelectedUnit((prevUnits) => ({ ...prevUnits, [productId]: unit.unitName }));
     setSelectedPrice((prevPrices) => ({ ...prevPrices, [productId]: unit.price }));
@@ -160,7 +161,7 @@ const ProductPrices = () => {
             boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
           }}
         >
-          <h1>Danh sách sản phẩm</h1>
+          <h2>Danh sách sản phẩm</h2>
           {error && <p style={{ color: "red" }}>{error}</p>}
 
           <div style={{ marginBottom: "20px" }}>
