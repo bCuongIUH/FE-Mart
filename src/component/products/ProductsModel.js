@@ -12,12 +12,12 @@ function ProductsModal({ product, onClose }) {
   const [cart, setCart] = useState([]);
 
   // Hàm để định dạng giá thành VND
-  const formatPrice = (price) => {
-    return price.toLocaleString("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    });
-  };
+  // const formatPrice = (price) => {
+  //   return price.toLocaleString("vi-VN", {
+  //     style: "currency",
+  //     currency: "VND",
+  //   });
+  // };
 
   // Hàm để tính toán giá dựa trên đơn vị được chọn
   const getTotalPrice = () => {
@@ -127,7 +127,7 @@ function ProductsModal({ product, onClose }) {
             </p>
             <p style={{ fontSize: "22px", marginBottom: "15px" }}>
               <span style={{ fontWeight: "bold" }}>
-                {formatPrice(getTotalPrice())}
+                {/* {formatPrice(getTotalPrice())} */}
               </span>
             </p>
             <div style={{ marginBottom: "20px" }}>

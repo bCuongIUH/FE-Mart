@@ -16,9 +16,7 @@ const VoucherDetail = ({ voucher }) => (
         : "Loại khuyến mãi không xác định"}
     </strong>
     <p>Mã: {voucher.code}</p>
-    
-    {/* Kiểm tra điều kiện trước khi gọi map */}
-    {voucher.type === "BuyXGetY" && voucher.conditions && (
+    {voucher.type === "BuyXGetY" && (
       <div>
         {voucher.conditions.map((condition, idx) => (
           <p key={idx}>
@@ -28,8 +26,7 @@ const VoucherDetail = ({ voucher }) => (
         ))}
       </div>
     )}
-    
-    {voucher.type === "FixedDiscount" && voucher.conditions && (
+    {voucher.type === "FixedDiscount" && (
       <div>
         {voucher.conditions.map((condition, idx) => (
           <p key={idx}>
@@ -39,8 +36,7 @@ const VoucherDetail = ({ voucher }) => (
         ))}
       </div>
     )}
-    
-    {voucher.type === "PercentageDiscount" && voucher.conditions && (
+    {voucher.type === "PercentageDiscount" && (
       <div>
         {voucher.conditions.map((condition, idx) => (
           <p key={idx}>

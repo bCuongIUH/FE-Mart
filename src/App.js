@@ -32,6 +32,7 @@ function App() {
     <Router>
       <AuthProvider> 
       <SignupContext>
+  
           <Routes>
             <Route path="/" element={<HomePage />} /> 
             <Route path="/register" element={<Register />} />
@@ -76,6 +77,7 @@ function App() {
                 
            
           </Routes>
+          
           </SignupContext>
       </AuthProvider>
     </Router>

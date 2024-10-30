@@ -1,11 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { Button, Modal, message, Row, Col, InputNumber, Input, Select, Tooltip } from "antd";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  Button,
+  Modal,
+  message,
+  Row,
+  Col,
+  InputNumber,
+  Input,
+  Select,
+} from "antd";
 import { getAllPriceProduct } from "../../untills/priceApi";
-import { ShoppingCartOutlined, GiftOutlined } from "@ant-design/icons";
-import CartTable from "./CartTable"; // CartTable Component
+import { createDirectSaleBill } from "../../untills/api";
+import { ShoppingCartOutlined } from "@ant-design/icons";
+import CartTable from "./CartTable";
 import { getAllActiveVouchers } from "../../services/voucherService";
-import VoucherDetail from "./VoucherDetail";
-import "../sell/SellPage.css";
+import { formatCurrency } from "../../untills/formatCurrency";
+import { AuthContext } from "../../untills/context/AuthContext";
+
 const { Option } = Select;
 
 const ProductPrices = () => {
@@ -17,12 +28,16 @@ const ProductPrices = () => {
   const [searchText, setSearchText] = useState("");
   const [cart, setCart] = useState([]);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false); 
   const [selectedUnit, setSelectedUnit] = useState({});
   const [selectedPrice, setSelectedPrice] = useState({});
   const [selectedQuantity, setSelectedQuantity] = useState({});
   const [inputQuantity, setInputQuantity] = useState({});
   const [vouchers, setVouchers] = useState([]);
+  const [applicableVouchers, setApplicableVouchers] = useState([]);
+  const [selectedVoucher, setSelectedVoucher] = useState(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [paymentMethod, setPaymentMethod] = useState("Cash");
+const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -31,29 +46,7 @@ const ProductPrices = () => {
         if (data.success) {
           setPrices(data.prices);
           setFilteredPrices(data.prices);
-
-          const categoryList = [...new Set(data.prices.map((product) => product.category))];
-          setCategories(categoryList);
-
-          const defaultUnits = {};
-          const defaultPrices = {};
-          const defaultQuantities = {};
-          const defaultInputQuantities = {};
-
-          data.prices.forEach((product) => {
-            const baseUnit = product.units.find((unit) => unit.conversionValue === 1);
-            if (baseUnit) {
-              defaultUnits[product.productId] = baseUnit.unitName;
-              defaultPrices[product.productId] = baseUnit.price;
-              defaultQuantities[product.productId] = baseUnit.quantity;
-              defaultInputQuantities[product.productId] = 1;
-            }
-          });
-
-          setSelectedUnit(defaultUnits);
-          setSelectedPrice(defaultPrices);
-          setSelectedQuantity(defaultQuantities);
-          setInputQuantity(defaultInputQuantities);
+          initializeProductState(data.prices);
         } else {
           setError(data.message);
         }
@@ -66,33 +59,184 @@ const ProductPrices = () => {
     fetchPrices();
   }, []);
 
-  const handleUnitChange = (productId, unit) => {
-    setSelectedUnit((prevUnits) => ({ ...prevUnits, [productId]: unit.unitName }));
-    setSelectedPrice((prevPrices) => ({ ...prevPrices, [productId]: unit.price }));
-    setSelectedQuantity((prevQuantities) => ({ ...prevQuantities, [productId]: unit.quantity }));
+
+  const initializeProductState = (products) => {
+    const defaultUnits = {};
+    const defaultPrices = {};
+    const defaultQuantities = {};
+    const defaultInputQuantities = {};
+
+    products.forEach((product) => {
+      const baseUnit = product.units.find((unit) => unit.conversionValue === 1);
+      if (baseUnit) {
+        defaultUnits[product.productId] = baseUnit.unitName;
+        defaultPrices[product.productId] = baseUnit.price;
+        defaultQuantities[product.productId] = baseUnit.quantity;
+        defaultInputQuantities[product.productId] = 1;
+      }
+    });
+
+    setSelectedUnit(defaultUnits);
+    setSelectedPrice(defaultPrices);
+    setSelectedQuantity(defaultQuantities);
+    setInputQuantity(defaultInputQuantities);
   };
 
-  const handleInputQuantityChange = (productId, quantity) => {
-    setInputQuantity((prevQuantities) => ({ ...prevQuantities, [productId]: quantity }));
+  const handleVoucherSelect = (value) => {
+    const selected = vouchers.find((voucher) => voucher._id === value);
+    setSelectedVoucher(selected);
+    calculateDiscount(selected);
+  };
+
+  const calculateDiscount = (voucher) => {
+    if (!voucher) return;
+
+    let discount = 0;
+    const totalAmount = cart.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    if (voucher.type === "PercentageDiscount" && voucher.conditions) {
+      const condition = voucher.conditions[0];
+      if (totalAmount >= condition.minOrderValue) {
+        discount = (totalAmount * condition.discountPercentage) / 100;
+        if (discount > condition.maxDiscountAmount) {
+          discount = condition.maxDiscountAmount;
+        }
+      }
+    } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
+      const condition = voucher.conditions[0];
+      if (totalAmount >= condition.minOrderValue) {
+        discount = condition.discountAmount;
+      }
+    } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
+      const condition = voucher.conditions[0];
+      const productXInCart = cart.find(
+        (item) => item.productId === condition.productXId
+      );
+      const productYExists = cart.find(
+        (item) => item.productId === condition.productYId && item.price === 0
+      );
+
+      if (
+        productXInCart &&
+        productXInCart.quantity >= condition.quantityX &&
+        !productYExists
+      ) {
+        const productY = prices.find(
+          (product) => product.productId === condition.productYId
+        );
+        if (productY) {
+          setCart((prevCart) => [
+            ...prevCart,
+            {
+              ...productY,
+              unit: selectedUnit[condition.productYId],
+              price: 0,
+              quantity: condition.quantityY,
+            },
+          ]);
+        }
+      }
+    }
+    setDiscountAmount(discount);
+    message.success("Áp dụng mã khuyến mãi thành công!");
+  };
+  const removeFromCart = (productId, unitName) => {
+    setCart((prevCart) =>
+      prevCart.filter(
+        (item) => !(item.productId === productId && item.unit === unitName)
+      )
+    );
+  };
+
+  const filterApplicableVouchers = () => {
+    const totalAmount = cart.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+    const applicable = vouchers.filter((voucher) => {
+      if (voucher.type === "PercentageDiscount" && voucher.conditions) {
+        return totalAmount >= voucher.conditions[0].minOrderValue;
+      } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
+        return totalAmount >= voucher.conditions[0].minOrderValue;
+      } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
+        const productXInCart = cart.find(
+          (item) => item.productId === voucher.conditions[0].productXId
+        );
+        return (
+          productXInCart &&
+          productXInCart.quantity >= voucher.conditions[0].quantityX
+        );
+      }
+      return false;
+    });
+    setApplicableVouchers(applicable);
+  };
+
+  useEffect(() => {
+    filterApplicableVouchers();
+  }, [cart, vouchers]);
+
+
+
+  const handlePayment = async () => {
+    const items = cart.map((item) => ({
+      // createBy: user._id,
+      product: item.productId,
+      quantity: item.quantity,
+      currentPrice: item.price,
+      unit: item.unit,
+     
+    }));
+
+    try {
+      await createDirectSaleBill(
+        
+        paymentMethod,
+        items,
+        "",
+        selectedVoucher ? selectedVoucher.code : ""
+      );
+      message.success("Thanh toán thành công!");
+      setIsCheckoutModalOpen(false);
+      setCart([]);
+      setDiscountAmount(0);
+      setSelectedVoucher(null);
+    } catch (error) {
+      message.error("Lỗi khi thanh toán. Vui lòng thử lại.");
+    }
+  };
+  
+  
+  const handleUnitChange = (productId, unit) => {
+    setSelectedUnit((prevUnits) => ({
+      ...prevUnits,
+      [productId]: unit.unitName,
+    }));
+    setSelectedPrice((prevPrices) => ({
+      ...prevPrices,
+      [productId]: unit.price,
+    }));
+    setSelectedQuantity((prevQuantities) => ({
+      ...prevQuantities,
+      [productId]: unit.quantity,
+    }));
   };
 
   const addToCart = (product) => {
     const unitName = selectedUnit[product.productId];
     const price = selectedPrice[product.productId];
-    const quantity = inputQuantity[product.productId];
+    const quantity = inputQuantity[product.productId] || 1;
 
     if (selectedQuantity[product.productId] === 0) {
       return message.warning("Đơn vị đã chọn hết hàng!");
     }
 
-    if (price === 0) {
-      return message.warning("Sản phẩm có giá trị bằng 0, không thể thêm vào giỏ hàng!");
-    }
-
     const itemInCart = cart.find(
       (item) => item.productId === product.productId && item.unit === unitName
     );
-
     if (itemInCart) {
       setCart((prevCart) =>
         prevCart.map((item) =>
@@ -107,47 +251,8 @@ const ProductPrices = () => {
     message.success("Sản phẩm đã được thêm vào giỏ hàng!");
   };
 
-  const removeFromCart = (productId, unitName) => {
-    setCart((prevCart) =>
-      prevCart.filter((item) => !(item.productId === productId && item.unit === unitName))
-    );
-  };
-
-  const handleCategoryChange = (value) => {
-    setSelectedCategory(value);
-    applyFilters(value, searchText);
-  };
-
-  const handleSearchTextChange = (event) => {
-    const searchValue = event.target.value;
-    setSearchText(searchValue);
-    applyFilters(selectedCategory, searchValue);
-  };
-
-  const applyFilters = (category, search) => {
-    let updatedPrices = prices;
-
-    if (category) {
-      updatedPrices = updatedPrices.filter((product) => product.category === category);
-    }
-
-    if (search) {
-      updatedPrices = updatedPrices.filter((product) =>
-        product.productName.toLowerCase().includes(search.toLowerCase())
-      );
-    }
-
-    setFilteredPrices(updatedPrices);
-  };
-
-  const formatCurrency = (value) => {
-    return value.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "VNĐ");
-  };
-  
-
   return (
     <div style={{ display: "flex", padding: "20px" }}>
-      {/* Left Side: Product List */}
       <div
         style={{
           flex: 1,
@@ -158,41 +263,28 @@ const ProductPrices = () => {
           padding: "10px",
         }}
       >
-        <div
-          style={{
-            position: "sticky",
-            top: 0,
-            backgroundColor: "#fff",
-            zIndex: 1,
-            padding: "10px",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
-          }}
-        >
-          <h2>Danh sách sản phẩm</h2>
-          {error && <p style={{ color: "red" }}>{error}</p>}
+        <h2>Danh sách sản phẩm</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-          <div style={{ marginBottom: "20px" }}>
-            <Input
-              placeholder="Tìm kiếm sản phẩm"
-              value={searchText}
-              onChange={handleSearchTextChange}
-              style={{ width: "100%", marginBottom: "10px" }}
-            />
-            <Select
-              placeholder="Chọn danh mục"
-              onChange={handleCategoryChange}
-              value={selectedCategory}
-              style={{ width: "100%" }}
-            >
-              <Option value={null}>Tất cả</Option>
-              {categories.map((category) => (
-                <Option key={category} value={category}>
-                  {category}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        </div>
+        <Input
+          placeholder="Tìm kiếm sản phẩm"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: "100%", marginBottom: "10px" }}
+        />
+        <Select
+          placeholder="Chọn danh mục"
+          onChange={(value) => setSelectedCategory(value)}
+          value={selectedCategory}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          <Option value={null}>Tất cả</Option>
+          {categories.map((category) => (
+            <Option key={category} value={category}>
+              {category}
+            </Option>
+          ))}
+        </Select>
 
         <Row gutter={[16, 16]}>
           {filteredPrices.length > 0 &&
@@ -213,48 +305,62 @@ const ProductPrices = () => {
                     <img
                       src={product.image}
                       alt={product.productName}
-                      style={{ width: "100px", height: "100px", marginRight: "15px" }}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        marginRight: "15px",
+                      }}
                     />
                     <div>
                       <h2>{product.productName}</h2>
-                      <div>
-                        {product.units.map((unit) => (
-                          <Button
-                            key={unit.unitName}
-                            style={{
-                              margin: "5px",
-                              backgroundColor:
-                                selectedUnit[product.productId] === unit.unitName
-                                  ? "#40a9ff"
-                                  : "#f0f0f0",
-                              color:
-                                selectedUnit[product.productId] === unit.unitName
-                                  ? "#fff"
-                                  : "#000",
-                            }}
-                            onClick={() => handleUnitChange(product.productId, unit)}
-                          >
-                            {unit.unitName}
-                          </Button>
-                        ))}
-                      </div>
+                      {product.units.map((unit) => (
+                        <Button
+                          key={unit.unitName}
+                          style={{
+                            margin: "5px",
+                            backgroundColor:
+                              selectedUnit[product.productId] === unit.unitName
+                                ? "#40a9ff"
+                                : "#f0f0f0",
+                            color:
+                              selectedUnit[product.productId] === unit.unitName
+                                ? "#fff"
+                                : "#000",
+                          }}
+                          onClick={() =>
+                            handleUnitChange(product.productId, unit)
+                          }
+                        >
+                          {unit.unitName}
+                        </Button>
+                      ))}
                       <p>
-                        <strong>Giá:</strong> {formatCurrency(selectedPrice[product.productId] || 0)}
+                        <strong>Giá:</strong>{" "}
+                        {formatCurrency(selectedPrice[product.productId] || 0)}
                       </p>
                       <p>
                         <strong>Số lượng còn:</strong>{" "}
-                        {selectedQuantity[product.productId] !== undefined
-                          ? selectedQuantity[product.productId]
-                          : "N/A"}
+                        {selectedQuantity[product.productId]}
                       </p>
                     </div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                    }}
+                  >
                     <InputNumber
-                      min={0}
+                      min={1}
                       max={selectedQuantity[product.productId]}
-                      value={inputQuantity[product.productId]}
-                      onChange={(value) => handleInputQuantityChange(product.productId, value)}
+                      value={inputQuantity[product.productId] || 1}
+                      onChange={(value) =>
+                        setInputQuantity((prev) => ({
+                          ...prev,
+                          [product.productId]: value,
+                        }))
+                      }
                       style={{ width: "80px" }}
                     />
                     <Button
@@ -269,70 +375,74 @@ const ProductPrices = () => {
         </Row>
       </div>
 
-      {/* Right Side: Cart */}
-      <div style={{ flex: 1, overflowY: "auto", marginTop: "20px", position: "relative" }}>
+      <div
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          marginTop: "20px",
+          position: "relative",
+        }}
+      >
         <h2>
-          Giỏ hàng <ShoppingCartOutlined style={{ fontSize: "24px" }} />
+          Giỏ hàng <ShoppingCartOutlined />
         </h2>
-        <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "20px" }}>
-          <CartTable 
-            cart={cart}
-            formatCurrency={formatCurrency}
-            removeFromCart={removeFromCart}
-          />
-        </div>
-        {vouchers.length > 0 && (
-            <Tooltip title="Chương trình khuyến mãi hiện có">
-              <GiftOutlined
-                style={{
-                  fontSize: "24px",
-                  marginLeft: "10px",
-                  color: "#ff4d4f",
-                  cursor: "pointer",
-                }}
-                className={vouchers.length > 0 ? "blink-icon" : ""}
-                onClick={() => setIsVoucherModalOpen(true)} 
-              />
-            </Tooltip>
+        <CartTable
+          removeFromCart={removeFromCart}
+          cart={cart}
+          formatCurrency={formatCurrency}
+        />
+        <p
+          style={{
+            fontSize: "18px",
+            fontWeight: "bold",
+            textAlign: "right",
+            marginRight: "20px",
+          }}
+        >
+          Tổng tiền:{" "}
+          {formatCurrency(
+            cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
           )}
+        </p>
+
+        <Select
+          placeholder="Chọn voucher"
+          onChange={handleVoucherSelect}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          <Option value={null}>Không áp dụng voucher</Option>
+          {applicableVouchers.map((voucher) => (
+            <Option key={voucher._id} value={voucher._id}>
+              {voucher.code}
+            </Option>
+          ))}
+        </Select>
+
+        <p
+          style={{ fontSize: "16px", textAlign: "right", marginRight: "20px" }}
+        >
+          Giảm giá: {formatCurrency(discountAmount)}
+        </p>
+
+        <Select
+          placeholder="Chọn hình thức thanh toán"
+          onChange={(value) => setPaymentMethod(value)}
+          value={paymentMethod}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          <Option value="Cash">Tiền mặt</Option>
+          <Option value="Card">Thẻ</Option>
+        </Select>
 
         <Button
           type="primary"
           onClick={() => setIsCheckoutModalOpen(true)}
-          style={{
-            position: "absolute",
-            bottom: "20px",
-            right: "20px",
-          }}
+          style={{ position: "absolute", bottom: "20px", right: "20px" }}
         >
           Thanh toán
         </Button>
 
-        {/* Voucher Modal */}
-        <Modal
-        
-            title="Chương trình khuyến mãi"
-            visible={isVoucherModalOpen}
-            onCancel={() => setIsVoucherModalOpen(false)}
-            footer={[
-              <Button key="close" onClick={() => setIsVoucherModalOpen(false)}>
-                Đóng
-              </Button>,
-            ]}
-            >
-            {vouchers.length > 0 ? (
-              <ul>
-                {vouchers.map((voucher, index) => (
-                  <VoucherDetail key={index} voucher={voucher} />
-                ))}
-              </ul>
-            ) : (
-              <p>Không có chương trình khuyến mãi hiện tại.</p>
-            )}
-          </Modal>
-
-        {/* Checkout Modal */}
-        <Modal
+        {/* <Modal
           title="Xác nhận thanh toán"
           visible={isCheckoutModalOpen}
           onCancel={() => setIsCheckoutModalOpen(false)}
@@ -340,12 +450,84 @@ const ProductPrices = () => {
         >
           <p>
             Tổng tiền:{" "}
-            {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0))}
+            {formatCurrency(
+              cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+            )}
           </p>
-          <Button type="primary" onClick={() => message.success("Thanh toán thành công!")}>
+          <p>Giảm giá: {formatCurrency(discountAmount)}</p>
+          <p>
+            <strong>
+              Thành tiền:{" "}
+              {formatCurrency(
+                cart.reduce(
+                  (acc, item) => acc + item.price * item.quantity,
+                  0
+                ) - discountAmount
+              )}
+            </strong>
+          </p>
+          <Button type="primary" onClick={handlePayment}>
+            Xác nhận
+          </Button>
+        </Modal> */}
+        <Modal
+          title="Xác nhận thanh toán"
+          visible={isCheckoutModalOpen}
+          onCancel={() => setIsCheckoutModalOpen(false)}
+          footer={null}
+        >
+          <h4>Sản phẩm mua:</h4>
+          {cart.map((item) => (
+            <div key={item.productId} style={{ marginBottom: "10px" }}>
+              <p>
+                <strong>Tên sản phẩm:</strong> {item.productName}
+              </p>
+              <p>
+                <strong>Đơn vị:</strong> {item.unit}
+              </p>
+              <p>
+                <strong>Giá:</strong> {formatCurrency(item.price)}
+              </p>
+              <p>
+                <strong>Số lượng:</strong> {item.quantity}
+              </p>
+            </div>
+          ))}
+
+          {selectedVoucher && (
+            <div style={{ marginBottom: "10px" }}>
+              <p>
+                <strong>Mã giảm giá:</strong> {selectedVoucher.code}
+              </p>
+              <p>
+                <strong>Số tiền giảm:</strong> {formatCurrency(discountAmount)}
+              </p>
+            </div>
+          )}
+
+          <p>
+            Tổng tiền:{" "}
+            {formatCurrency(
+              cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+            )}
+          </p>
+          <p>Giảm giá: {formatCurrency(discountAmount)}</p>
+          <p>
+            <strong>
+              Thành tiền:{" "}
+              {formatCurrency(
+                cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
+                discountAmount
+              )}
+            </strong>
+          </p>
+          <Button type="primary" onClick={handlePayment}>
             Xác nhận
           </Button>
         </Modal>
+
+
+
       </div>
     </div>
   );

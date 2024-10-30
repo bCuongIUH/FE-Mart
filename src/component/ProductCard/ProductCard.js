@@ -1,16 +1,11 @@
-import React, { useState } from "react";
-import { ShoppingCartOutlined } from "@ant-design/icons"; // Import icon cho nút
+import React, { useState, useEffect } from "react";
+import { ShoppingCartOutlined } from "@ant-design/icons";
 import ProductsModal from "../products/ProductsModel";
-
-const formatCurrency = (amount) => {
-  return amount.toLocaleString("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  });
-};
+import { getAllPriceProduct } from "../../untills/priceApi";
 
 const ProductCard = ({ product }) => {
-  const [selectedProduct, setSelectedProduct] = useState(null); // State để lưu sản phẩm được chọn
+  const [selectedProduct, setSelectedProduct] = useState(null); // State để lưu chi tiết sản phẩm
+  const [isLoading, setIsLoading] = useState(false);
 
   const defaultImage = product.image || "/path-to-placeholder-image.jpg";
 
@@ -34,9 +29,18 @@ const ProductCard = ({ product }) => {
     transition: "background-color 0.3s, color 0.3s",
   };
 
-  // Hàm xử lý khi nhấn nút "Chọn Mua"
-  const handleSelectProduct = () => {
-    setSelectedProduct(product); // Lưu sản phẩm vào state
+  // Hàm xử lý khi nhấn nút "Chọn Mua" để lấy chi tiết sản phẩm từ API
+  const handleSelectProduct = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getAllPriceProduct();
+      const productDetails = data.find((p) => p.productId === product.productId);
+      setSelectedProduct(productDetails); // Lưu chi tiết sản phẩm vào state
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Hàm đóng modal
@@ -46,21 +50,18 @@ const ProductCard = ({ product }) => {
 
   // Hàm thêm sản phẩm vào giỏ hàng
   const handleAddToCart = () => {
-    // Logic thêm sản phẩm vào giỏ hàng
-    console.log("Thêm vào giỏ hàng:", product);
+    console.log("Thêm vào giỏ hàng:", selectedProduct);
   };
 
   // Hàm "Mua ngay"
   const handleBuyNow = () => {
-    // Logic xử lý "Mua ngay"
-    console.log("Mua ngay:", product);
+    console.log("Mua ngay:", selectedProduct);
   };
 
   return (
     <>
       <div className="product-card">
         <div className="card-top">
-          {/* ======= Ảnh ======= */}
           <div
             className="product-img"
             onClick={handleSelectProduct}
@@ -70,14 +71,14 @@ const ProductCard = ({ product }) => {
           </div>
         </div>
 
-        {/* ======= Giá ======= */}
+        {/* Giá */}
         <div className="product-price">
           <p>
-            <span>{formatCurrency(product.currentPrice)}</span>
+            {/* <span>{formatCurrency(product.currentPrice)}</span> */}
           </p>
         </div>
 
-        {/* ======= Tiêu đề ======= */}
+        {/* Tiêu đề */}
         <div
           className="product-title"
           style={{
@@ -86,14 +87,14 @@ const ProductCard = ({ product }) => {
             WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
-            cursor: "pointer", // Thêm cursor pointer
+            cursor: "pointer",
           }}
           onClick={handleSelectProduct}
         >
           <h6>{product.name}</h6>
         </div>
 
-        {/* ======= Nút Chọn Mua ======= */}
+        {/* Nút Chọn Mua */}
         <div style={buttonContainerStyle}>
           <button style={addToCartButtonStyle} onClick={handleSelectProduct}>
             <ShoppingCartOutlined /> Chọn Mua
@@ -101,13 +102,14 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* ======= Modal hiển thị khi chọn sản phẩm ======= */}
+      {/* Modal hiển thị khi chọn sản phẩm */}
       {selectedProduct && (
         <ProductsModal
           product={selectedProduct}
           onClose={handleCloseModal}
           onAddToCart={handleAddToCart}
           onBuyNow={handleBuyNow}
+          isLoading={isLoading} // Truyền trạng thái loading vào modal
         />
       )}
     </>

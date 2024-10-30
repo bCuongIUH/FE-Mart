@@ -47,6 +47,7 @@ const WarehouseManager = () => {
     setShowUserInfo(false);
   };
 
+
   const handleLogout = () => {
     logout();
     navigate('/');

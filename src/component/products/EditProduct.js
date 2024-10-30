@@ -17,23 +17,21 @@ import {
   MinusCircleOutlined,
 } from "@ant-design/icons";
 import {
-  createProduct,
+  updateProduct,
   getCategories,
   getAllSuppliers,
 } from "../../untills/api";
-import "./AddProduct.css";
 
 const { Option } = Select;
 
-const AddProduct = ({ visible, onCancel, fetchAllData }) => {
+const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [conversionUnits, setConversionUnits] = useState([]);
-  const [showConversionUnits, setShowConversionUnits] = useState(false);
   const [loading, setLoading] = useState(false); // Thêm state loading
-
+  console.log(product);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -54,6 +52,28 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (visible && product) {
+      form.setFieldsValue({
+        code: product.code,
+        name: product.name,
+        barcode: product.barcode,
+        description: product.description,
+        categoryId: product.category,
+        supplierId: product.supplier,
+        "baseUnit.name": product.baseUnit.name,
+        "baseUnit.conversionValue": product.baseUnit.conversionValue,
+      });
+
+      setFileList(
+        product.image
+          ? [{ url: product.image, name: "Current Image", status: "done" }]
+          : []
+      );
+      setConversionUnits(product.conversionUnits || []);
+    }
+  }, [visible, product, form]);
 
   const onFinish = async (values) => {
     setLoading(true); // Bắt đầu loading
@@ -81,25 +101,21 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
         formData.append(`conversionUnits[${index}][barcode]`, unit.barcode);
       });
 
-      if (fileList.length > 0) {
+      if (fileList.length > 0 && fileList[0].originFileObj) {
         formData.append("image", fileList[0].originFileObj);
       }
 
-      await createProduct(formData);
-      message.success("Thêm sản phẩm thành công!");
+      await updateProduct(product._id, formData);
+      message.success("Cập nhật sản phẩm thành công!");
       fetchAllData();
-      form.resetFields();
-      setFileList([]);
-      setConversionUnits([]);
-      setShowConversionUnits(false);
       onCancel();
     } catch (error) {
       message.error(
-        "Có lỗi xảy ra khi thêm sản phẩm: " +
+        "Có lỗi xảy ra: " +
           (error.response?.data.message || "Vui lòng thử lại!")
       );
     } finally {
-      setLoading(false); // Kết thúc loading sau khi API xử lý xong
+      setLoading(false); // Kết thúc loading
     }
   };
 
@@ -111,14 +127,6 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
       <div style={{ marginTop: 8 }}>Tải lên</div>
     </div>
   );
-
-  const addConversionUnit = () => {
-    setConversionUnits([
-      ...conversionUnits,
-      { name: "", conversionValue: "", barcode: "" },
-    ]);
-    setShowConversionUnits(true);
-  };
 
   const handleConversionUnitChange = (index, field, value) => {
     const newUnits = [...conversionUnits];
@@ -134,13 +142,14 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
   return (
     <Modal
       visible={visible}
-      title="Thêm sản phẩm mới"
+      title="Chỉnh sửa sản phẩm"
       onCancel={onCancel}
-      onOk={() => form.submit()} // Kích hoạt form submit khi nhấn OK
-      okText="Thêm sản phẩm"
+      onOk={() => form.submit()} // Submit form khi nhấn OK
+      okText="Cập nhật"
       cancelText="Hủy"
-      confirmLoading={loading} // Áp dụng loading cho nút "Thêm sản phẩm"
-      width={800}
+      confirmLoading={loading} 
+      width={1000}
+      maxheight={400}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         <Card title="Thông tin sản phẩm">
@@ -246,62 +255,62 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
                 label="Tên đơn vị cơ bản"
                 rules={[{ required: true, message: "Nhập tên đơn vị!" }]}
               >
-                <Input placeholder="Ví dụ: Lon" style={{ height: "40px" }} />
+                <Input style={{ height: "40px" }} placeholder="Ví dụ: Lon" />
               </Form.Item>
             </Col>
           </Row>
 
-          {showConversionUnits &&
-            conversionUnits.map((unit, index) => (
-              <Row key={index} gutter={8} style={{ marginBottom: "8px" }}>
-                <Col span={8}>
-                  <Input
-                    placeholder="Tên đơn vị"
-                    value={unit.name}
-                    style={{ height: "40px" }}
-                    onChange={(e) =>
-                      handleConversionUnitChange(index, "name", e.target.value)
-                    }
-                  />
-                </Col>
-                <Col span={8}>
-                  <Input
-                    placeholder="Giá trị quy đổi"
-                    style={{ height: "40px" }}
-                    value={unit.conversionValue}
-                    onChange={(e) =>
-                      handleConversionUnitChange(
-                        index,
-                        "conversionValue",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Col>
-                <Col span={8}>
-                  <Input
-                    style={{ height: "40px" }}
-                    placeholder="Mã vạch"
-                    value={unit.barcode}
-                    onChange={(e) =>
-                      handleConversionUnitChange(
-                        index,
-                        "barcode",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Col>
-                <Col>
-                  <MinusCircleOutlined
-                    onClick={() => removeConversionUnit(index)}
-                  />
-                </Col>
-              </Row>
-            ))}
+          {conversionUnits.map((unit, index) => (
+            <Row key={index} gutter={8} style={{ marginBottom: "8px" }}>
+              <Col span={8}>
+                <Input
+                  style={{ height: "40px" }}
+                  placeholder="Tên đơn vị"
+                  value={unit.name}
+                  onChange={(e) =>
+                    handleConversionUnitChange(index, "name", e.target.value)
+                  }
+                />
+              </Col>
+              <Col span={8}>
+                <Input
+                  style={{ height: "40px" }}
+                  placeholder="Giá trị quy đổi"
+                  value={unit.conversionValue}
+                  onChange={(e) =>
+                    handleConversionUnitChange(
+                      index,
+                      "conversionValue",
+                      e.target.value
+                    )
+                  }
+                />
+              </Col>
+              <Col span={8}>
+                <Input
+                  style={{ height: "40px" }}
+                  placeholder="Mã vạch"
+                  value={unit.barcode}
+                  onChange={(e) =>
+                    handleConversionUnitChange(index, "barcode", e.target.value)
+                  }
+                />
+              </Col>
+              <Col>
+                <MinusCircleOutlined
+                  onClick={() => removeConversionUnit(index)}
+                />
+              </Col>
+            </Row>
+          ))}
           <Button
             type="dashed"
-            onClick={addConversionUnit}
+            onClick={() =>
+              setConversionUnits([
+                ...conversionUnits,
+                { name: "", conversionValue: "", barcode: "" },
+              ])
+            }
             style={{ width: "10%" }}
           >
             Thêm đơn vị quy đổi
@@ -312,4 +321,4 @@ const AddProduct = ({ visible, onCancel, fetchAllData }) => {
   );
 };
 
-export default AddProduct;
+export default EditProduct;
