@@ -4,7 +4,7 @@ import { FiBarChart2 } from "react-icons/fi";
 import { BsHeart, BsBag } from "react-icons/bs";
 import { IoIosSearch } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllCart } from "../../untills/api"; // Import API call
+import { getAllCart } from "../../untills/api";
 import { AuthContext } from "../../untills/context/AuthContext";
 
 const Actions = () => {
@@ -69,6 +69,10 @@ const Actions = () => {
     window.location.reload();
   };
 
+  const handleCustomAction = () => {  
+
+  }
+
   return (
     <div className="header-top-actions d-flex">
       <div className="left-actions">
@@ -131,54 +135,57 @@ const Actions = () => {
         </div>
 
         <div
-          className="links"
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          {/* Nếu user đã đăng nhập */}
-          {user ? (
-            <>
-              <span
-                style={{
-                  fontWeight: "bold",
-                  maxWidth: "150px", // Giới hạn chiều rộng để đảm bảo fullName nằm trong 1 dòng
-                  whiteSpace: "nowrap", // Ngăn không cho text xuống dòng
-                  overflow: "hidden", // Ẩn phần vượt quá chiều rộng
-                  textOverflow: "ellipsis", // Hiển thị dấu 3 chấm nếu text bị cắt
-                }}
-              >
-                {user.fullName}
-              </span>
-              <button
-                onClick={handleLogout}
-                style={{
-                  marginLeft: "10px",
-                  padding: "5px 10px",
-                  fontSize: "14px",
-                  cursor: "pointer",
-                  width: "150px",
-                }}
-              >
-                Đăng xuất
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                style={{
-                  fontWeight: "bold",
-                  maxWidth: "150px", // Giới hạn chiều rộng để đảm bảo fullName nằm trong 1 dòng
-                  whiteSpace: "nowrap", // Ngăn không cho text xuống dòng
-                  overflow: "hidden", // Ẩn phần vượt quá chiều rộng
-                  textOverflow: "ellipsis", // Hiển thị dấu 3 chấm nếu text bị cắt
-                }}
-                to="/login"
-              >
-                Đăng nhập
-              </Link>
-              <Link to="/register">Đăng ký</Link>
-            </>
-          )}
-        </div>
+            className="links"
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            {/* Nếu user đã đăng nhập */}
+            {user ? (
+              <>
+                <span
+                  style={{
+                    fontWeight: "bold",
+                    maxWidth: "150px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {user.fullName}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    marginLeft: "10px",
+                    padding: "5px 10px",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    width: "150px",
+                  }}
+                >
+                  Đăng xuất
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  style={{
+                    fontWeight: "bold",
+                    maxWidth: "150px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                  to="/login"
+                >
+                  Đăng nhập
+                </Link>
+                <Link to="/register">Đăng ký</Link>
+              </>
+            )}
+         
+
+          </div>
+
       </div>
     </div>
   );

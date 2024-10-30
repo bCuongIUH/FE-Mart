@@ -18,6 +18,7 @@ const WarehouseEntryDetailModal = ({ visible, onCancel, entry, getSupplierNameBy
 
   return (
     <Modal
+     key={entry._id}
       title={<div style={{ textAlign: 'center', fontSize: 30 }}>Thông tin phiếu nhập kho</div>}
       visible={visible}
       onCancel={onCancel}

@@ -22,11 +22,38 @@ export const getAllEmployee = async () => {
 // API để thêm một nhân viên mới
 export const addEmployee = async (employeeData) => {
   try {
-    const response = await axios.post(`${API_URL}/employees/add-employee`, employeeData, config); 
+    const response = await axios.post(`${API_URL}/employees/add-employee`, employeeData, config);
     return response.data;
   } catch (error) {
-    console.error('Lỗi khi thêm nhân viên:', error);
-    throw new Error('Không thể thêm nhân viên');
+    if (error.response && error.response.data && error.response.data.message) {
+      // Trả về lỗi cụ thể từ Backend
+      throw new Error(error.response.data.message);
+    } else {
+      console.error('Lỗi khi thêm nhân viên:', error);
+      throw new Error('Không thể thêm nhân viên');
+    }
+  }
+};
+
+// Hàm API xóa nhân viên
+export const deleteEmployee = async (employeeId) => {
+  try {
+    const response = await axios.delete(`${API_URL}/employees/${employeeId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi xóa nhân viên:', error);
+    throw new Error(error.response?.data?.message || 'Không thể xóa nhân viên');
+  }
+};
+
+// API sửa nhân viên
+export const updateEmployee = async (employeeId, updateData) => {
+  try {
+    const response = await axios.put(`${API_URL}/employees/${employeeId}`, updateData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi sửa nhân viên:', error);
+    throw new Error(error.response?.data?.message || 'Không thể sửa nhân viên');
   }
 };
 //xác thực nhân viên

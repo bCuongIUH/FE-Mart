@@ -1,139 +1,98 @@
+import React, { useEffect, useState } from 'react';
+import { getAllSuppliers } from '../../../untills/api';
+import { Button, Modal } from 'antd';
+import SuppliersAddModal from './SuppliersAddModal';
+import styles from './suppliersInfo.module.css';
+import { FaTrash } from 'react-icons/fa';
 
-import React, { useState } from 'react';
-import styles from './suppliersimport.module.css';
-import { createSuppliers } from '../../../untills/api';
+function SuppliersInfo() {
+  const [suppliers, setSuppliers] = useState([]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
 
-function SuppliersImport() {
-  const [supplierData, setSupplierData] = useState({
-    name: '',
-    contactInfo: '',
-    email: '',
-    phoneNumber: '',
-  });
-  const [confirmData, setConfirmData] = useState(null); // Lưu dữ liệu để xác nhận
-  const [step, setStep] = useState(1); // Quản lý bước hiển thị
-  const [message, setMessage] = useState('');
-
-  // Hàm xử lý thay đổi input
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSupplierData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  // Hàm xử lý submit form bước 1
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (step === 1) {
-      // Xác nhận dữ liệu và chuyển qua bước 2
-      setConfirmData({
-        ...supplierData,
-        entryDate: new Date().toISOString(),
-      });
-      setStep(2);
-    } else if (step === 2) {
-      handleConfirmSubmit();
+  useEffect(() => {
+    async function fetchSuppliers() {
+      try {
+        const suppliersList = await getAllSuppliers();
+        setSuppliers(suppliersList || []); // Nếu suppliersList là undefined, gán thành mảng trống
+      } catch (error) {
+        console.error('Lỗi khi lấy danh sách nhà cung cấp:', error);
+      }
     }
+    fetchSuppliers();
+  }, []);
+
+  const handleSupplierClick = (supplier) => {
+    setSelectedSupplier(supplier);
   };
 
-  // Hàm xử lý submit form bước 2
-  const handleConfirmSubmit = async () => {
-    try {
-      const response = await createSuppliers(confirmData);
-      setMessage(response.message); // Hiển thị thông báo thêm thành công
-      resetForm();
-    } catch (error) {
-      setMessage('Lỗi khi thêm nhà cung cấp: ' + error.response.data.message);
-    }
+  const closeModal = () => {
+    setSelectedSupplier(null);
   };
 
-  // Reset form sau khi thêm thành công
-  const resetForm = () => {
-    setSupplierData({
-      name: '',
-      contactInfo: '',
-      email: '',
-      phoneNumber: '',
-    });
-    setConfirmData(null);
-    setStep(1);
+  const handleAddSupplierSuccess = (newSupplier) => {
+    setSuppliers((prevSuppliers) => [...prevSuppliers, newSupplier]);
+    setIsAddModalVisible(false);
   };
 
   return (
-    <div className={styles.suppliersImport}>
-      <h2>Nhập nhà cung cấp mới</h2>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Danh sách nhà cung cấp</h1>
+        <Button type="primary" onClick={() => setIsAddModalVisible(true)} style={{ float: 'right' }}>
+          Thêm nhà cung cấp
+        </Button>
+      </div>
 
-      {step === 1 ? (
-        <form onSubmit={handleSubmit} className={styles.formContainer}>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Tên nhà cung cấp</label>
-            <input
-              type="text"
-              name="name"
-              value={supplierData.name}
-              onChange={handleChange}
-              className={styles.input}
-              required
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Thông tin liên hệ</label>
-            <input
-              type="text"
-              name="contactInfo"
-              value={supplierData.contactInfo}
-              onChange={handleChange}
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={supplierData.email}
-              onChange={handleChange}
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label}>Số điện thoại</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              value={supplierData.phoneNumber}
-              onChange={handleChange}
-              className={styles.input}
-            />
-          </div>
-          <button type="submit" className={styles.submitButton}>
-            Tiếp tục
-          </button>
-        </form>
+      {suppliers?.length > 0 ? (
+        <ul className={styles.supplierList}>
+          {suppliers.map((supplier) => (
+            supplier && (
+              <li
+                key={supplier._id}
+                className={styles.supplierItem}
+                onClick={() => handleSupplierClick(supplier)}
+              >
+                <div className={styles.supplierDetail}>
+                  <span className={styles.supplierName}><strong>Tên:</strong> {supplier.name || 'Không có tên'}</span>
+                  <span className={styles.supplierContactInfo}><strong>Email:</strong> {supplier.email || 'Không có email'}</span>
+                  <span className={styles.supplierContactInfo}><strong>Số ĐT:</strong> {supplier.phoneNumber || 'Không có số điện thoại'}</span>
+                  <span className={styles.supplierContactInfo}><strong>Thông tin liên hệ:</strong> {supplier.contactInfo || 'Không có thông tin liên hệ'}</span>
+                </div>
+                <button className={styles.deleteButton}>
+                  <FaTrash />
+                </button>
+              </li>
+            )
+          ))}
+        </ul>
       ) : (
-        <div className={styles.confirmContainer}>
-          <h3>Xác nhận thông tin nhà cung cấp</h3>
-          <p><strong>Tên nhà cung cấp:</strong> {confirmData.name}</p>
-          <p><strong>Thông tin liên hệ:</strong> {confirmData.contactInfo}</p>
-          <p><strong>Email:</strong> {confirmData.email}</p>
-          <p><strong>Số điện thoại:</strong> {confirmData.phoneNumber}</p>
-          <p><strong>Ngày nhập:</strong> {new Date(confirmData.entryDate).toLocaleDateString()}</p>
-
-          <button type="submit" onClick={handleSubmit} className={styles.confirmButton}>
-            Xác nhận
-          </button>
-          <button type="button" className={styles.cancelButton} onClick={resetForm}>
-            Hủy
-          </button>
-        </div>
+        <p>Không có nhà cung cấp nào</p>
       )}
 
-      {message && <p className={styles.message}>{message}</p>}
+      {/* Modal chi tiết nhà cung cấp */}
+      {selectedSupplier && (
+        <Modal
+          visible={selectedSupplier !== null}
+          onCancel={closeModal}
+          footer={null}
+          title="Thông tin nhà cung cấp"
+        >
+          <h2>{selectedSupplier.name || 'Không có tên'}</h2>
+          <p><strong>Thông tin liên hệ:</strong> {selectedSupplier.contactInfo || 'Không có thông tin'}</p>
+          <p><strong>Email:</strong> {selectedSupplier.email || 'Không có email'}</p>
+          <p><strong>Số điện thoại:</strong> {selectedSupplier.phoneNumber || 'Không có số điện thoại'}</p>
+        </Modal>
+      )}
+
+      {/* Modal thêm nhà cung cấp */}
+      <SuppliersAddModal
+        visible={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
+        onAddSuccess={handleAddSupplierSuccess}
+      />
     </div>
   );
 }
 
-export default SuppliersImport;
-
+export default SuppliersInfo;
