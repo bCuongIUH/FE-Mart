@@ -45,7 +45,7 @@ const StockList = () => {
           );
           conversionValue = matchingUnit?.conversionValue || 1;
         }
-
+        const baseUnitQuantity = s.quantity * conversionValue;
         return {
           productId: stock.productId,
           code: stock.productCode,
@@ -54,6 +54,8 @@ const StockList = () => {
           unit: s.unit,
           quantity: s.quantity,
           conversionValue: conversionValue, // Thêm conversionValue
+          baseUnitName: product?.baseUnit.name,
+          baseUnitQuantity: baseUnitQuantity,
         };
       });
     });
@@ -104,13 +106,16 @@ const StockList = () => {
             <img src={image} alt="product" style={{ width: 50, height: 50 }} />
           )}
         />
-        <Column title="Đơn vị" dataIndex="unit" key="unit" />
+        <Column title="Đơn vị tính" dataIndex="unit" key="unit" />
+        <Column title="Số lượng tồn" dataIndex="quantity" key="quantity" />
+        <Column title="Đơn vị cơ bản" dataIndex="baseUnitName" key="baseUnitName" />
         <Column
           title="Giá trị quy đổi"
           dataIndex="conversionValue"
           key="conversionValue"
         />
-        <Column title="Số lượng tồn" dataIndex="quantity" key="quantity" />
+        <Column title="Tổng số lượng" dataIndex="baseUnitQuantity" key="baseUnitQuantity" />
+
       </Table>
     </div>
   );

@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, Select, Switch } from "antd";
-import { getAllProducts } from "../../../untills/api"; // Import hàm API để lấy danh sách sản phẩm
+import { getAllProducts } from "../../../untills/api";
 
 const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
   const [form] = Form.useForm();
-  const [voucherType, setVoucherType] = useState(""); // State để lưu loại voucher
-  const [products, setProducts] = useState([]); // State để lưu danh sách sản phẩm
+  const [voucherType, setVoucherType] = useState("");
+  const [products, setProducts] = useState([]);
 
-  // Lấy danh sách sản phẩm khi component được mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -24,56 +23,12 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
     form.submit();
   };
 
-  // Điều kiện tương ứng dựa trên loại voucher
   const renderConditionsFields = () => {
     switch (voucherType) {
       case "BuyXGetY":
         return (
           <>
-            <Form.Item
-              name={["conditions", "productXId"]}
-              label="Sản phẩm mua"
-              rules={[{ required: true, message: "Vui lòng chọn sản phẩm X" }]}
-              style={{ marginBottom: "50px" }}
-            >
-              <Select placeholder="Chọn sản phẩm mua">
-                {products.map((product) => (
-                  <Select.Option key={product._id} value={product._id}>
-                    {product.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name={["conditions", "quantityX"]}
-              label="Số lượng mua"
-              rules={[{ required: true, message: "Vui lòng nhập số lượng X" }]}
-              style={{ marginBottom: "50px" }}
-            >
-              <Input type="number" />
-            </Form.Item>
-            <Form.Item
-              name={["conditions", "productYId"]}
-              label="Sản phẩm tặng"
-              rules={[{ required: true, message: "Vui lòng chọn sản phẩm tặng" }]}
-              style={{ marginBottom: "50px" }}
-            >
-              <Select placeholder="Chọn sản phẩm tặng">
-                {products.map((product) => (
-                  <Select.Option key={product._id} value={product._id}>
-                    {product.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name={["conditions", "quantityY"]}
-              label="Số lượng tặng"
-              rules={[{ required: true, message: "Vui lòng nhập số lượng tặng" }]}
-              style={{ marginBottom: "30px" }}
-            >
-              <Input type="number" />
-            </Form.Item>
+            {/* Các trường điều kiện cho BuyXGetY */}
           </>
         );
       case "FixedDiscount":
@@ -83,24 +38,33 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "minOrderValue"]}
               label="Giá trị đơn hàng tối thiểu"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập giá trị đơn hàng tối thiểu",
-                },
+                { required: true, message: "Vui lòng nhập giá trị đơn hàng tối thiểu" },
               ]}
               style={{ marginBottom: "30px" }}
             >
-              <Input type="number" />
+              <Input type="number" min={0} />
             </Form.Item>
             <Form.Item
               name={["conditions", "discountAmount"]}
               label="Số tiền giảm giá"
+              dependencies={["conditions", "minOrderValue"]}
               rules={[
                 { required: true, message: "Vui lòng nhập số tiền giảm giá" },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const minOrderValue = getFieldValue(["conditions", "minOrderValue"]);
+                    if (!value || (minOrderValue && value <= minOrderValue)) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Số tiền giảm giá phải nhỏ hơn hoặc bằng giá trị đơn hàng tối thiểu")
+                    );
+                  },
+                }),
               ]}
               style={{ marginBottom: "30px" }}
             >
-              <Input type="number" />
+              <Input type="number" min={0} />
             </Form.Item>
           </>
         );
@@ -111,31 +75,52 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               name={["conditions", "minOrderValue"]}
               label="Giá trị đơn hàng tối thiểu"
               rules={[
-                {
-                  required: true,
-                  message: "Vui lòng nhập giá trị đơn hàng tối thiểu",
-                },
+                { required: true, message: "Vui lòng nhập giá trị đơn hàng tối thiểu" },
               ]}
               style={{ marginBottom: "30px" }}
             >
-              <Input type="number" />
+              <Input type="number" min={0} />
             </Form.Item>
             <Form.Item
               name={["conditions", "discountPercentage"]}
               label="Phần trăm giảm giá"
               rules={[
                 { required: true, message: "Vui lòng nhập phần trăm giảm giá" },
+                {
+                  validator(_, value) {
+                    if (value >= 1 && value <= 100) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Phần trăm giảm giá phải nằm trong khoảng từ 1% đến 100%")
+                    );
+                  },
+                },
               ]}
               style={{ marginBottom: "30px" }}
             >
-              <Input type="number" />
+              <Input type="number" min={1} max={100} />
             </Form.Item>
             <Form.Item
               name={["conditions", "maxDiscountAmount"]}
               label="Số tiền giảm giá tối đa"
+              dependencies={["conditions", "minOrderValue"]}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    const minOrderValue = getFieldValue(["conditions", "minOrderValue"]);
+                    if (!value || (minOrderValue && value <= minOrderValue)) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Số tiền giảm giá tối đa phải thấp hơn hoặc bằng giá trị đơn hàng tối thiểu")
+                    );
+                  },
+                }),
+              ]}
               style={{ marginBottom: "30px" }}
             >
-              <Input type="number" />
+              <Input type="number" min={0} />
             </Form.Item>
           </>
         );
@@ -147,7 +132,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
   return (
     <Modal
       visible={visible}
-      title="Thêm Mới Voucher"
+      title="Thêm Mới Khuyến Mãi"
       okText="Thêm"
       cancelText="Hủy"
       onCancel={onCancel}
@@ -157,7 +142,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
       <Form form={form} onFinish={onSubmit} layout="vertical">
         <Form.Item
           name="code"
-          label="Mã voucher"
+          label="Mã Khuyến Mãi"
           rules={[{ required: true, message: "Vui lòng nhập mã voucher" }]}
           style={{ marginBottom: "50px" }}
         >
@@ -165,16 +150,14 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
         </Form.Item>
         <Form.Item
           name="type"
-          label="Loại voucher"
+          label="Loại Khuyến Mãi"
           rules={[{ required: true, message: "Vui lòng chọn loại voucher" }]}
           style={{ marginBottom: "50px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
-          <Select.Option value="BuyXGetY">Mua hàng tặng quà</Select.Option>
+            <Select.Option value="BuyXGetY">Mua hàng tặng quà</Select.Option>
             <Select.Option value="FixedDiscount">Tặng tiền theo hóa đơn</Select.Option>
-            <Select.Option value="PercentageDiscount">
-              Giảm %
-            </Select.Option>
+            <Select.Option value="PercentageDiscount">Giảm %</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item

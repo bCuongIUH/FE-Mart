@@ -12,21 +12,21 @@ import {
   createVoucher,
   updateVoucher,
   deleteVoucher,
-} from "../../services/voucherService"; // Import voucher service
+} from "../../services/voucherService"; 
 import moment from "moment";
 import AddPromotionProgramModal from "./Components/AddPromotionProgramModal";
 import EditPromotionProgramModal from "./Components/EditPromotionProgramModal";
-import AddVoucherModal from "./Components/AddVoucherModal"; // Modal thêm mới voucher
-import EditVoucherModal from "./Components/EditVoucherModal"; // Modal sửa voucher
-import { EditOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons"; // Import các biểu tượng
+import AddVoucherModal from "./Components/AddVoucherModal"; 
+import EditVoucherModal from "./Components/EditVoucherModal"; 
+import { EditOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons"; 
 
 const PromotionProgramList = () => {
   const [promotionPrograms, setPromotionPrograms] = useState([]);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingProgram, setEditingProgram] = useState(null);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]); // Quản lý các dòng được mở rộng
-  const [voucherData, setVoucherData] = useState({}); // Lưu danh sách voucher theo chương trình
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]); 
+  const [voucherData, setVoucherData] = useState({}); 
   const [isAddVoucherModalVisible, setIsAddVoucherModalVisible] =
     useState(false);
   const [isEditVoucherModalVisible, setIsEditVoucherModalVisible] =
@@ -91,30 +91,30 @@ const PromotionProgramList = () => {
       if (editingVoucher) {
         // Cập nhật voucher
         await updateVoucher(editingVoucher._id, values);
-        message.success("Cập nhật voucher thành công");
+        message.success("Cập nhật khuyến mãi thành công");
       } else {
         // Tạo mới voucher
         await createVoucher({
           ...values,
           promotionProgramId: currentPromotionId,
         });
-        message.success("Tạo mới voucher thành công");
+        message.success("Tạo mới khuyến mãi thành công");
       }
       setIsAddVoucherModalVisible(false);
       setIsEditVoucherModalVisible(false);
       fetchVouchers(currentPromotionId);
     } catch (error) {
-      message.error("Có lỗi xảy ra khi lưu voucher");
+      message.error("Có lỗi xảy ra khi lưu khuyến mãi");
     }
   };
 
   const handleVoucherDelete = async (voucherId, promotionProgramId) => {
     try {
       await deleteVoucher(voucherId);
-      message.success("Voucher đã được xóa");
+      message.success("Khuyến mãi đã được xóa");
       fetchVouchers(promotionProgramId);
     } catch (error) {
-      message.error("Có lỗi xảy ra khi xóa voucher");
+      message.error("Có lỗi xảy ra khi xóa khuyến mãi");
     }
   };
 
@@ -151,12 +151,12 @@ const PromotionProgramList = () => {
     const vouchers = voucherData[record._id] || [];
     const voucherColumns = [
       {
-        title: "Mã voucher",
+        title: "Mã Khuyến Mãi",
         dataIndex: "code",
         key: "code",
       },
       {
-        title: "Loại voucher",
+        title: "Loại Khuyến Mãi",
         dataIndex: "type",
         key: "type",
         render: (text) => voucherTypeNames[text] || text,
@@ -179,7 +179,7 @@ const PromotionProgramList = () => {
               onClick={() => handleVoucherEdit(voucher, record._id)}
             />
             <Popconfirm
-              title="Bạn có chắc muốn xóa voucher này không?"
+              title="Bạn có chắc muốn xóa khuyến mãi này không?"
               onConfirm={() => handleVoucherDelete(voucher._id, record._id)}
               okText="Xóa"
               cancelText="Hủy"
@@ -193,13 +193,17 @@ const PromotionProgramList = () => {
 
     return (
       <div>
-        <Button
-          type="primary"
-          style={{ marginBottom: 16 }}
-          onClick={() => handleAddVoucher(record._id)}
-        >
-          Thêm mới voucher
-        </Button>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+          <Button
+            type="primary"
+            onClick={() => handleAddVoucher(record._id)}
+            danger
+            
+          >
+            Thêm mới khuyến mãi
+          </Button>
+        </div>
+        
         <Table
           columns={voucherColumns}
           dataSource={vouchers}
@@ -208,6 +212,7 @@ const PromotionProgramList = () => {
         />
       </div>
     );
+    
   };
 
   const columns = [
@@ -215,23 +220,52 @@ const PromotionProgramList = () => {
       title: "Tên chương trình",
       dataIndex: "name",
       key: "name",
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
+      
     },
     {
       title: "Mô tả",
       dataIndex: "description",
       key: "description",
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
     },
     {
       title: "Ngày bắt đầu",
       dataIndex: "startDate",
       key: "startDate",
       render: (text) => moment(text).format("DD-MM-YYYY"),
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
     },
     {
       title: "Ngày kết thúc",
       dataIndex: "endDate",
       key: "endDate",
       render: (text) => moment(text).format("DD-MM-YYYY"),
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
     },
     {
       title: "Trạng thái",
@@ -243,6 +277,13 @@ const PromotionProgramList = () => {
           onChange={(checked) => handleSwitchChange(record._id, checked)}
         />
       ),
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
     },
     {
       title: "Hành động",
@@ -263,18 +304,25 @@ const PromotionProgramList = () => {
           </Popconfirm>
         </>
       ),
+      onHeaderCell: () => ({
+        style: {
+          backgroundColor: "#F5F5DC",
+          color: "#333",
+          fontWeight: "bold",
+        },
+      }),
     },
   ];
 
   return (
     <div>
-      <Button
-        type="primary"
-        onClick={handleAddNew}
-        style={{ marginBottom: 16 }}
-      >
-        Thêm mới chương trình khuyến mãi
-      </Button>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <Button type="primary" onClick={handleAddNew} danger
+           style={{ marginTop: 16 }}>
+          Thêm mới chương trình khuyến mãi
+        </Button>
+      </div>
+      
       <Table
         dataSource={promotionPrograms}
         columns={columns}

@@ -11,15 +11,19 @@ function SuppliersAddModal({ visible, onClose, onAddSuccess }) {
       const values = await form.validateFields();
       setLoading(true);
       const response = await createSuppliers(values);
-      message.success('Thêm nhà cung cấp thành công');
-      onAddSuccess(response.data);  // Truyền dữ liệu mới về component cha để cập nhật danh sách
-      form.resetFields();
+      if (response.data && response.data.supplier) { 
+        message.success('Thêm nhà cung cấp thành công');
+        onAddSuccess(response.data.supplier);  
+        form.resetFields();
+        onClose();
+      }
     } catch (error) {
       message.error(error.response?.data?.message || 'Lỗi khi thêm nhà cung cấp');
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <Modal

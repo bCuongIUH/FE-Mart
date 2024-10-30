@@ -140,7 +140,10 @@ const NhapKho = () => {
               onChange={(e) => handleSearch(e.target.value)} // Gọi hàm lọc khi thay đổi
               style={{ width: 500 }}
             />
-            <Button type="primary" onClick={() => setShowAddEntry(true)}>
+            <Button type="primary" onClick={() => setShowAddEntry(true)}
+                 style={{ marginTop: 16 }}
+                 danger
+              >
               Tạo phiếu nhập kho mới
             </Button>
           </div>

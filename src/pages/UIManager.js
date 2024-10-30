@@ -13,7 +13,6 @@ import styles from './UIManager.module.css';
 import { AuthContext } from '../untills/context/AuthContext';
 import SellPage from '../component/sell/SellPage';
 import SuppliersInfo from '../component/suppliers/item/suppliersInfo';
-import SuppliersImport from '../component/suppliers/item/suppliersImport';
 // import ExportProduct from '../component/warehouseManager/item/UpdateWarehouseOutputProduct';
 import StatisticsChart from '../component/Statistical/Statistical';
 import CompletedCart from '../component/shopping/item/completedCart';
@@ -28,6 +27,7 @@ import PromotionProgramList from '../component/PromotionManager/PromotionProgram
 // import UnitManager from '../component/units/UnitsPage';
 import StockList from '../component/Stock/StockList';
 import ProductPrices from '../component/PriceProduct/ProductPrices';
+import InventoryList from '../component/InvenStock/InventoryList';
 // import CreatePriceList from '../component/priceListV2/CreatePriceList';
 
 
@@ -89,7 +89,7 @@ const WarehouseManager = () => {
 
       {/* Sider với margin-top để đẩy xuống dưới Header */}
       <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} style={{ position: 'fixed', top: '70px', bottom: 0, left: 0 }}>
-        <div className="logo" />
+        <div className="logo"  />
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <SubMenu key="sub1" icon={<ShoppingCartOutlined />} title="Quản lí bán hàng">
             <Menu.Item key="1" onClick={() => handleNavigate(<SellPage/>)}>Bán hàng</Menu.Item>
@@ -110,11 +110,11 @@ const WarehouseManager = () => {
             <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>
             <Menu.Item key="9" onClick={() => handleNavigate(<StockList/>)}>Tồn kho</Menu.Item>
             {/* <Menu.Item key="10" onClick={() => handleNavigate(<ProductPrices/>)}>Kiểm kê kho</Menu.Item> */}
-            <Menu.Item key="11" onClick={() => handleNavigate('/AddWarehouse')}>Báo cáo thống kê</Menu.Item>
+            <Menu.Item key="11" onClick={() => handleNavigate(<InventoryList/>)}>Kiểm kê kho</Menu.Item>
           </SubMenu>
           <SubMenu key="sub5" icon={<DesktopOutlined />} title="Quản lí nhà cung cấp">
             <Menu.Item key="12" onClick={() => handleNavigate(<SuppliersInfo/>)}>Danh sách nhà cung cấp</Menu.Item>
-            <Menu.Item key="13" onClick={() => handleNavigate(<SuppliersImport/>)}>Thêm nhà cung cấp</Menu.Item>
+            {/* <Menu.Item key="13" onClick={() => handleNavigate(<SuppliersImport/>)}>Thêm nhà cung cấp</Menu.Item> */}
           </SubMenu>
           <SubMenu key="sub6" icon={<DropboxOutlined />} title="Quản lí chương trình khuyến mãi">
            

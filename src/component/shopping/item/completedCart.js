@@ -115,8 +115,8 @@ const CompletedCart = () => {
    <thead>
      <tr>
        <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Tên sản phẩm</th>
-       <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
        <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Đơn vị</th> 
+       <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
        <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Giá</th>
        <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Thành tiền</th>
      </tr>

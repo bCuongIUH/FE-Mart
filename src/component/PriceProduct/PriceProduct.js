@@ -469,35 +469,41 @@ const PriceProduct = () => {
             placeholder="Nhập mã sản phẩm"
             value={searchCode}
             onChange={(e) => setSearchCode(e.target.value)}
-            style={{ width: "70%", height: "40px", marginRight: "2%" }} // Tăng chiều cao và đặt chiều rộng
+            style={{ width: "15%", height: "30px", marginRight: "2%" }}
           />
           <Button
             type="primary"
             onClick={handleSearch}
-            style={{ width: "20%", height: "40px" }} // Tăng chiều cao và đặt chiều rộng
+            style={{ width: "10%", height: "20%" }}
+            danger
           >
             Tìm kiếm
           </Button>
         </div>
+        
         {error && <p style={{ color: "red" }}>Lỗi: {error}</p>}
+        
         <Table
           columns={columns}
           dataSource={productData}
-          pagination={false}
           rowKey={(record) => `${record.productId}-${record.unitName}`}
+          pagination={{ pageSize: 6 }} // Hiển thị 6 sản phẩm mỗi trang
         />
+    
         <Button
           type="primary"
           icon={<SaveOutlined />}
           onClick={() => handleSavePrices(recordColumn.key)}
           style={{ marginTop: 16 }}
+          danger
         >
           Cập nhật Giá
         </Button>
       </>
     );
-  };
-
+    
+  }
+  
   // Hiển thị modal chỉnh sửa bảng giá
   const handleEditPriceList = (priceListId) => {
     const priceList = priceLists.find((list) => list._id === priceListId);
@@ -553,7 +559,7 @@ const PriceProduct = () => {
           marginBottom: 16,
         }}
       >
-        <Button type="primary" onClick={() => setShowPriceListForm(true)}>
+        <Button type="primary" danger onClick={() => setShowPriceListForm(true)}>
           Thêm bảng giá
         </Button>
       </div>
@@ -562,6 +568,7 @@ const PriceProduct = () => {
         <div style={{ marginBottom: 16 }}>
           <Input
             placeholder="Mã bảng giá"
+          
             value={newPriceList.code}
             onChange={(e) =>
               setNewPriceList({ ...newPriceList, code: e.target.value })

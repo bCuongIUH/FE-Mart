@@ -14,7 +14,7 @@ import UserInfo from "./component/profile/profile.UserInfo";
 import ChangePassword from "./component/password/ChangePassword";
 import ManageEmployees from './component/employees/ManageEmployees';
 import WarehouseManager from "./component/warehouseManager/WarehouseManager";
-import Suppliers from "./component/suppliers/suppliers";
+// import Suppliers from "./component/suppliers/suppliers";
 import ShoppingCart from "./component/shopping/shoppingCart";
 import SignupContext from "./untills/context/SignupContext";
 import SellPage from './component/sell/SellPage';
@@ -67,7 +67,7 @@ function App() {
              <Route path="/change-password" element={<ChangePassword />} /> 
              <Route path="/ManageEmployees" element={<ManageEmployees />} />
              <Route path="/WarehouseManager" element={<WarehouseManager />} />
-             <Route path="/Suppliers" element={<Suppliers />} />
+             {/* <Route path="/Suppliers" element={<Suppliers />} /> */}
              <Route path="/ShoppingCart" element={<ShoppingCart />} />
              <Route path="/ManagerSales" element={<SellPage />} />
              <Route path="/statistics" element={<StatisticsChart />} />

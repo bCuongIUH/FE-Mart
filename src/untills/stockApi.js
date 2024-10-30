@@ -17,3 +17,25 @@ export const getAllStocks = async () => {
       throw error; 
     }
   };
+
+// Gửi yêu cầu cập nhật kiểm kê tồn kho
+export const updateInventoryQuantities = async (adjustments) => {
+  try {
+    const response = await axios.post(`${API_URL}/stock/invenstock/update`, { adjustments }, config); 
+    return response.data; 
+  } catch (error) {
+    console.error('Lỗi khi cập nhật tồn kho:', error);
+    throw error;
+  }
+};
+//lấy ds kiểm kê
+export const getInventoryAdjustments = async () => {
+  try {
+ 
+    const response = await axios.get(`${API_URL}/stock/invenstock`, config);
+    return response.data; 
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách kiểm kê kho:", error);
+    throw error;
+  }
+};
