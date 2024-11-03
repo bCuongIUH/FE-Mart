@@ -39,3 +39,14 @@ export const getInventoryAdjustments = async () => {
     throw error;
   }
 };
+
+// Lấy tất cả các giao dịch
+export const getAllTransactions = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/transactions`, config); 
+    return response.data; 
+  } catch (error) {
+    console.error("Lỗi khi lấy danh sách giao dịch:", error);
+    throw error;
+  }
+};

@@ -67,9 +67,17 @@ const ManageEmployees = () => {
   return (
     <div>
       <h2>Quản lý nhân viên</h2>
-      <Button type="primary" onClick={() => setIsAddModalVisible(true)} style={{ marginBottom: '20px' }}>
+      {/* <Button type="primary" onClick={() => setIsAddModalVisible(true)} style={{ marginBottom: '20px' }}>
         Thêm nhân viên
-      </Button>
+      </Button> */}
+<div style={{ textAlign: "right", marginBottom: "20px" }}>
+  <Button
+    type="primary"
+    onClick={() => setIsAddModalVisible(true)}
+  >
+    Thêm nhân viên
+  </Button>
+</div>
 
       <List
         bordered

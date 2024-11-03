@@ -1,56 +1,98 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPriceProduct } from '../../untills/priceApi';
+import { getAllTransactions } from '../../untills/stockApi';
+import { Table, Spin, Alert } from 'antd';
 
 const ProductPrices = () => {
-    const [prices, setPrices] = useState([]);
-    const [error, setError] = useState('');
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchPrices = async () => {
+        const fetchTransactions = async () => {
             try {
-                const data = await getAllPriceProduct();
-                if (data.success) {
-                    setPrices(data.prices);
-                } else {
-                    setError(data.message);
-                }
-            } catch (err) {
-                setError(err.message);
+                const data = await getAllTransactions();
+                setTransactions(data);
+            } catch (error) {
+                console.error("Failed to fetch transactions:", error);
+                setError("Unable to load transactions.");
+            } finally {
+                setLoading(false);
             }
         };
+        fetchTransactions();
+    }, []);
 
-        fetchPrices();
-    }, []); // Chạy một lần khi component mount
+    // Hàm chuyển đổi loại giao dịch thành tên hiển thị
+    const formatTransactionType = (type) => {
+        switch (type) {
+            case 'kiemke':
+                return 'Kiểm kê';
+            case 'huy':
+                return 'Hủy';
+            case 'ban':
+                return 'Bán hàng';
+            case 'nhap':
+                return 'Nhập kho';
+            default:
+                return type;
+        }
+    };
+
+    // Định nghĩa các cột cho bảng
+    const columns = [
+        {
+            title: 'Mã SP',
+            dataIndex: ['productId', 'code'],
+            key: 'productId',
+            render: (text) => text || 'N/A',
+        },
+        {
+            title: 'Tên sản phẩm',
+            dataIndex: ['productId', 'name'],
+            key: 'productId',
+            render: (text) => text || 'N/A',
+        },
+        {
+            title: 'Đơn vị tính',
+            dataIndex: 'unit',
+            key: 'unit',
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            key: 'quantity',
+        },
+        {
+            title: 'Loại giao dịch',
+            dataIndex: 'transactionType',
+            key: 'transactionType',
+            render: (type) => formatTransactionType(type),
+        },
+        {
+            title: 'Ngày giao dịch',
+            dataIndex: 'date',
+            key: 'date',
+            render: (date) => new Date(date).toLocaleString(),
+        },
+    ];
+
+    if (loading) {
+        return <Spin tip="Loading..." />;
+    }
+
+    if (error) {
+        return <Alert message="Error" description={error} type="error" showIcon />;
+    }
 
     return (
         <div>
-            <h1>Giá Sản Phẩm</h1>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {prices.length > 0 ? (
-                <ul>
-                    {prices.map(product => (
-                        <li key={product.productId}>
-                            <h2>{product.productName}</h2>
-                            <img src={product.image} alt={product.productName} style={{ width: '100px', height: '100px' }} />
-                            <p><strong>Mô tả:</strong> {product.description}</p>
-                            
-                            <h3>Đơn vị và Giá:</h3>
-                            <ul>
-                                {product.units.map((unit) => (
-                                    <li key={unit.unitName}>
-                                        <p><strong>Đơn vị:</strong> {unit.unitName}</p>
-                                        <p><strong>Số lượng tồn kho:</strong> {unit.quantity}</p>
-                                        <p><strong>Giá:</strong> {unit.price} VNĐ</p>
-                                        <p><strong>Giá trị chuyển đổi:</strong> {unit.conversionValue}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>Không có dữ liệu sản phẩm.</p>
-            )}
+            <h2>Giao dịch</h2>
+            <Table
+                columns={columns}
+                dataSource={transactions}
+                rowKey={(record) => record._id}  
+                pagination={{ pageSize: 10 }}  
+            />
         </div>
     );
 };

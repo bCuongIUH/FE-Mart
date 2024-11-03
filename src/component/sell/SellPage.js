@@ -152,33 +152,31 @@ const { user } = useContext(AuthContext);
   };
 
   const filterApplicableVouchers = () => {
+    // Đảm bảo `vouchers` là mảng, nếu không thì đặt giá trị mặc định là mảng rỗng
+    const voucherList = Array.isArray(vouchers) ? vouchers : [];
+  
     const totalAmount = cart.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
-    const applicable = vouchers.filter((voucher) => {
+  
+    const applicable = voucherList.filter((voucher) => {
       if (voucher.type === "PercentageDiscount" && voucher.conditions) {
         return totalAmount >= voucher.conditions[0].minOrderValue;
       } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
         return totalAmount >= voucher.conditions[0].minOrderValue;
-      } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
-        const productXInCart = cart.find(
-          (item) => item.productId === voucher.conditions[0].productXId
-        );
-        return (
-          productXInCart &&
-          productXInCart.quantity >= voucher.conditions[0].quantityX
-        );
       }
       return false;
     });
-    setApplicableVouchers(applicable);
+  
+    // Kiểm tra xem có mã khuyến mãi hợp lệ không
+    setApplicableVouchers(applicable.length ? applicable : []);
   };
-
+  
   useEffect(() => {
     filterApplicableVouchers();
   }, [cart, vouchers]);
-
+  
 
 
   const handlePayment = async () => {
@@ -250,6 +248,7 @@ const { user } = useContext(AuthContext);
     }
     message.success("Sản phẩm đã được thêm vào giỏ hàng!");
   };
+
 
   return (
     <div style={{ display: "flex", padding: "20px" }}>
@@ -406,17 +405,18 @@ const { user } = useContext(AuthContext);
         </p>
 
         <Select
-          placeholder="Chọn voucher"
+          placeholder="Chọn khuyến mãi"
           onChange={handleVoucherSelect}
           style={{ width: "100%", marginBottom: "10px" }}
         >
-          <Option value={null}>Không áp dụng voucher</Option>
+          <Option value={null}>Không áp dụng khuyến mãi</Option>
           {applicableVouchers.map((voucher) => (
             <Option key={voucher._id} value={voucher._id}>
               {voucher.code}
             </Option>
           ))}
         </Select>
+        
 
         <p
           style={{ fontSize: "16px", textAlign: "right", marginRight: "20px" }}
@@ -470,7 +470,7 @@ const { user } = useContext(AuthContext);
             Xác nhận
           </Button>
         </Modal> */}
-        <Modal
+        {/* <Modal
           title="Xác nhận thanh toán"
           visible={isCheckoutModalOpen}
           onCancel={() => setIsCheckoutModalOpen(false)}
@@ -524,9 +524,100 @@ const { user } = useContext(AuthContext);
           <Button type="primary" onClick={handlePayment}>
             Xác nhận
           </Button>
-        </Modal>
+        </Modal> */}
 
+<Modal
+    title="Xác nhận thanh toán"
+    visible={isCheckoutModalOpen}
+    onCancel={() => setIsCheckoutModalOpen(false)}
+    footer={null}
+  >
+    <h4>Sản phẩm mua:</h4>
 
+    {/* Header */}
+    <div
+      style={{
+        display: "flex",
+        fontWeight: "bold",
+        borderBottom: "1px dashed #ccc",
+        paddingBottom: "8px",
+        marginBottom: "10px",
+      }}
+    >
+      <div style={{ flex: 2 }}>Tên sản phẩm</div>
+      <div style={{ flex: 1 }}>Đơn vị</div>
+      <div style={{ flex: 1 }}>Giá</div>
+      <div style={{ flex: 1 }}>Số lượng</div>
+    </div>
+
+    {/* Product rows */}
+    {cart.map((item) => (
+      <div
+        key={item.productId}
+        style={{
+          display: "flex",
+          borderBottom: "1px dashed #ccc",
+          padding: "8px 0",
+        }}
+      >
+        <div style={{ flex: 2 }}>{item.productName}</div>
+        <div style={{ flex: 1 }}>{item.unit}</div>
+        <div style={{ flex: 1 }}>{formatCurrency(item.price)}</div>
+        <div style={{ flex: 1 }}>{item.quantity}</div>
+      </div>
+    ))}
+
+    {/* Voucher Section */}
+    {selectedVoucher && (
+      <div
+        style={{
+          border: "1px dashed #ccc", // Đường nét đứt cho phần mã giảm giá
+          padding: "10px",
+          marginTop: "10px",
+        }}
+      >
+        <p>
+          <strong>Mã giảm giá:</strong> {selectedVoucher.code}
+        </p>
+        <p>
+          {/* <strong>Số tiền giảm:</strong> {formatCurrency(discountAmount)} */}
+        </p>
+      </div>
+    )}
+
+    {/* Total Section */}
+    <div
+      style={{
+        border: "1px dashed #ccc",
+        padding: "10px",
+        marginTop: "10px",
+        textAlign: "right", 
+      }}
+    >
+      
+     
+      <p>
+        <strong>Thành tiền:</strong>{" "}
+        {formatCurrency(
+          cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+        )}
+      </p>
+      <p>
+        <strong>Giảm giá:</strong> {formatCurrency(discountAmount)}
+      </p>
+      <p>
+        <strong>Tổng tiền:</strong>{" "}
+        {formatCurrency(
+          cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
+          discountAmount
+        )}
+      </p>
+    </div>
+
+    <Button type="primary" onClick={handlePayment} style={{ marginTop: "10px" }}>
+      Xác nhận
+    </Button>
+  </Modal>
 
       </div>
     </div>

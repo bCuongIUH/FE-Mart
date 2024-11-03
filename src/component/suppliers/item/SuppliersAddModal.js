@@ -11,11 +11,12 @@ function SuppliersAddModal({ visible, onClose, onAddSuccess }) {
       const values = await form.validateFields();
       setLoading(true);
       const response = await createSuppliers(values);
-      if (response.data && response.data.supplier) { 
-        message.success('Thêm nhà cung cấp thành công');
-        onAddSuccess(response.data.supplier);  
+
+      if (response) { 
+        // message.success('Thêm nhà cung cấp thành công');
+        onAddSuccess(response);  // Gọi hàm onAddSuccess để cập nhật danh sách
         form.resetFields();
-        onClose();
+        onClose();  // Đóng modal
       }
     } catch (error) {
       message.error(error.response?.data?.message || 'Lỗi khi thêm nhà cung cấp');
@@ -23,7 +24,6 @@ function SuppliersAddModal({ visible, onClose, onAddSuccess }) {
       setLoading(false);
     }
   };
-  
 
   return (
     <Modal

@@ -81,7 +81,7 @@ const InventoryList = () => {
       key: "adjustmentQuantity",
     },
     {
-      title: "Số lượng sau khi cập nhật",
+      title: "Số lượng thực tế",
       dataIndex: "updatedQuantity",
       key: "updatedQuantity",
     },

@@ -18,7 +18,16 @@ export const getAllEmployee = async () => {
     throw new Error('Không thể lấy danh sách nhân viên');
   }
 };
-
+// Lấy nhân viên theo ID
+export const getEmployeeById = async (employeeId) => {
+  try {
+    const response = await axios.get(`${API_URL}/employees/by/${employeeId}`, config); 
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi lấy thông tin nhân viên:', error);
+    throw new Error('Không thể lấy thông tin nhân viên');
+  }
+};
 // API để thêm một nhân viên mới
 export const addEmployee = async (employeeData) => {
   try {

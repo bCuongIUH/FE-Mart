@@ -234,7 +234,27 @@ export const createSuppliers = async (suppliersData) => {
     throw error;
   }
 };
+// Cập nhật nhà cung cấp
+export const updateSupplier = async (id, updatedData) => {
+  try {
+    const response = await axios.put(`${API_URL}/suppliers/${id}`, updatedData, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi cập nhật nhà cung cấp:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
+// Xóa nhà cung cấp (chuyển isDeleted thành true)
+export const deleteSupplier = async (id) => {
+  try {
+    const response = await axios.delete(`${API_URL}/suppliers/${id}`, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi xóa nhà cung cấp:', error.response?.data || error.message);
+    throw error;
+  }
+};
 
 // Lấy tất cả ncc
 export const getAllSuppliers = async () => {

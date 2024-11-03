@@ -156,7 +156,7 @@
 }
 .userInfo {
   background: #f9f9f9;
-  padding: 30px; /* Giảm padding để tiết kiệm không gian */
+  padding: 30px; 
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
@@ -183,4 +183,59 @@
 
 h2 {
   margin: 0 0 20px 0; 
+}
+/* Hiệu ứng cho welcomeMessage */
+/* Hiệu ứng cho welcomeMessage */
+.welcomeMessage {
+  position: relative;
+  margin-top: 20px;
+  font-size: 50px; 
+  font-weight: bold;
+  color: #ff1818;
+  text-align: center;
+  overflow: hidden;
+  animation: slideIn 2s ease-in-out forwards, disappear 1s 6s forwards;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  white-space: nowrap;
+  letter-spacing: 2px;
+  font-style: italic; 
+  font-family: 'Georgia', serif; 
+}
+
+.welcomeMessage span {
+  display: inline-block;
+  opacity: 1;
+  animation: drop 2s ease-out 3s forwards;
+}
+
+/* Hiệu ứng di chuyển vào màn hình */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Hiệu ứng rơi xuống */
+@keyframes drop {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(700px);
+    opacity: 0;
+  }
+}
+
+/* Hiệu ứng biến mất */
+@keyframes disappear {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
