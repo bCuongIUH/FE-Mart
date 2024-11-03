@@ -19,15 +19,16 @@ export const getAllStocks = async () => {
   };
 
 // Gửi yêu cầu cập nhật kiểm kê tồn kho
-export const updateInventoryQuantities = async (adjustments) => {
+export const updateInventoryQuantities = async (auditData) => {
   try {
-    const response = await axios.post(`${API_URL}/stock/invenstock/update`, { adjustments }, config); 
+    const response = await axios.post(`${API_URL}/stock/invenstock/update`, auditData, config); 
     return response.data; 
   } catch (error) {
     console.error('Lỗi khi cập nhật tồn kho:', error);
     throw error;
   }
 };
+
 //lấy ds kiểm kê
 export const getInventoryAdjustments = async () => {
   try {

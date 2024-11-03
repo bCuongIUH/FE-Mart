@@ -30,6 +30,7 @@ const StockList = () => {
     }
   };
 
+
   // Tạo stockData với conversionValue
   const stockData = stocks
     .filter((stock) => stock.productCode === product?.code)

@@ -30,8 +30,8 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [conversionUnits, setConversionUnits] = useState([]);
-  const [loading, setLoading] = useState(false); // Thêm state loading
-  console.log(product);
+  const [loading, setLoading] = useState(false); 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -76,48 +76,47 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
   }, [visible, product, form]);
 
   const onFinish = async (values) => {
-    setLoading(true); // Bắt đầu loading
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("code", values.code);
       formData.append("barcode", values.barcode);
       formData.append("name", values.name);
       formData.append("description", values.description);
-      formData.append("categoryId", values.categoryId);
       formData.append("supplierId", values.supplierId);
-
+      formData.append("categoryId", values.categoryId);
+  
       formData.append("baseUnit[name]", values["baseUnit.name"]);
-      formData.append(
-        "baseUnit[conversionValue]",
-        values["baseUnit.conversionValue"] || 1
-      );
-
+      formData.append("baseUnit[conversionValue]", values["baseUnit.conversionValue"] || 1);
+  
       conversionUnits.forEach((unit, index) => {
         formData.append(`conversionUnits[${index}][name]`, unit.name);
-        formData.append(
-          `conversionUnits[${index}][conversionValue]`,
-          unit.conversionValue
-        );
+        formData.append(`conversionUnits[${index}][conversionValue]`, unit.conversionValue);
         formData.append(`conversionUnits[${index}][barcode]`, unit.barcode);
       });
-
+  
       if (fileList.length > 0 && fileList[0].originFileObj) {
         formData.append("image", fileList[0].originFileObj);
       }
-
+  
+      // Debug FormData content
+      console.log("FormData before sending:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+      }
+  
       await updateProduct(product._id, formData);
       message.success("Cập nhật sản phẩm thành công!");
       fetchAllData();
       onCancel();
     } catch (error) {
-      message.error(
-        "Có lỗi xảy ra: " +
-          (error.response?.data.message || "Vui lòng thử lại!")
-      );
+      message.error("Có lỗi xảy ra: " + (error.response?.data.message || "Vui lòng thử lại!"));
     } finally {
-      setLoading(false); // Kết thúc loading
+      setLoading(false);
     }
   };
+  
+  
 
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
 
@@ -139,12 +138,13 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
     setConversionUnits(newUnits);
   };
 
+
   return (
     <Modal
       visible={visible}
       title="Chỉnh sửa sản phẩm"
       onCancel={onCancel}
-      onOk={() => form.submit()} // Submit form khi nhấn OK
+      onOk={() => form.submit()}
       okText="Cập nhật"
       cancelText="Hủy"
       confirmLoading={loading} 
@@ -191,7 +191,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item
+            <Form.Item
                 name="supplierId"
                 label="Nhà cung cấp"
                 rules={[{ required: true, message: "Chọn nhà cung cấp!" }]}
@@ -207,6 +207,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
                   ))}
                 </Select>
               </Form.Item>
+
             </Col>
           </Row>
 

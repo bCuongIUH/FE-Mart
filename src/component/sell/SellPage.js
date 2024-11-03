@@ -11,13 +11,15 @@ import {
 } from "antd";
 import { getAllPriceProduct } from "../../untills/priceApi";
 import { createDirectSaleBill } from "../../untills/api";
-import { ShoppingCartOutlined } from "@ant-design/icons";
+import { GiftOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import CartTable from "./CartTable";
 import { getAllActiveVouchers } from "../../services/voucherService";
 import { formatCurrency } from "../../untills/formatCurrency";
 import { AuthContext } from "../../untills/context/AuthContext";
 import { getAllCustomers } from "../../untills/customersApi";
 import { getEmployeeById } from "../../untills/employeesApi";
+import VoucherDetail from "./VoucherDetail";
+import PaymentMethodSelector from "./Payment";
 
 const { Option } = Select;
 
@@ -42,7 +44,7 @@ const ProductPrices = () => {
   const [employeeId, setEmployeeId] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
 
   const { user } = useContext(AuthContext);
   useEffect(() => {
@@ -58,6 +60,7 @@ const ProductPrices = () => {
     };
     fetchEmployeeId();
   }, [user]);
+
 
 
 
@@ -83,6 +86,8 @@ const ProductPrices = () => {
     };
     fetchPrices();
   }, []);
+  console.log(vouchers);
+  
 // phần khách hàng 
 const handleCustomerSelect = (value) => {
   const customer = customers.find((c) => c._id === value);
@@ -112,11 +117,7 @@ const handleCustomerSelect = (value) => {
     setInputQuantity(defaultInputQuantities);
   };
 
-  const handleVoucherSelect = (value) => {
-    const selected = vouchers.find((voucher) => voucher._id === value);
-    setSelectedVoucher(selected);
-    calculateDiscount(selected);
-  };
+
 
   const calculateDiscount = (voucher) => {
     if (!voucher) return;
@@ -182,32 +183,62 @@ const handleCustomerSelect = (value) => {
   };
 
   const filterApplicableVouchers = () => {
-    // Đảm bảo `vouchers` là mảng, nếu không thì đặt giá trị mặc định là mảng rỗng
     const voucherList = Array.isArray(vouchers) ? vouchers : [];
-  
     const totalAmount = cart.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
   
-    const applicable = voucherList.filter((voucher) => {
+    let bestVoucher = null;
+    let maxDiscount = 0;
+  
+    // Tính mức giảm cho từng voucher và tìm voucher có mức giảm lớn nhất
+    voucherList.forEach((voucher) => {
+      let discount = 0;
+      
       if (voucher.type === "PercentageDiscount" && voucher.conditions) {
-        return totalAmount >= voucher.conditions[0].minOrderValue;
+        const condition = voucher.conditions[0];
+        if (totalAmount >= condition.minOrderValue) {
+          discount = (totalAmount * condition.discountPercentage) / 100;
+          if (discount > condition.maxDiscountAmount) {
+            discount = condition.maxDiscountAmount;
+          }
+        }
       } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
-        return totalAmount >= voucher.conditions[0].minOrderValue;
+        const condition = voucher.conditions[0];
+        if (totalAmount >= condition.minOrderValue) {
+          discount = condition.discountAmount;
+        }
       }
-      return false;
+  
+      if (discount > maxDiscount) {
+        maxDiscount = discount;
+        bestVoucher = voucher;
+      }
     });
   
-    // Kiểm tra xem có mã khuyến mãi hợp lệ không
-    setApplicableVouchers(applicable.length ? applicable : []);
+    setDiscountAmount(maxDiscount);  // Áp dụng mức giảm lớn nhất
+    setSelectedVoucher(bestVoucher); // Chọn voucher có mức giảm lớn nhất
+  
+    // Hiển thị thông báo nếu voucher hiện tại khác với voucher đã được áp dụng trước đó
+    if (bestVoucher && bestVoucher._id !== (appliedVoucher ? appliedVoucher._id : null)) {
+      message.destroy();  // Đóng tất cả các thông báo hiện tại
+      message.success(`Áp dụng mã khuyến mãi ${bestVoucher.code} thành công!`);
+      setAppliedVoucher(bestVoucher); // Cập nhật voucher đã được áp dụng
+    }
   };
   
+  
+  // Cập nhật hàm useEffect để tự động áp dụng voucher tốt nhất khi có thay đổi giỏ hàng
   useEffect(() => {
     filterApplicableVouchers();
   }, [cart, vouchers]);
   
-
+  // Cập nhật hàm useEffect để tự động áp dụng voucher tốt nhất khi có thay đổi giỏ hàng
+  useEffect(() => {
+    filterApplicableVouchers();
+  }, [cart, vouchers]);
+  
 
   const handlePayment = async () => {
     if (!selectedCustomer) {
@@ -223,9 +254,11 @@ const handleCustomerSelect = (value) => {
       quantity: item.quantity,
       currentPrice: item.price,
       unit: item.unit,
+      
     }));
 
-  
+    console.log("Items sent to createDirectSaleBill:", items);
+
     try {
       await createDirectSaleBill({
         paymentMethod,
@@ -285,7 +318,7 @@ const handleCustomerSelect = (value) => {
     } else {
       setCart([...cart, { ...product, unit: unitName, price, quantity }]);
     }
-    message.success("Sản phẩm đã được thêm vào giỏ hàng!");
+    // message.success("Sản phẩm đã được thêm vào giỏ hàng!");
   };
 
 
@@ -301,7 +334,9 @@ const handleCustomerSelect = (value) => {
           padding: "10px",
         }}
       >
-         <h2>Chọn Khách Hàng</h2>
+        
+
+        <h3>Chọn Khách Hàng</h3>
         <Select
           placeholder="Chọn khách hàng"
           onChange={handleCustomerSelect}
@@ -314,9 +349,8 @@ const handleCustomerSelect = (value) => {
             </Option>
           ))}
             </Select>
-        <h2>Danh sách sản phẩm</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
-
+        <h3>Danh sách sản phẩm</h3>
         <Input
           placeholder="Tìm kiếm sản phẩm"
           value={searchText}
@@ -442,6 +476,8 @@ const handleCustomerSelect = (value) => {
           cart={cart}
           formatCurrency={formatCurrency}
         />
+          {/* hộp qà */}
+          <VoucherDetail vouchers={vouchers} />
         <p
           style={{
             fontSize: "18px",
@@ -450,41 +486,42 @@ const handleCustomerSelect = (value) => {
             marginRight: "20px",
           }}
         >
-          Tổng tiền:{" "}
+          Tổng tiền hàng:{" "}
           {formatCurrency(
             cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
           )}
         </p>
 
-        <Select
-          placeholder="Chọn khuyến mãi"
-          onChange={handleVoucherSelect}
-          style={{ width: "100%", marginBottom: "10px" }}
-        >
-          <Option value={null}>Không áp dụng khuyến mãi</Option>
-          {applicableVouchers.map((voucher) => (
-            <Option key={voucher._id} value={voucher._id}>
-              {voucher.code}
-            </Option>
-          ))}
-        </Select>
-        
+    
 
         <p
           style={{ fontSize: "16px", textAlign: "right", marginRight: "20px" }}
         >
-          Giảm giá: {formatCurrency(discountAmount)}
+           Giảm giá: {formatCurrency(discountAmount)}
+        </p>
+        <p 
+          style={{
+            fontSize: "18px",
+            fontWeight: "bold",
+            textAlign: "right",
+            marginRight: "20px",
+            // color: "#1890ff",
+          }}
+        >
+          Tổng cộng:{" "}
+          {formatCurrency(
+            cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
+            discountAmount
+          )}
         </p>
 
-        <Select
-          placeholder="Chọn hình thức thanh toán"
-          onChange={(value) => setPaymentMethod(value)}
-          value={paymentMethod}
-          style={{ width: "100%", marginBottom: "10px" }}
-        >
-          <Option value="Cash">Tiền mặt</Option>
-          <Option value="Card">Thẻ</Option>
-        </Select>
+      
+        <PaymentMethodSelector 
+          paymentMethod={paymentMethod} 
+          setPaymentMethod={setPaymentMethod} 
+          // totalAmount={cart.reduce((acc, item) => acc + item.price * item.quantity, 0)} 
+          // discountAmount={discountAmount} 
+        />
 
         <Button
           type="primary"
@@ -573,7 +610,7 @@ const handleCustomerSelect = (value) => {
         <strong>Giảm giá:</strong> {formatCurrency(discountAmount)}
       </p>
       <p>
-        <strong>Tổng tiền:</strong>{" "}
+        <strong>Tổng tiền :</strong>{" "}
         {formatCurrency(
           cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
           discountAmount

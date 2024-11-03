@@ -3,6 +3,7 @@ const config = {
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${localStorage.getItem('token')}`, 
+  
   },
 };
 
@@ -142,7 +143,7 @@ export const getProductById = async (id) => {
 // Cập nhật sản phẩm
 export const updateProduct = async (id, productData) => {
   try {
-    const response = await axios.put(`${API_URL}/products/${id}`, productData, config);
+    const response = await axios.put(`${API_URL}/products/update/${id}`, productData, config);
     return response.data;
   } catch (error) {
     throw error;

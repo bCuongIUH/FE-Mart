@@ -1,221 +1,291 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Form, Input, DatePicker, Button, Select, Table, Space, notification } from "antd";
-import { updateInventoryQuantities, getAllStocks } from "../../untills/stockApi";
-import moment from "moment";
-import { AuthContext } from "../../untills/context/AuthContext";
+import React, { useState, useEffect, useContext } from 'react';
+import { Form, Input, Select, Button, Table, message, AutoComplete } from 'antd';
+import { getAllProducts } from '../../untills/api';
+import { AuthContext } from '../../untills/context/AuthContext';
+import { getAllStocks, updateInventoryQuantities } from '../../untills/stockApi';
+import { MinusCircleOutlined } from '@ant-design/icons';
+import styles from './AuditForm.module.css';
+import { getAllEmployee } from '../../untills/employeesApi';
 
 const { Option } = Select;
 
 const AuditForm = ({ onClose }) => {
-  const { user } = useContext(AuthContext); // Lấy thông tin người dùng từ AuthContext
+  const { user } = useContext(AuthContext); 
   const [form] = Form.useForm();
-  const [stocks, setStocks] = useState([]);
-  const [adjustments, setAdjustments] = useState([]);
-  const [currentStockQuantity, setCurrentStockQuantity] = useState(null);
-  const [selectedStockId, setSelectedStockId] = useState(null); // Lưu `stockId` của kho đã chọn
-  const [loading, setLoading] = useState(false);
+  const [stocks, setStocks] = useState({}); 
+  const [employeeId, setEmployeeId] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [entryProducts, setEntryProducts] = useState([
+    { productCode: '', unit: '', actualQuantity: 0, name: '', stockQuantity: 0, productId: '', reason: '' }
+  ]);
 
   useEffect(() => {
-    const fetchStocks = async () => {
+    const fetchEmployeeData = async () => {
       try {
-        const response = await getAllStocks();
-        if (Array.isArray(response.stocks)) {
-          setStocks(response.stocks);
+        if (user && user._id) {
+          const employees = await getAllEmployee();
+          console.log("Danh sách nhân viên:", employees);
+          console.log("User ID từ AuthContext:", user._id);
+
+          // So sánh user._id với employee.employeeId
+          const employee = employees.find(emp => String(emp.employeeId) === String(user._id));
+
+          if (employee) {
+            console.log("Nhân viên tìm thấy:", employee);
+            setEmployeeId(employee._id); // Gán emp._id vào auditedById
+          } else {
+            message.error("Không tìm thấy nhân viên phù hợp.");
+          }
         }
       } catch (error) {
-        notification.error({ message: "Lỗi khi lấy danh sách kho" });
+        console.error("Lỗi khi lấy dữ liệu nhân viên:", error);
+        message.error("Không thể tải dữ liệu nhân viên.");
       }
+    };
+
+    fetchEmployeeData();
+  }, [user]);
+console.log("Employee ID:", employeeId);
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const productsData = await getAllProducts();
+        setProducts(Array.isArray(productsData) ? productsData : []);
+        
+        const response = await getAllStocks();
+        const stocksData = response.stocks;
+        
+        if (Array.isArray(stocksData)) {
+          const formattedStocks = {};
+          stocksData.forEach(product => {
+            formattedStocks[product.productId] = product.stocks;
+          });
+          setStocks(formattedStocks);
+        } else {
+          console.error("Stocks data không phải là một mảng:", stocksData);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu sản phẩm hoặc kho:", error);
+        message.error('Không thể tải dữ liệu sản phẩm hoặc kho.');
+      }
+    };
+    fetchData();
+  }, []);
+  
+  const handleProductCodeChange = (index, code) => {
+    const updatedProducts = [...entryProducts];
+    const product = products.find(p => p.code === code);
+    
+    if (product) {
+      updatedProducts[index] = {
+        ...updatedProducts[index],
+        productCode: code,
+        productId: product._id,
+        name: product.name,
+        conversionUnits: product.conversionUnits || [],
+        baseUnit: product.baseUnit?.name || ''
+      };
+    } else {
+      updatedProducts[index] = { productCode: code, unit: '', actualQuantity: 0, stockQuantity: 0, reason: '' };
+    }
+    
+    setEntryProducts(updatedProducts);
+  };
+
+  const handleUnitChange = (index, unit) => {
+    const updatedProducts = [...entryProducts];
+    const product = updatedProducts[index];
+  
+    const productStocks = stocks[product.productId] || [];
+    const sanitizedUnit = unit.trim().toLowerCase();
+    const stock = productStocks.find(s => s.unit.trim().toLowerCase() === sanitizedUnit);
+  
+    if (stock) {
+      updatedProducts[index] = {
+        ...product,
+        unit: unit,
+        stockQuantity: stock.quantity // Cập nhật số lượng kho hiện có
+      };
+    } else {
+      message.warning('Không tìm thấy đơn vị tính hoặc kho phù hợp cho sản phẩm này.');
+      updatedProducts[index] = {
+        ...product,
+        unit: '',
+        stockQuantity: 0
+      };
+    }
+  
+    setEntryProducts(updatedProducts);
+  };
+
+  const handleQuantityChange = (index, quantity) => {
+    const updatedProducts = [...entryProducts];
+    updatedProducts[index].actualQuantity = Number(quantity) || 0;
+    setEntryProducts(updatedProducts);
+  };
+
+  const handleAddProduct = () => {
+    setEntryProducts([...entryProducts, { productCode: '', unit: '', actualQuantity: 0, name: '', stockQuantity: 0, productId: '', reason: '' }]);
+  };
+
+  const handleRemoveProduct = (index) => {
+    const updatedProducts = entryProducts.filter((_, i) => i !== index);
+    setEntryProducts(updatedProducts);
+  };
+
+  const handleSubmit = async (values) => {
+    const adjustments = entryProducts.map(p => ({
+      productId: p.productId,
+      unit: p.unit,
+      adjustmentQuantity: p.actualQuantity,
+      reason: p.reason
+    }));
+  
+    const auditData = {
+      code: values.code, 
+      description: values.description, 
+      auditDate: new Date().toISOString(),
+      auditedBy: employeeId, 
+      adjustments: adjustments.length > 0 ? adjustments : [] 
     };
   
-    fetchStocks();
-  }, []);
-
-  // Xử lý khi chọn sản phẩm hoặc đơn vị tính
-  const handleProductChange = (productId) => {
-    form.setFieldsValue({ unit: undefined, quantity: undefined, reason: "" });
-    setCurrentStockQuantity(null);
-    setSelectedStockId(null); // Đặt lại `stockId` khi thay đổi sản phẩm
-  };
-
-  const handleUnitChange = (unit) => {
-    const productId = form.getFieldValue("selectedProductId");
-
-    // Tìm sản phẩm dựa trên `productId`
-    const product = stocks.find((s) => s.productId === productId);
-
-    if (!product) {
-      notification.error({ message: "Không tìm thấy sản phẩm với ID đã chọn" });
-      setSelectedStockId(null); // Đặt lại `selectedStockId`
-      return;
-    }
-
-    // Tìm `stock` dựa trên `unit` đã chọn
-    const stockItem = product.stocks.find((s) => s.unit === unit);
-
-    if (!stockItem) {
-      notification.error({ message: "Không tìm thấy kho với đơn vị tính đã chọn" });
-      setSelectedStockId(null); // Đặt lại `selectedStockId` nếu không tìm thấy
-      return;
-    }
-
-    // Cập nhật `selectedStockId` và `currentStockQuantity`
-    setSelectedStockId(stockItem._id); // Gán `_id` của kho vào `selectedStockId`
-    setCurrentStockQuantity(stockItem.quantity); // Lưu số lượng hiện tại của kho
-};
-
-
-  // Xử lý khi thêm điều chỉnh cho một sản phẩm
-  const handleAddAdjustment = () => {
-    const { selectedProductId, unit, actualQuantity, reason } = form.getFieldsValue();
-
-
-    // Kiểm tra xem các thông tin cần thiết đã được chọn chưa
-    if (!selectedProductId || !unit || actualQuantity == null) {
-      notification.error({ message: "Vui lòng nhập đầy đủ thông tin trước khi thêm sản phẩm vào phiếu kiểm kê" });
-      return;
-    }
-
-    if (!selectedStockId) {
-      notification.error({ message: "Không tìm thấy kho phù hợp cho sản phẩm và đơn vị tính đã chọn" });
-      return;
-    }
-
-    const adjustmentQuantity = actualQuantity - currentStockQuantity;
-    const adjustmentType = adjustmentQuantity > 0 ? "increase" : "decrease";
-
-    setAdjustments([
-      ...adjustments,
-      {
-        stockId: selectedStockId, // Sử dụng `selectedStockId` đã lấy từ `handleUnitChange`
-        adjustmentQuantity: Math.abs(adjustmentQuantity),
-        adjustmentType,
-        reason
-      }
-    ]);
-
-    // Đặt lại các trường để chuẩn bị cho lần nhập tiếp theo
-    form.resetFields(["selectedProductId", "unit", "actualQuantity", "reason"]);
-    setCurrentStockQuantity(null);
-    setSelectedStockId(null); // Đặt lại `selectedStockId`
-};
-
-  // Gửi yêu cầu tạo phiếu kiểm kê
-  const handleSubmit = async (values) => {
-    const { code, description } = values;
-
-    const auditData = {
-      code,
-      description,
-      auditDate: moment().toISOString(),
-      auditedBy: user._id,
-      adjustments: adjustments.map(({ stockId, adjustmentQuantity, reason, adjustmentType }) => ({
-        stockId, 
-        adjustmentQuantity,
-        adjustmentType,
-        reason
-      }))
-    };
-
-    console.log("auditData to be sent:", JSON.stringify(auditData, null, 2));
-
     try {
-      setLoading(true);
-      await updateInventoryQuantities(auditData);
-      notification.success({ message: "Tạo phiếu kiểm kê thành công" });
+      const newAdjustment = await updateInventoryQuantities(auditData);
+      message.success('Phiếu kiểm kê đã được lưu thành công.');
       form.resetFields();
-      setAdjustments([]);
-      onClose();
+      setEntryProducts([{ productCode: '', unit: '', actualQuantity: 0, name: '', stockQuantity: 0, productId: '', reason: '' }]);
+      onClose(newAdjustment);
     } catch (error) {
-      console.error("Error response:", error.response?.data);
-      notification.error({ message: "Lỗi khi tạo phiếu kiểm kê" });
-    } finally {
-      setLoading(false);
+      console.error("Lỗi khi lưu phiếu kiểm kê:", error);
+      message.error('Lỗi khi lưu phiếu kiểm kê.');
     }
   };
-
-
+  
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Tạo Phiếu Kiểm Kê Kho</h2>
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          code: `ST-${Date.now()}`, // Tự động tạo mã phiếu kiểm kê dựa trên thời gian
-          description: "Phiếu kiểm kê tự động"
-        }}
-        onFinish={handleSubmit}
-      >
-        <Form.Item name="code" label="Mã phiếu kiểm kê" rules={[{ required: true, message: "Vui lòng nhập mã phiếu kiểm kê" }]}>
-          <Input disabled />
+    <div className={styles.formContainer}>
+      <h2>Tạo Phiếu Kiểm Kê</h2>
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form.Item style={{width : '20%'}} name="code" label="Mã Phiếu" rules={[{ required: true, message: 'Vui lòng nhập mã phiếu' }]}>
+          <Input placeholder="Nhập mã phiếu kiểm kê" />
         </Form.Item>
-
-        <Form.Item name="description" label="Mô tả" rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}>
-          <Input />
+        <Form.Item style={{width : '20%'}} name="description" label="Mô Tả">
+          <Input placeholder="Nhập mô tả phiếu kiểm kê" />
         </Form.Item>
-
-        <h3>Danh sách sản phẩm cần kiểm kê</h3>
+        
         <Table
-          columns={[
-            { title: "Sản phẩm", dataIndex: "productName", key: "productName" },
-            { title: "Đơn vị", dataIndex: "unit", key: "unit" },
-            { title: "Số lượng trong kho", dataIndex: "quantity", key: "quantity" },
-            { title: "Số lượng thực tế", dataIndex: "actualQuantity", key: "actualQuantity" },
-            { title: "Số lượng điều chỉnh", dataIndex: "adjustmentQuantity", key: "adjustmentQuantity" },
-            { title: "Loại điều chỉnh", dataIndex: "adjustmentType", key: "adjustmentType" },
-            { title: "Lý do", dataIndex: "reason", key: "reason" }
-          ]}
-          dataSource={adjustments}
-          rowKey={(record) => `${record.stockId}-${record.unit}`}
-          pagination={false}
+  columns={[
+    {
+      title: 'Mã SP',
+      dataIndex: 'productCode',
+      width: 80, 
+      render: (text, record, index) => (
+        <AutoComplete
+          value={entryProducts[index]?.productCode}
+          onChange={(value) => handleProductCodeChange(index, value)}
+          options={products.map(product => ({ value: product.code }))}
+          placeholder="Nhập mã sản phẩm"
+          style={{ width: '90%' }}
         />
+      ),
+    },
+    {
+      title: 'Tên SP',
+      dataIndex: 'name',
+      width: 150, 
+      render: (text, record, index) => <span>{entryProducts[index]?.name || '-'}</span>,
+    },
+    {
+      title: 'Đơn vị',
+      dataIndex: 'unit',
+      width: 100, 
+      render: (text, record, index) => (
+        <Select
+          value={entryProducts[index]?.unit || undefined}
+          onChange={(value) => handleUnitChange(index, value)}
+          placeholder="Chọn đơn vị"
+          style={{ width: '80%' }}
+        >
+          {(entryProducts[index].conversionUnits || []).map((unit) => (
+            <Option key={unit._id} value={unit.name}>
+              {unit.name} (1 {unit.name} = {unit.conversionValue} {entryProducts[index].baseUnit || 'Đơn vị cơ bản'})
+            </Option>
+          ))}
+          {entryProducts[index].baseUnit && (
+            <Option key={entryProducts[index].baseUnit} value={entryProducts[index].baseUnit}>
+              {entryProducts[index].baseUnit} (1 {entryProducts[index].baseUnit} = 1)
+            </Option>
+          )}
+        </Select>
+      ),
+    },
+    {
+      title: 'Số lượng kho',
+      dataIndex: 'stockQuantity',
+      width: 100, 
+      render: (text, record, index) => (
+        <span>{entryProducts[index]?.stockQuantity || 0}</span>
+      ),
+    },
+    {
+      title: 'Số lượng thực tế',
+      dataIndex: 'actualQuantity',
+      width: 150, 
+      render: (text, record, index) => (
+        <Input
+          type="number"
+          min={0}
+          value={entryProducts[index]?.actualQuantity}
+          onChange={(e) => handleQuantityChange(index, e.target.value)}
+          placeholder="Nhập số lượng thực tế"
+        />
+      ),
+    },
+    {
+      title: 'Lý do',
+      dataIndex: 'reason',
+      width: 200, 
+      render: (text, record, index) => (
+        <Input
+          value={entryProducts[index]?.reason || ''}
+          onChange={(e) => {
+            const updatedProducts = [...entryProducts];
+            updatedProducts[index].reason = e.target.value;
+            setEntryProducts(updatedProducts);
+          }}
+          placeholder="Nhập lý do kiểm hàng"
+        />
+      ),
+    },
+    {
+      title: 'Hành động',
+      dataIndex: 'action',
+      width: 50,
+      render: (text, record, index) => (
+        <MinusCircleOutlined
+          onClick={() => handleRemoveProduct(index)} // Gọi hàm xóa khi bấm vào biểu tượng xóa
+          style={{ cursor: 'pointer', color: 'red' }}
+        />
+      ),
+    },
+  ]}
+  dataSource={entryProducts}
+  rowKey={(record, index) => index}
+  scroll={{ x: 900 }} // Cho phép cuộn ngang nếu tổng chiều rộng các cột vượt quá 900px
+  style={{ tableLayout: 'fixed' }} // Thiết lập layout cố định cho bảng
+/>
 
-        <Space style={{ marginTop: 20 }}>
-          <Form.Item name="selectedProductId" label="Sản phẩm">
-            <Select placeholder="Chọn sản phẩm" onChange={handleProductChange}>
-              {stocks.map((stock) => (
-                <Option key={stock.productId} value={stock.productId}>
-                  {stock.productName} ({stock.productCode})
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
 
-          <Form.Item name="unit" label="Đơn vị">
-            <Select placeholder="Chọn đơn vị" onChange={handleUnitChange}>
-              {stocks.length > 0 &&
-                stocks.find((stock) => stock.productId === form.getFieldValue("selectedProductId"))
-                  ?.stocks.map((s) => (
-                    <Option key={s.unit} value={s.unit}>
-                      {s.unit}
-                    </Option>
-                  ))}
-            </Select>
-          </Form.Item>
+        <Button type="dashed" onClick={handleAddProduct} style={{ marginTop: 16 }}>
+          Thêm sản phẩm
+        </Button>
 
-          <Form.Item label="Số lượng trong kho">
-            <Input value={currentStockQuantity || ""} readOnly />
-          </Form.Item>
-
-          <Form.Item name="actualQuantity" label="Số lượng thực tế">
-            <Input type="number" />
-          </Form.Item>
-
-          <Form.Item name="reason" label="Lý do">
-            <Input />
-          </Form.Item>
-
-          <Button onClick={handleAddAdjustment}>Thêm</Button>
-        </Space>
-
-        <Form.Item style={{ marginTop: 20 }}>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            Lưu Phiếu Kiểm Kê
-          </Button>
-          <Button onClick={onClose} style={{ marginLeft: 8 }}>
-            Hủy
-          </Button>
-        </Form.Item>
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
+          <Button onClick={onClose} style={{ marginRight: 8 }}>Hủy</Button>
+          <Button type="primary" htmlType="submit">Lưu Phiếu Kiểm Kê</Button>
+        </div>
       </Form>
     </div>
   );

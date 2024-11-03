@@ -73,6 +73,7 @@ const ManageEmployees = () => {
 <div style={{ textAlign: "right", marginBottom: "20px" }}>
   <Button
     type="primary"
+    danger
     onClick={() => setIsAddModalVisible(true)}
   >
     Thêm nhân viên
@@ -88,7 +89,7 @@ const ManageEmployees = () => {
               <EditOutlined
                 key="edit"
                 onClick={(e) => showEditModal(employee, e)}
-                style={{ color: 'blue' }}
+                style={{ color: 'black' }}
               />,
               <DeleteOutlined
                 key="delete"

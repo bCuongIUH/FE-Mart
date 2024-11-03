@@ -22,6 +22,7 @@ import {
   deletePriceFromPriceList
 } from "../../untills/priceApi";
 import EditPriceListModal from "./EditPriceListModal";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const PriceProduct = () => {
   const [products, setProducts] = useState([]);
@@ -661,7 +662,7 @@ const PriceProduct = () => {
               key: "isActive",
               render: (text, record) => (
                 <Tag color={record.isActive ? "green" : "red"}>
-                  {record.isActive ? "Đang hoạt động" : "Ngừng hoạt động"}
+                  {record.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
                 </Tag>
               ),
             },
@@ -671,16 +672,17 @@ const PriceProduct = () => {
               render: (text, record) => (
                 <>
                   <Button
-                    type="primary"
-                    icon={<EditOutlined />}
+                    type="text"
+                    icon={<FaEdit />}
                     onClick={() => handleEditPriceList(record.key)}
                     style={{ marginRight: 8 }}
-                  ></Button>
+                  >Sửa</Button>
                   <Button
-                    type="danger"
-                    icon={<DeleteOutlined />}
+                    type="text"
+                    danger
+                    icon={<FaTrash />}
                     onClick={() => confirmDeletePriceList(record.key)}
-                  ></Button>
+                  >Xóa</Button>
                 </>
               ),
             },

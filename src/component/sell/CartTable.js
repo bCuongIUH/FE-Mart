@@ -6,7 +6,10 @@ const CartTable = ({ cart, formatCurrency, removeFromCart }) => {
     <Table
       dataSource={cart}
       rowKey={(record) => `${record.productId}-${record.unit}`}
-      pagination={false}
+      pagination={{
+        pageSize: 4, 
+        showSizeChanger: false, 
+      }}
       columns={[
         { title: "Tên sản phẩm", dataIndex: "productName", key: "productName" },
         {
