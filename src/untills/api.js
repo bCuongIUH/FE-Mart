@@ -461,24 +461,16 @@ export const createBill = async (userId, paymentMethod) => {
 //     throw error;
 //   }
 // };
-export const createDirectSaleBill = async (
-  paymentMethod,
-  items,
-  phoneNumber,
-  // createBy,
-  voucherCode
-) => {
+export const createDirectSaleBill = async ({ paymentMethod, items, customerId, voucherCode ,createBy}) => {
   try {
-    const response = await axios.post(`${API_URL}/bill/create-buy-directly`, {
-      paymentMethod,
-      items,
-      phoneNumber,
-      // createBy,
-      voucherCode,
-    });
+    const response = await axios.post(
+      `${API_URL}/bill/create-buy-directly`,
+      { paymentMethod, items, customerId, voucherCode,createBy },
+      config
+    );
     return response.data;
   } catch (error) {
-    console.error("Lỗi khi tạo hóa đơn bán hàng trực tiếp:", error);
+    console.error("Lỗi từ createDirectSaleBill:", error.response?.data);
     throw error;
   }
 };

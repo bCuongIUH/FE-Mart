@@ -16,6 +16,8 @@ import CartTable from "./CartTable";
 import { getAllActiveVouchers } from "../../services/voucherService";
 import { formatCurrency } from "../../untills/formatCurrency";
 import { AuthContext } from "../../untills/context/AuthContext";
+import { getAllCustomers } from "../../untills/customersApi";
+import { getEmployeeById } from "../../untills/employeesApi";
 
 const { Option } = Select;
 
@@ -37,7 +39,27 @@ const ProductPrices = () => {
   const [selectedVoucher, setSelectedVoucher] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("Cash");
-const { user } = useContext(AuthContext);
+  const [employeeId, setEmployeeId] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+
+
+  const { user } = useContext(AuthContext);
+  useEffect(() => {
+    const fetchEmployeeId = async () => {
+      if (user?._id) {
+        try {
+          const employeeData = await getEmployeeById(user._id);
+          setEmployeeId(employeeData._id); 
+        } catch (error) {
+          console.error('Không thể lấy employeeId:', error);
+        }
+      }
+    };
+    fetchEmployeeId();
+  }, [user]);
+
+
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -52,13 +74,21 @@ const { user } = useContext(AuthContext);
         }
         const voucherData = await getAllActiveVouchers();
         setVouchers(voucherData);
+
+        const customerData = await getAllCustomers();
+        setCustomers(customerData);
       } catch (err) {
         setError(err.message);
       }
     };
     fetchPrices();
   }, []);
-
+// phần khách hàng 
+const handleCustomerSelect = (value) => {
+  const customer = customers.find((c) => c._id === value);
+  setSelectedCustomer(customer);
+  message.success(`Đã chọn khách hàng: ${customer.fullName}`);
+};
 
   const initializeProductState = (products) => {
     const defaultUnits = {};
@@ -180,30 +210,39 @@ const { user } = useContext(AuthContext);
 
 
   const handlePayment = async () => {
+    if (!selectedCustomer) {
+      return message.warning("Vui lòng chọn khách hàng trước khi thanh toán!");
+    }
+  
+    if (cart.length === 0) {
+      return message.warning("Giỏ hàng không có sản phẩm nào.");
+    }
+  
     const items = cart.map((item) => ({
-      // createBy: user._id,
       product: item.productId,
       quantity: item.quantity,
       currentPrice: item.price,
       unit: item.unit,
-     
     }));
 
+  
     try {
-      await createDirectSaleBill(
-        
+      await createDirectSaleBill({
         paymentMethod,
         items,
-        "",
-        selectedVoucher ? selectedVoucher.code : ""
-      );
+        customerId: selectedCustomer._id,
+        voucherCode: selectedVoucher ? selectedVoucher.code : "",
+        createBy: employeeId,
+      });
       message.success("Thanh toán thành công!");
       setIsCheckoutModalOpen(false);
       setCart([]);
       setDiscountAmount(0);
       setSelectedVoucher(null);
+      setSelectedCustomer(null);
     } catch (error) {
       message.error("Lỗi khi thanh toán. Vui lòng thử lại.");
+      console.error(error);
     }
   };
   
@@ -262,6 +301,19 @@ const { user } = useContext(AuthContext);
           padding: "10px",
         }}
       >
+         <h2>Chọn Khách Hàng</h2>
+        <Select
+          placeholder="Chọn khách hàng"
+          onChange={handleCustomerSelect}
+          value={selectedCustomer ? selectedCustomer._id : undefined}
+          style={{ width: "100%", marginBottom: "10px" }}
+        >
+          {customers.map((customer) => (
+            <Option key={customer._id} value={customer._id}>
+              {customer.fullName} - {customer.phoneNumber}
+            </Option>
+          ))}
+            </Select>
         <h2>Danh sách sản phẩm</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
 
@@ -486,7 +538,7 @@ const { user } = useContext(AuthContext);
     {selectedVoucher && (
       <div
         style={{
-          border: "1px dashed #ccc", // Đường nét đứt cho phần mã giảm giá
+          border: "1px dashed #ccc", 
           padding: "10px",
           marginTop: "10px",
         }}

@@ -16,13 +16,13 @@ function Login({ onClose, onSwitchToRegister }) {
     e.preventDefault();
     try {
       const response = await postLogin({ email, password });
-
+  
       if (response.status === 200) {
         const data = response.data;
         localStorage.setItem('token', data.token);
         const token = localStorage.getItem('token');
         console.log('Token from localStorage:', token); 
-        
+  
         login(data.user);
         if (data.user.role === 'admin') {
           navigate('/UIManager');
@@ -33,10 +33,14 @@ function Login({ onClose, onSwitchToRegister }) {
         setErrorMessage(response.data.message || 'Đăng nhập thất bại');
       }
     } catch (error) {
-      console.error('Lỗi khi đăng nhập:', error);
-      setErrorMessage('Lỗi server');
+      if (error.response && error.response.status === 400) {
+        setErrorMessage(error.response.data.message || 'Sai mật khẩu');
+      } else {
+        setErrorMessage('Lỗi server');
+      }
     }
   };
+  
 
   const handleClose = () => {
     // Gọi hàm onClose khi đóng modal
