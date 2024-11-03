@@ -33,6 +33,7 @@ import InventoryList from '../component/InvenStock/InventoryList';
 import Transaction from '../component/Transaction/Transaction';
 import { getAllEmployee, getEmployeeById } from '../untills/employeesApi';
 import UserProfile from '../component/profile/UserProfile';
+import CustomerList from '../component/Customers/customerList';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -138,6 +139,9 @@ const WarehouseManager = () => {
           </SubMenu>
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
             <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>
+          </SubMenu>
+          <SubMenu key="sub9" icon={<TeamOutlined />} title="Quản lí khách hàng">
+            <Menu.Item key="6" onClick={() => handleNavigate(<CustomerList/>)}>Danh sách khách hàng</Menu.Item>
           </SubMenu>
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
             <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>

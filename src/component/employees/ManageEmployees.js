@@ -138,7 +138,7 @@ const ManageEmployees = () => {
             {`${selectedEmployee.addressLines?.houseNumber || ''}, ${selectedEmployee.addressLines?.ward || ''}, ${selectedEmployee.addressLines?.district || ''}, ${selectedEmployee.addressLines?.province || ''}`}
             </p>
             <p><strong>Giới tính:</strong> {selectedEmployee.gender}</p>
-            <p><strong>Ngày sinh:</strong> {selectedEmployee.dateOfBirth}</p>
+            <p><strong>Ngày sinh:</strong> {new Date(selectedEmployee.dateOfBirth).toLocaleDateString('vi-VN')}</p>
           </div>
         )}
       </Modal>

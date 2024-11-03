@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Card, Typography, Row, Col, Button, Divider, Spin } from 'antd';
+import { Card, Typography, Row, Col, Button, Divider, Spin, Modal, Input, Form, message } from 'antd';
 import { MailOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
 import { AuthContext } from '../../untills/context/AuthContext';
 import { getEmployeeById } from '../../untills/employeesApi';
+import { changePassword } from '../../untills/api'; // Import hàm changePassword
 import styles from './UserProfile.module.css';
 
 const { Title, Text } = Typography;
@@ -11,6 +12,7 @@ const UserProfile = () => {
   const { user } = useContext(AuthContext); // Lấy thông tin người dùng từ context
   const [employeeDetails, setEmployeeDetails] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái hiển thị của modal đổi mật khẩu
 
   useEffect(() => {
     const fetchEmployeeDetails = async () => {
@@ -27,6 +29,17 @@ const UserProfile = () => {
     };
     fetchEmployeeDetails();
   }, [user]);
+
+  // Xử lý khi nhấn nút đổi mật khẩu
+  const handlePasswordChange = async (values) => {
+    try {
+      await changePassword(user._id, values.oldPassword, values.newPassword);
+      message.success('Đổi mật khẩu thành công');
+      setIsModalVisible(false); // Đóng modal sau khi đổi mật khẩu thành công
+    } catch (error) {
+      message.error('Có lỗi xảy ra khi đổi mật khẩu');
+    }
+  };
 
   // Hiển thị loading nếu dữ liệu chưa có
   if (loading) {
@@ -83,10 +96,38 @@ const UserProfile = () => {
         <Divider />
 
         <div className={styles.actionButtons}>
-          <Button type="primary" style={{ marginRight: '10px' }}>Chỉnh sửa thông tin</Button>
-          <Button type="danger">Đổi mật khẩu</Button>
+          {/* <Button type="primary" style={{ marginRight: '10px' }}>Chỉnh sửa thông tin</Button> */}
+          <Button type="primary" onClick={() => setIsModalVisible(true)}>Đổi mật khẩu</Button>
         </div>
       </Card>
+
+      {/* Modal đổi mật khẩu */}
+      <Modal
+        title="Đổi mật khẩu"
+        visible={isModalVisible}
+        onCancel={() => setIsModalVisible(false)}
+        footer={null}
+      >
+        <Form onFinish={handlePasswordChange} layout="vertical">
+          <Form.Item
+            label="Mật khẩu hiện tại"
+            name="oldPassword"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Form.Item
+            label="Mật khẩu mới"
+            name="newPassword"
+            rules={[{ required: true, message: 'Vui lòng nhập mật khẩu mới' }]}
+          >
+            <Input.Password />
+          </Form.Item>
+          <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
+            Xác nhận
+          </Button>
+        </Form>
+      </Modal>
     </div>
   );
 };
