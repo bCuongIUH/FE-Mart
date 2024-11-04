@@ -23,6 +23,7 @@ import {
 } from "../../untills/priceApi";
 import EditPriceListModal from "./EditPriceListModal";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import Title from "antd/es/typography/Title";
 
 const PriceProduct = () => {
   const [products, setProducts] = useState([]);
@@ -552,7 +553,7 @@ const PriceProduct = () => {
 
   return (
     <>
-      <h2>Quản lý Bảng Giá</h2>
+        <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí bảng giá</Title>
       <div
         style={{
           display: "flex",

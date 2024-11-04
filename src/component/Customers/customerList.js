@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Modal, message } from 'antd';
 import { getAllCustomers } from '../../untills/customersApi';
+import Title from 'antd/es/typography/Title';
 
 const CustomerList = () => {
   const [customers, setCustomers] = useState([]);
@@ -62,7 +63,7 @@ const CustomerList = () => {
 
   return (
     <div>
-      <h2>Danh sách khách hàng</h2>
+      <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí khách hàng</Title>
       <Table
         columns={columns}
         dataSource={customers}

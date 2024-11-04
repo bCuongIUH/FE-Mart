@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getAllStocks } from "../../untills/stockApi";
 import { getProductByCode } from "../../untills/api";
 import { Table, Input, Button } from "antd";
+import Title from "antd/es/typography/Title";
 
 const { Column } = Table;
 
@@ -63,6 +64,7 @@ const StockList = () => {
 
   return (
     <div>
+        <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí tồn kho</Title>
       <div
         style={{
           display: "flex",
@@ -71,6 +73,7 @@ const StockList = () => {
           marginTop: 20,
         }}
       >
+       
         <Input
           placeholder="Nhập mã sản phẩm"
           value={searchCode}

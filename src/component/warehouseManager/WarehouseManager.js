@@ -5,6 +5,7 @@ import WarehouseEntryForm from './NhapKhoDetail';
 import WarehouseEntryDetailModal from './WarehouseEntryDetailModal';
 import { AuthContext } from '../../untills/context/AuthContext';
 import './WarehouseManager.module.css';
+import Title from 'antd/es/typography/Title';
 
 const NhapKho = () => {
   const { user } = useContext(AuthContext);
@@ -123,6 +124,7 @@ const NhapKho = () => {
 
   return (
     <div>
+        <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí nhập kho</Title>
       {showAddEntry ? (
         <WarehouseEntryForm 
           onCancel={() => setShowAddEntry(false)} 

@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Avatar, Button, List, Skeleton, Row, Col, Modal } from 'antd';
+import React, { useEffect, useState, useRef } from 'react';
+import { Button, List, Skeleton, Row, Col, Modal } from 'antd';
 import { getBillOffline, getAllUsers } from '../../../untills/api';
+import { getAllEmployee } from '../../../untills/employeesApi';
+import { getAllCustomers } from '../../../untills/customersApi';
 
 const CompletedCart = () => {
   const [initLoading, setInitLoading] = useState(true);
@@ -11,12 +13,16 @@ const CompletedCart = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  
+  // Tham chiếu đến nội dung hóa đơn
+  const invoiceRef = useRef();
 
   useEffect(() => {
     const fetchBillOffline = async () => {
       try {
         const data = await getBillOffline();
-        // Sắp xếp hóa đơn theo ngày tạo, hóa đơn mới nhất sẽ ở đầu danh sách
         const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setBillData(sortedData);
         setList(sortedData);
@@ -37,17 +43,33 @@ const CompletedCart = () => {
       }
     };
 
+    const fetchEmployee = async () => {
+      try {
+        const employeesData = await getAllEmployee();
+        setEmployees(employeesData);
+      } catch (error) {
+        setError('Lỗi khi lấy dữ liệu nhân viên');
+        console.error(error);
+      }
+    };
+    const fetchCustomers = async () => {
+      try {
+        const customersData = await getAllCustomers();
+        setCustomers(customersData);
+      } catch (error) {
+        setError('Lỗi khi lấy dữ liệu khách hàng');
+        console.error(error);
+      }
+    };
+    
+    fetchCustomers();
+    fetchEmployee();
     fetchBillOffline();
-    fetchUsers(); // Gọi hàm lấy danh sách người dùng
+    fetchUsers(); 
   }, []);
-
-  const onLoadMore = () => {
-    // Logic tải thêm hóa đơn
-  };
 
   const showModal = (bill) => {
     setSelectedBill(bill);
-    console.log("Selected Bill:", bill);
     setIsModalVisible(true);
   };
 
@@ -55,17 +77,38 @@ const CompletedCart = () => {
     setIsModalVisible(false);
   };
 
-  const loadMore =
-    !initLoading && !loading ? (
-      <div style={{ textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px' }}>
-        <Button onClick={onLoadMore}>Tải thêm</Button>
-      </div>
-    ) : null;
+  // Hàm in hóa đơn
+  const handlePrint = () => {
+    const printContent = invoiceRef.current.innerHTML;
+    const printWindow = window.open('', '_blank', 'width=800,height=600');
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>In hóa đơn</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            .invoice-details, .product-list { margin: 20px; }
+            .product-item { display: flex; border-bottom: 1px dashed #ccc; padding: 8px 0; }
+            .product-item div { flex: 1; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          ${printContent}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
 
-  // Hàm để lấy tên người tạo hóa đơn dựa trên ID
   const getCreatorName = (creatorId) => {
-    const creator = users.find(user => user._id === creatorId);
-    return creator ? creator.fullName : 'Không xác định';
+    const employee = employees.find(emp => emp._id === creatorId);
+    return employee ? employee.fullName : 'Không xác định';
+  };
+
+  const getCustomerName = (customerId) => {
+    const customer = customers.find(cust => cust._id === customerId);
+    return customer ? customer.fullName : 'Khách vãng lai';
   };
 
   return (
@@ -74,79 +117,91 @@ const CompletedCart = () => {
         className="demo-loadmore-list"
         loading={initLoading}
         itemLayout="horizontal"
-        loadMore={loadMore}
         dataSource={list}
         renderItem={(item) => (
           <List.Item actions={[<a key="list-loadmore-more">.</a>]}>
             <Skeleton avatar title={false} loading={initLoading} active>
-              <List.Item.Meta
-                title={<a onClick={() => showModal(item)}>Hóa đơn #{item._id}</a>}
-              />
+              <List.Item.Meta title={<a onClick={() => showModal(item)}>Hóa đơn #{item._id}</a>} />
               <Row gutter={20} style={{ width: '100%', alignItems: 'center' }}>
                 <Col span={6} style={{ marginLeft: '250px' }}>
                   <strong>Tổng tiền:</strong> {item.totalAmount} VND
-                </Col><Col span={6}>
-                  <strong>Ngày mua:</strong> {new Date(item.createdAt).toLocaleDateString()}
                 </Col>
-                <Col span={6}>
-                  <strong>Phương thức thanh toán:</strong> {item.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}
-                </Col>
+                <Col span={6}><strong>Ngày mua:</strong> {new Date(item.createdAt).toLocaleDateString()}</Col>
+                <Col span={6}><strong>Phương thức thanh toán:</strong> {item.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</Col>
               </Row>
             </Skeleton>
           </List.Item>
         )}
       />
 
-      {/* Modal hiển thị chi tiết hóa đơn */}
       {selectedBill && (
         <Modal
           visible={isModalVisible}
           onCancel={handleCancel}
-          footer={[<Button key="back" onClick={handleCancel}>Đóng</Button>]}
+          footer={[<Button key="back" onClick={handlePrint}>In hóa đơn</Button>]}
         >
-          <h4 style={{ textAlign: 'center', fontWeight: 'bold' }}>Hóa Đơn Siêu Thị C'Mart</h4>
-          <br />
-          {/* <p><strong>NV bán hàng:</strong> {getCreatorName(selectedBill.items[0]?.createBy)}</p> */}
-          <p><strong>Ngày mua:</strong> {new Date(selectedBill.createdAt).toLocaleDateString()}</p>
-          <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p>
+          <div ref={invoiceRef}>
+            <h4 style={{ textAlign: 'center', fontWeight: 'bold' }}>Hóa Đơn Siêu Thị C'Mart</h4><br />
+            <div style={{ textAlign: "center", marginBottom: "10px" }}>
+              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Hotline: 076 848 6006</p>
+              <p>* * *</p>
+            </div>
+            <p><strong>NV bán hàng:</strong> {getCreatorName(selectedBill.createBy)}</p>
+            <p><strong>Tên khách hàng:</strong> {getCustomerName(selectedBill.customer)}</p>
+            <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
+            <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p>
 
-          {/* Bảng hiển thị sản phẩm */}
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Tên sản phẩm</th>
-                <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
-                <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Đơn vị</th>
-                <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Giá</th>
-                <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              {selectedBill.items.map((item, index) => (
-                <tr key={index}>
-                  <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.product.name}</td>
-                  <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.unit}</td>
-                  <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.quantity}</td>
-                  <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.currentPrice} VND</td>
-                  <td style={{ border: '1px dashed #ddd', padding: '8px' }}>
-                    {item.currentPrice * item.quantity} VND
-                  </td>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Tên sản phẩm</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Đơn vị</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px'}}>Giá</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Thành tiền</th>
                 </tr>
-              ))}
-              <tr>
-                <td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Tổng cộng:</td>
-                <td style={{ padding: '8px', fontWeight: 'bold' }}>{selectedBill.totalAmount} VND</td>
-              </tr>
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {selectedBill.items.map((item, index) => (
+                  <tr key={index}>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.product.name}</td>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.quantity}</td>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.unit}</td>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.currentPrice} VND</td>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.currentPrice * item.quantity} VND</td>
+                  </tr>
+                ))}
+                {/* Tổng cộng và chiết khấu */}
+                {(() => {
+                  const actualTotal = selectedBill.items.reduce((acc, item) => acc + item.currentPrice * item.quantity, 0);
+                  const discountAmount = actualTotal - selectedBill.totalAmount;
+                  return (
+                    <>
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Thành tiền:</td>
+                        <td style={{ padding: '8px', fontWeight: 'bold' }}>{actualTotal} VND</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Chiết khấu:</td>
+                        <td style={{ padding: '8px', fontWeight: 'bold' }}>{discountAmount} VND</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: 'right', fontWeight: 'bold' }}>Tổng cộng:</td>
+                        <td style={{ padding: '8px', fontWeight: 'bold' }}>{selectedBill.totalAmount} VND</td>
+                      </tr>
+                    </>
+                  );
+                })()}
+              </tbody>
+            </table>
 
-          <p style={{ textAlign: 'center', marginTop: '20px', fontWeight: 'bold', color: '#888' }}>
-            Cảm ơn quý khách, hẹn gặp lại!
-          </p>
+            <p style={{ textAlign: 'center', marginTop: '20px', fontWeight: 'bold', color: '#888' }}>
+              Cảm ơn quý khách, hẹn gặp lại!
+            </p>
+          </div>
         </Modal>
-
       )}
-
     </>
   );
 };

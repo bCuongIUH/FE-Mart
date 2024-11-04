@@ -32,7 +32,7 @@ const VoucherModal = ({ vouchers }) => {
   return (
     <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
       <GiftOutlined 
-        style={{ fontSize: "20px", marginRight: "8px", color: "#ff85c0", cursor: "pointer" }} 
+        style={{ fontSize: "20px", color: "#ff85c0", cursor: "pointer" ,  marginLeft :'10px'}} 
         onClick={showModal}
       />
       <Text style={{ cursor: "pointer" }} onClick={showModal}></Text>

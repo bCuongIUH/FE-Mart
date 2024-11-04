@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Radio, InputNumber, Button, Typography, Modal } from "antd";
 import { CreditCardOutlined, DollarOutlined } from "@ant-design/icons";
+import Title from "antd/es/typography/Title";
 
 const { Text } = Typography;
 
@@ -14,8 +15,9 @@ const PaymentMethodSelector = ({ paymentMethod, setPaymentMethod}) => {
 
 
   return (
-    <div style={{ marginBottom: "10px" }}>
-      <h3>Chọn hình thức thanh toán</h3>
+    <div style={{ marginBottom: "10px",  marginLeft : '10px'  }}>
+      <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Hình thức thanh toán</Title>
+
       <Radio.Group
         onChange={handlePaymentMethodChange}
         value={paymentMethod}

@@ -80,7 +80,7 @@ const InventoryList = () => {
       ) : (
         <>
           <Space style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-            <Title level={2}>Danh sách kiểm kê kho</Title>
+            <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Danh sách kiểm kê kho</Title>
             <Button type="primary" danger icon={<PlusOutlined />} onClick={handleShowAuditForm}>
               Tạo phiếu kiểm kê
             </Button>

@@ -4,6 +4,7 @@ import { getAllEmployee, deleteEmployee } from '../../untills/employeesApi';
 import AddEmployeeModal from './AddEmployeeModal';
 import EditEmployeeModal from './EditEmployeeModal';
 import { EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import Title from 'antd/es/typography/Title';
 
 const { confirm } = Modal;
 
@@ -66,7 +67,7 @@ const ManageEmployees = () => {
 
   return (
     <div>
-      <h2>Quản lý nhân viên</h2>
+       <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí nhân viên</Title>
       {/* <Button type="primary" onClick={() => setIsAddModalVisible(true)} style={{ marginBottom: '20px' }}>
         Thêm nhân viên
       </Button> */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Switch, message, Popconfirm } from "antd";
+import { Table, Button, Switch, message, Popconfirm, Form, Tag } from "antd";
 import {
   getAllPromotionPrograms,
   createPromotionProgram,
@@ -19,6 +19,7 @@ import EditPromotionProgramModal from "./Components/EditPromotionProgramModal";
 import AddVoucherModal from "./Components/AddVoucherModal"; 
 import EditVoucherModal from "./Components/EditVoucherModal"; 
 import { EditOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons"; 
+import Title from "antd/es/typography/Title";
 
 const PromotionProgramList = () => {
   const [promotionPrograms, setPromotionPrograms] = useState([]);
@@ -33,7 +34,7 @@ const PromotionProgramList = () => {
     useState(false);
   const [editingVoucher, setEditingVoucher] = useState(null);
   const [currentPromotionId, setCurrentPromotionId] = useState(null);
-
+  const [form] = Form.useForm();
   useEffect(() => {
     fetchPromotionPrograms();
   }, []);
@@ -46,7 +47,8 @@ const PromotionProgramList = () => {
       message.error("Có lỗi xảy ra khi tải danh sách chương trình khuyến mãi");
     }
   };
-
+ 
+  
   // Gọi API để lấy danh sách voucher khi mở rộng một dòng
   const fetchVouchers = async (promotionProgramId) => {
     try {
@@ -126,6 +128,7 @@ const PromotionProgramList = () => {
 
   const handleAddVoucher = (promotionProgramId) => {
     setCurrentPromotionId(promotionProgramId);
+      setEditingVoucher(null); 
     setIsAddVoucherModalVisible(true);
   };
 
@@ -165,8 +168,10 @@ const PromotionProgramList = () => {
         title: "Trạng thái",
         dataIndex: "isActive",
         key: "isActive",
-        render: (text, voucher) => (
-          <Switch checked={voucher.isActive} disabled />
+        render: (isActive) => (
+          <Tag color={isActive ? "green" : "red"}>
+            {isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
+          </Tag>
         ),
       },
       {
@@ -193,6 +198,7 @@ const PromotionProgramList = () => {
 
     return (
       <div>
+      
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
           <Button
             type="primary"
@@ -271,11 +277,10 @@ const PromotionProgramList = () => {
       title: "Trạng thái",
       dataIndex: "isActive",
       key: "isActive",
-      render: (text, record) => (
-        <Switch
-          checked={record.isActive}
-          onChange={(checked) => handleSwitchChange(record._id, checked)}
-        />
+      render: (isActive) => (
+        <Tag color={isActive ? "green" : "red"}>
+          {isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
+        </Tag>
       ),
       onHeaderCell: () => ({
         style: {
@@ -291,7 +296,7 @@ const PromotionProgramList = () => {
       render: (text, record) => (
         <>
           <EditOutlined
-            style={{ marginRight: 8, color: "blue", cursor: "pointer" }}
+            style={{ marginRight: 8, color: "black", cursor: "pointer" }}
             onClick={() => handleEdit(record)}
           />
           <Popconfirm
@@ -316,6 +321,7 @@ const PromotionProgramList = () => {
 
   return (
     <div>
+         <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí chương trình khuyến mãi</Title>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
         <Button type="primary" onClick={handleAddNew} danger
            style={{ marginTop: 16 }}>

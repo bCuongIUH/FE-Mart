@@ -46,7 +46,8 @@ const WarehouseManager = () => {
   const [showUserInfo, setShowUserInfo] = useState(true);
   const [showWelcome, setShowWelcome] = useState(true);
   const [employeeDetails, setEmployeeDetails] = useState(null);
-
+  // const [collapsed, setCollapsed] = useState(false);
+  const [openKeys, setOpenKeys] = useState([]);
   useEffect(() => {
     if (user && user._id) { 
       getEmployeeById(user._id)
@@ -75,7 +76,11 @@ const WarehouseManager = () => {
     logout();
     navigate('/');
   };
-
+  const handleOpenChange = (keys) => {
+    // Ensure only one SubMenu is open at a time
+    const latestOpenKey = keys.find((key) => !openKeys.includes(key));
+    setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
+  };
   const userMenu = (
     <Menu>
       <Menu.Item key="profile" icon={<UserOutlined />} onClick={() => handleNavigate(<UserProfile/>)}>
@@ -127,40 +132,58 @@ const WarehouseManager = () => {
         </div>
       </Header>
 
-      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed} style={{ position: 'fixed', top: '70px', bottom: 0, left: 0 }}>
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
+      <Sider
+        collapsible
+        collapsed={collapsed}
+        onCollapse={setCollapsed}
+        style={{ position: 'fixed', top: '70px', bottom: 0, left: 0 }}
+      >
+        <Menu
+          theme="dark"
+          mode="inline"
+          openKeys={openKeys}
+          onOpenChange={handleOpenChange} // Handles open state of SubMenus
+        >
           <SubMenu key="sub1" icon={<ShoppingCartOutlined />} title="Quản lí bán hàng">
-            <Menu.Item key="1" onClick={() => handleNavigate(<SellPage/>)}>Bán hàng</Menu.Item>
-            <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart/>)}>Hóa đơn bán hàng</Menu.Item>
+            <Menu.Item key="1" onClick={() => handleNavigate(<SellPage />)}>Bán hàng</Menu.Item>
+            <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart />)}>Hóa đơn bán hàng</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
             <Menu.Item key="3" onClick={() => handleNavigate(<ProductPage />)}>Danh sách sản phẩm</Menu.Item>
-            <Menu.Item key="4" onClick={() => handleNavigate(<PriceProduct/>)}>Bảng giá</Menu.Item>
+            <Menu.Item key="4" onClick={() => handleNavigate(<PriceProduct />)}>Bảng giá</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub3" icon={<TeamOutlined />} title="Quản lí nhân viên">
-            <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees/>)}>Danh sách nhân viên</Menu.Item>
+            <Menu.Item key="5" onClick={() => handleNavigate(<ManageEmployees />)}>Danh sách nhân viên</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub9" icon={<TeamOutlined />} title="Quản lí khách hàng">
-            <Menu.Item key="6" onClick={() => handleNavigate(<CustomerList/>)}>Danh sách khách hàng</Menu.Item>
+            <Menu.Item key="6" onClick={() => handleNavigate(<CustomerList />)}>Danh sách khách hàng</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub4" icon={<InboxOutlined />} title="Quản lí kho">
-            <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho/>)}>Quản lí nhập kho</Menu.Item>
-            <Menu.Item key="9" onClick={() => handleNavigate(<StockList/>)}>Tồn kho</Menu.Item>
-            <Menu.Item key="11" onClick={() => handleNavigate(<InventoryList/>)}>Kiểm kê kho</Menu.Item>
-            <Menu.Item key="10" onClick={() => handleNavigate(<Transaction/>)}>Giao dịch</Menu.Item>
+            <Menu.Item key="8" onClick={() => handleNavigate(<NhapKho />)}>Quản lí nhập kho</Menu.Item>
+            <Menu.Item key="9" onClick={() => handleNavigate(<StockList />)}>Tồn kho</Menu.Item>
+            <Menu.Item key="11" onClick={() => handleNavigate(<InventoryList />)}>Kiểm kê kho</Menu.Item>
+            <Menu.Item key="10" onClick={() => handleNavigate(<Transaction />)}>Giao dịch</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub5" icon={<DesktopOutlined />} title="Quản lí nhà cung cấp">
-            <Menu.Item key="12" onClick={() => handleNavigate(<SuppliersInfo/>)}>Danh sách nhà cung cấp</Menu.Item>
+            <Menu.Item key="12" onClick={() => handleNavigate(<SuppliersInfo />)}>Danh sách nhà cung cấp</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub6" icon={<DropboxOutlined />} title="Quản lí chương trình khuyến mãi">
             <Menu.Item key="14" onClick={() => handleNavigate(<PromotionProgramList />)}>Danh sách chương trình</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub7" icon={<EyeOutlined />} title="Theo dõi đơn hàng">
-            <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking/>)}>Theo dõi đơn hàng</Menu.Item>
+            <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking />)}>Theo dõi đơn hàng</Menu.Item>
             <Menu.Item key="17" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
           </SubMenu>
+
           <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">
-            <Menu.Item key="18" onClick={() => handleNavigate(<StatisticsChart/>)}>Báo cáo doanh thu</Menu.Item>
+            <Menu.Item key="18" onClick={() => handleNavigate(<StatisticsChart />)}>Báo cáo doanh thu</Menu.Item>
             <Menu.Item key="19" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
           </SubMenu>
         </Menu>
@@ -175,20 +198,20 @@ const WarehouseManager = () => {
         <div className={styles.userRow}>
             <div className={styles.userColumn}>
                 {/* Mã NV với biểu tượng */}
-                <Text strong><IdcardOutlined style={{ marginRight: '8px' }} /> Mã NV:</Text>
-                <p>{employeeDetails.MaNV}</p>
+                <Text strong> Mã NV:</Text>
+                <p><IdcardOutlined style={{ marginRight: '8px' }} />{employeeDetails.MaNV}</p>
                 
                 {/* Tên với biểu tượng */}
-                <Text strong><UserOutlined style={{ marginRight: '8px' }} /> Tên:</Text>
-                <p>{employeeDetails.fullName}</p>
+                <Text strong> Tên:</Text>
+                <p> <UserOutlined style={{ marginRight: '8px' }}/>{employeeDetails.fullName}</p>
                 
                 {/* Giới tính với biểu tượng */}
-                <Text strong><ManOutlined style={{ marginRight: '8px' }} /> Giới tính:</Text>
-                <p>{employeeDetails.gender}</p>
+                <Text strong> Giới tính:</Text>
+                <p><ManOutlined style={{ marginRight: '8px' }} />{employeeDetails.gender}</p>
                 
                 {/* Ngày sinh với biểu tượng */}
-                <Text strong><CalendarOutlined style={{ marginRight: '8px' }} /> Ngày sinh:</Text>
-                <p>
+                <Text strong> Ngày sinh:</Text>
+                <p><CalendarOutlined style={{ marginRight: '8px' }} />
                     {employeeDetails.dateOfBirth 
                         ? new Date(employeeDetails.dateOfBirth).toLocaleDateString('vi-VN') 
                         : 'N/A'}
@@ -197,16 +220,16 @@ const WarehouseManager = () => {
 
             <div className={styles.userColumn}>
                 {/* Email với biểu tượng */}
-                <Text strong><MailOutlined style={{ marginRight: '8px' }} /> Email:</Text>
-                <p>{employeeDetails.email}</p>
+                <Text strong>Email:</Text>
+                <p><MailOutlined style={{ marginRight: '8px' }} /> {employeeDetails.email}</p>
                 
                 {/* Số điện thoại với biểu tượng */}
-                <Text strong><PhoneOutlined style={{ marginRight: '8px' }} /> Số điện thoại:</Text>
-                <p>{employeeDetails.phoneNumber}</p>
+                <Text strong> Số điện thoại:</Text>
+                <p><PhoneOutlined style={{ marginRight: '8px' }} />{employeeDetails.phoneNumber}</p>
                 
                 {/* Địa chỉ với biểu tượng */}
-                <Text strong><EnvironmentOutlined style={{ marginRight: '8px' }} /> Địa chỉ:</Text>
-                <p>
+                <Text strong>Địa chỉ:</Text>
+                <p><EnvironmentOutlined style={{ marginRight: '8px' }} /> 
                     {employeeDetails.addressLines
                         ? `${employeeDetails.addressLines.houseNumber}, ${employeeDetails.addressLines.ward}, ${employeeDetails.addressLines.district}, ${employeeDetails.addressLines.province}`
                         : 'Không có địa chỉ'}

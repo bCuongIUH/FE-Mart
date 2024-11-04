@@ -4,6 +4,7 @@ import { Table, Spin, Alert, Button, DatePicker, Select, Row, Col, Dropdown, Men
 import TransactionDetailsModal from './TransactionDetailsModal';
 import moment from 'moment';
 import { DownOutlined, FilterOutlined } from '@ant-design/icons';
+import Title from 'antd/es/typography/Title';
 
 const { Option } = Select;
 
@@ -60,7 +61,7 @@ const Transaction = () => {
                 return type;
         }
     };
-console.log(transactions);
+
 
     // Lọc giao dịch dựa trên ngày và loại
     useEffect(() => {
@@ -168,7 +169,7 @@ console.log(transactions);
 
     return (
         <div>
-            <h2>Giao dịch</h2>
+            <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Danh sách giao dịch</Title>
             <Row justify="end" gutter={16} style={{ marginBottom: '16px' }}>
                 <Col>
                     <Dropdown 

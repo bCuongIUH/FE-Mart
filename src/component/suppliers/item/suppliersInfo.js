@@ -4,6 +4,7 @@ import { Button, Table, message, Modal, Space, Input, Form } from 'antd';
 import SuppliersAddModal from './SuppliersAddModal';
 import { FaTrash, FaEdit } from 'react-icons/fa';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import Title from 'antd/es/typography/Title';
 
 function SuppliersInfo() {
   const [suppliers, setSuppliers] = useState([]);
@@ -130,9 +131,8 @@ function SuppliersInfo() {
           borderRadius: '8px',
         }}
       >
-        <h2>
-          Danh sách nhà cung cấp
-        </h2>
+          <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí nhà cung cấp</Title>
+
         <Button danger type="primary" onClick={() => setIsAddModalVisible(true)}>
           Thêm nhà cung cấp
         </Button>

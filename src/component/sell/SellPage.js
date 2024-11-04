@@ -22,6 +22,7 @@ import VoucherDetail from "./VoucherDetail";
 import PaymentMethodSelector from "./Payment";
 import CustomerSelect from "./CustomerSelect";
 import ProductFilter from "./ProductFilter";
+import Title from "antd/es/typography/Title";
 const { Option } = Select;
 
 const ProductPrices = () => {
@@ -66,6 +67,9 @@ const ProductPrices = () => {
   }, [user]);
 
 
+console.log('====================================');
+console.log(vouchers);
+console.log('====================================');
 
 
   useEffect(() => {
@@ -332,275 +336,281 @@ const ProductPrices = () => {
   };
 
 
-  return (
-    <div style={{ display: "flex", padding: "20px" }}>
-    <div
-      style={{
-        flex: 1,
-        // marginRight: "20px",
-        height: "85vh",
-        overflowY: "auto",
-        border: "1px solid #f0f0f0",
-       
-      }}
-    >
-      {/* Header cố định */}
-      <div style={{
-        position: "sticky",
-        top: 0,
-        backgroundColor: "#f5f5f5 ",
-        zIndex: 1,
-        paddingBottom: "10px",
-        borderBottom: "2px solid #f0f0f0",
-        border: "1px solid #f0f0f0",
-        
-      }}>
-        <CustomerSelect
-          onCustomerSelect={setSelectedCustomer}
-          selectedCustomer={selectedCustomer}
-        />
-
-        <h3 style={{ fontStyle: "italic", fontWeight: "bold" , padding :"5px"}}>Sản phẩm</h3>
-
-        <Input
-          placeholder="Tìm kiếm sản phẩm"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: "40%", marginBottom: "10px" , marginLeft : '10px'}}
-        />
-        <Select
-          placeholder="Chọn danh mục"
-          onChange={(value) => setSelectedCategory(value)}
-          value={selectedCategory}
-          style={{ width: "40%", marginBottom: "10px", marginLeft : '10px' }}
-        >
-          <Option value={null}>Tất cả</Option>
-          {categories.map((category) => (
-            <Option key={category} value={category}>{category}</Option>
-          ))}
-        </Select>
-      </div>
-
-     
-
-        <Row gutter={[16, 16]}>
-          {filteredPrices.length > 0 &&
-            filteredPrices.map((product) => (
-              <Col span={24} key={product.productId}>
-                <div
-                  style={{
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    padding: "10px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    backgroundColor: "#fff",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <img
-                      src={product.image}
-                      alt={product.productName}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        marginRight: "15px",
-                      }}
-                    />
-                    <div>
-                    <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>{product.productName}</h2>
-                      {product.units.map((unit) => (
-                        <Button
-                          key={unit.unitName}
-                          style={{
-                            margin: "5px",
-                            backgroundColor:
-                              selectedUnit[product.productId] === unit.unitName
-                                ? "#40a9ff"
-                                : "#f0f0f0",
-                            color:
-                              selectedUnit[product.productId] === unit.unitName
-                                ? "#fff"
-                                : "#000",
-                          }}
-                          onClick={() =>
-                            handleUnitChange(product.productId, unit)
-                          }
-                        >
-                          {unit.unitName}
-                        </Button>
-                      ))}
-                      <p>
-                        <strong>Giá:</strong>{" "}
-                        {formatCurrency(selectedPrice[product.productId] || 0)}
-                      </p>
-                      <p>
-                        <strong>Số lượng còn:</strong>{" "}
-                        {selectedQuantity[product.productId]}
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
-                    <InputNumber
-                      min={1}
-                      max={selectedQuantity[product.productId]}
-                      value={inputQuantity[product.productId] || 1}
-                      onChange={(value) =>
-                        setInputQuantity((prev) => ({
-                          ...prev,
-                          [product.productId]: value,
-                        }))
-                      }
-                      style={{ width: "80px" }}
-                    />
-                    <Button
-                      icon={<ShoppingCartOutlined />}
-                      onClick={() => addToCart(product)}
-                      type="primary"
-                    />
-                  </div>
-                </div>
-              </Col>
-            ))}
-        </Row>
-      </div>
-
+    return (
+      <div style={{ display: "flex", padding: "20px" }}>
       <div
         style={{
           flex: 1,
+          // marginRight: "20px",
+          height: "85vh",
           overflowY: "auto",
-          marginTop: "20px",
-          position: "relative",
+          border: "1px solid #f0f0f0",
+        
         }}
       >
-        <h2>
-          Giỏ hàng <ShoppingCartOutlined />
-        </h2>
-        <CartTable
-          removeFromCart={removeFromCart}
-          cart={cart}
-          formatCurrency={formatCurrency}
-        />
-          {/* hộp qà */}
-          <VoucherDetail vouchers={vouchers} />
-        <p
-          style={{
-            fontSize: "18px",
-            fontWeight: "bold",
-            textAlign: "right",
-            marginRight: "20px",
-          }}
-        >
-          Tổng tiền hàng:{" "}
-          {formatCurrency(
-            cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
-          )}
-        </p>
+        {/* Header cố định */}
+        <div style={{
+          position: "sticky",
+          top: 0,
+          backgroundColor: "#f5f5f5 ",
+          zIndex: 1,
+          paddingBottom: "10px",
+          borderBottom: "2px solid #f0f0f0",
+          border: "1px solid #f0f0f0",
+          
+        }}>
+          <CustomerSelect
+            onCustomerSelect={setSelectedCustomer}
+            selectedCustomer={selectedCustomer}
+          />
 
-    
+          <h3 style={{ fontStyle: "italic", fontWeight: "bold" , padding :"5px"}}>Sản phẩm</h3>
 
-        <p
-          style={{ fontSize: "16px", textAlign: "right", marginRight: "20px" }}
-        >
-           Giảm giá: {formatCurrency(discountAmount)}
-        </p>
-        <p 
-          style={{
-            fontSize: "18px",
-            fontWeight: "bold",
-            textAlign: "right",
-            marginRight: "20px",
-            // color: "#1890ff",
-          }}
-        >
-          Tổng cộng:{" "}
-          {formatCurrency(
-            cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
-            discountAmount
-          )}
-        </p>
+          <Input
+            placeholder="Tìm kiếm sản phẩm"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: "40%", marginBottom: "10px" , marginLeft : '10px'}}
+          />
+          <Select
+            placeholder="Chọn danh mục"
+            onChange={(value) => setSelectedCategory(value)}
+            value={selectedCategory}
+            style={{ width: "40%", marginBottom: "10px", marginLeft : '10px' }}
+          >
+            <Option value={null}>Tất cả</Option>
+            {categories.map((category) => (
+              <Option key={category} value={category}>{category}</Option>
+            ))}
+          </Select>
+        </div>
 
       
-        <PaymentMethodSelector 
-          paymentMethod={paymentMethod} 
-          setPaymentMethod={setPaymentMethod} 
-          // totalAmount={cart.reduce((acc, item) => acc + item.price * item.quantity, 0)} 
-          // discountAmount={discountAmount} 
-        />
 
-        <Button
-          type="primary"
-          onClick={() => setIsCheckoutModalOpen(true)}
-          style={{ position: "absolute", bottom: "20px", right: "20px" }}
+          <Row gutter={[16, 16]}>
+            {filteredPrices.length > 0 &&
+              filteredPrices.map((product) => (
+                <Col span={24} key={product.productId}>
+                  <div
+                    style={{
+                      border: "1px solid #ddd",
+                      borderRadius: "8px",
+                      padding: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      backgroundColor: "#fff",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <img
+                        src={product.image}
+                        alt={product.productName}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          marginRight: "15px",
+                        }}
+                      />
+                      <div>
+                      <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>{product.productName}</h2>
+                        {product.units.map((unit) => (
+                          <Button
+                            key={unit.unitName}
+                            style={{
+                              margin: "5px",
+                              backgroundColor:
+                                selectedUnit[product.productId] === unit.unitName
+                                  ? "#40a9ff"
+                                  : "#f0f0f0",
+                              color:
+                                selectedUnit[product.productId] === unit.unitName
+                                  ? "#fff"
+                                  : "#000",
+                            }}
+                            onClick={() =>
+                              handleUnitChange(product.productId, unit)
+                            }
+                          >
+                            {unit.unitName}
+                          </Button>
+                        ))}
+                        <p>
+                          <strong>Giá:</strong>{" "}
+                          {formatCurrency(selectedPrice[product.productId] || 0)}
+                        </p>
+                        <p>
+                          <strong>Số lượng còn:</strong>{" "}
+                          {selectedQuantity[product.productId]}
+                        </p>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <InputNumber
+                        min={1}
+                        max={selectedQuantity[product.productId]}
+                        value={inputQuantity[product.productId] || 1}
+                        onChange={(value) =>
+                          setInputQuantity((prev) => ({
+                            ...prev,
+                            [product.productId]: value,
+                          }))
+                        }
+                        style={{ width: "80px" }}
+                      />
+                      <Button
+                        icon={<ShoppingCartOutlined />}
+                        onClick={() => addToCart(product)}
+                        type="primary"
+                      />
+                    </div>
+                  </div>
+                </Col>
+              ))}
+          </Row>
+        </div>
+
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            marginTop: "20px",
+            position: "relative",
+          }}
         >
-          Thanh toán
-        </Button>
+          
+          <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}> Giỏ hàng <ShoppingCartOutlined /></Title>
+          <div style={{minHeight : '50%'}}> <CartTable
+            removeFromCart={removeFromCart}
+            cart={cart}
+            formatCurrency={formatCurrency}
+      
+          /></div>
+         
+            {/* hộp qà */}
+            <VoucherDetail vouchers={vouchers} />
+          <p
+            style={{
+              fontSize: "18px",
+              fontWeight: "bold",
+              textAlign: "right",
+              marginRight: "20px",
+            }}
+          >
+            Tổng tiền hàng:{" "}
+            {formatCurrency(
+              cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
+            )}
+          </p>
 
-        {/* giao diện xác nhân */}
-        <Modal
-          visible={isCheckoutModalOpen}
-          onCancel={() => setIsCheckoutModalOpen(false)}
-          footer={null}
-        >
-          <div ref={invoiceRef}>
-            {/* Thông tin tiêu đề và siêu thị */}
-            <div style={{ textAlign: "center", marginBottom: "20px" }}>
-              <h2>Siêu thị C'Mart</h2>
-              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
-              <p>Hotline: 076 848 6006</p>
-            </div>
+      
 
-            {/* Thông tin người tạo bill và khách hàng */}
-            <div className="header-section" style={{ borderBottom: "1px solid #ccc", paddingBottom: "15px", marginBottom: "15px" }}>
-              <p><strong>Nhân viên:</strong> {user ? user.fullName : "N/A"}</p>
-              <p><strong>Tên khách hàng:</strong> {selectedCustomer ? selectedCustomer.fullName : "Khách vãng lai"}</p>
-              <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
-            </div>
+          <p
+            style={{ fontSize: "16px", textAlign: "right", marginRight: "20px",  fontStyle: 'italic'  }}
+          >
+            Giảm giá: {formatCurrency(discountAmount)}
+          </p>
+          <p 
+            style={{
+              fontSize: "18px",
+              fontWeight: "bold",
+              textAlign: "right",
+              marginRight: "20px",
+              // color: "#1890ff",
+            }}
+          >
+            Tổng cộng:{" "}
+            {formatCurrency(
+              cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
+              discountAmount
+            )}
+          </p>
 
-            {/* Sản phẩm mua - Tiêu đề */}
-            <div style={{ display: "flex", fontWeight: "bold", borderBottom: "1px dashed #ccc", paddingBottom: "8px", marginBottom: "10px" }}>
-              <div style={{ flex: 2 }}>Tên sản phẩm</div>
-              <div style={{ flex: 1 }}>Đơn vị</div>
-              <div style={{ flex: 1 }}>Giá</div>
-              <div style={{ flex: 1 }}>Số lượng</div>
-              <div style={{ flex: 1 }}>Thành tiền</div>
-            </div>
-
-            {/* Danh sách sản phẩm */}
-            {cart.map((item) => (
-              <div key={item.productId} style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0" }}>
-                <div style={{ flex: 2 }}>{item.productName}</div>
-                <div style={{ flex: 1 }}>{item.unit}</div>
-                <div style={{ flex: 1 }}>{formatCurrency(item.price)}</div>
-                <div style={{ flex: 1 }}>{item.quantity}</div>
-                <div style={{ flex: 1 }}>{formatCurrency(item.quantity * item.price)}</div>
-
-              </div>
-            ))}
-
-            {/* Tổng tiền */}
-            <div style={{ padding: "10px", marginTop: "10px", textAlign: "right" }}>
-              <p><strong>Thành tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0))}</p>
-              <p><strong>Chiết khấu:</strong> {formatCurrency(discountAmount)}</p>
-              <p><strong>Tổng tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0) - discountAmount)}</p>
-            </div>
-          </div>
-
-          <Button type="primary" onClick={handlePayment} style={{ marginTop: "20px", width: "100%" }}>
-            Xác nhận và In hóa đơn
+        
+          <PaymentMethodSelector 
+            paymentMethod={paymentMethod} 
+            setPaymentMethod={setPaymentMethod} 
+           style={{ position: "absolute", bottom: "20px", left: "20px" }}
+          />
+          <Button
+            type="primary"
+            onClick={() => setIsCheckoutModalOpen(true)}
+            style={{ width: "150px", height: "50px", position: "absolute", bottom: "20px", right: "20px" }}
+          >
+            Thanh toán
           </Button>
-        </Modal>
+         
 
+          {/* giao diện xác nhân */}
+          <Modal
+            visible={isCheckoutModalOpen}
+            onCancel={() => setIsCheckoutModalOpen(false)}
+            footer={null}
+          >
+            <div ref={invoiceRef}>
+              {/* Thông tin tiêu đề và siêu thị */}
+              <div style={{ textAlign: "center", marginBottom: "20px" }}>
+              <h4 style={{ textAlign: 'center', fontWeight: 'bold' }}>Hóa Đơn Siêu Thị C'Mart</h4><br />
+                <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+                <p>Hotline: 076 848 6006</p>
+              <p>* * *</p>  
+              </div>
+
+              {/* Thông tin người tạo bill và khách hàng */}
+              <div className="header-section" style={{ borderBottom: "1px solid #ccc", paddingBottom: "15px", marginBottom: "15px" }}>
+                <p><strong>NV bán hàng:</strong> {user ? user.fullName : "N/A"}</p>
+                <p><strong>Tên khách hàng:</strong> {selectedCustomer ? selectedCustomer.fullName : "Khách vãng lai"}</p>
+                <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
+              </div>
+
+              {/* Sản phẩm mua - Tiêu đề */}
+              <div style={{ display: "flex", fontWeight: "bold", borderBottom: "1px dashed #ccc", paddingBottom: "8px", marginBottom: "10px" }}>
+                <div style={{ flex: 2 }}>Tên sản phẩm</div>
+                <div style={{ flex: 1 }}>Đơn vị</div>
+                <div style={{ flex: 1 }}>Giá</div>
+                <div style={{ flex: 1 }}>Số lượng</div>
+                <div style={{ flex: 1 }}>Thành tiền</div>
+              </div>
+
+              {/* Danh sách sản phẩm */}
+              {cart.map((item) => (
+                <div key={item.productId} style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0" }}>
+                  <div style={{ flex: 2 }}>{item.productName}</div>
+                  <div style={{ flex: 1 }}>{item.unit}</div>
+                  <div style={{ flex: 1 }}>{formatCurrency(item.price)}</div>
+                  <div style={{ flex: 1 }}>{item.quantity}</div>
+                  <div style={{ flex: 1 }}>{formatCurrency(item.quantity * item.price)}</div>
+
+                </div>
+              ))}
+
+              {/* Tổng tiền */}
+              <div style={{ padding: "10px", marginTop: "10px", textAlign: "right" }}>
+                <p><strong>Thành tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0))}</p>
+                <p><strong>Chiết khấu:</strong> {formatCurrency(discountAmount)}</p>
+                <p><strong>Tổng tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0) - discountAmount)}</p>
+              </div>
+            </div>
+            <p style={{ textAlign: 'center', marginTop: '20px', fontWeight: 'bold', color: '#888' }}>
+            Cảm ơn quý khách, hẹn gặp lại!
+          </p>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <Button type="primary" onClick={handlePayment} style={{ width: "auto" }}>
+                Xác nhận và In hóa đơn
+              </Button>
+            </div>
+
+          </Modal>
+
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
-export default ProductPrices;
+  export default ProductPrices;
