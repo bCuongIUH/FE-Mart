@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './Register.module.css';
 import { postRegister } from '../../untills/api';
+import { Modal, Input, Button, Typography, Alert, Form } from 'antd';
+
+const { Title } = Typography;
 
 function Register({ onClose, onSwitchToLogin }) {
   const [email, setEmail] = useState('');
@@ -11,20 +13,29 @@ function Register({ onClose, onSwitchToLogin }) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
-  const modalRef = useRef(null); 
 
-//nút đăng kí
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Regex để kiểm tra số điện thoại Việt Nam
+  const phoneRegex = /^0\d{9}$/;
 
+  // Regex để kiểm tra tên tiếng Việt
+  const vietnameseNameRegex = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểễếìỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹỶ\s]+$/;
+
+  const handleSubmit = async () => {
     if (password !== confirmPassword) {
       setErrorMessage('Mật khẩu và xác nhận mật khẩu không khớp');
+      return;
+    }
+    if (!phoneRegex.test(phoneNumber)) {
+      setErrorMessage('Số điện thoại không hợp lệ. Phải là 10 số và bắt đầu bằng 0.');
+      return;
+    }
+    if (!vietnameseNameRegex.test(fullName)) {
+      setErrorMessage('Tên không hợp lệ. Vui lòng nhập tên bằng tiếng Việt.');
       return;
     }
 
     try {
       const response = await postRegister({ email, password, fullName, phoneNumber });
-
       if (response.status === 201) {
         console.log('Đăng ký thành công');
         navigate('/otp-verification', { state: { email } });
@@ -32,89 +43,68 @@ function Register({ onClose, onSwitchToLogin }) {
         setErrorMessage(response.data.message || 'Có lỗi xảy ra khi đăng ký');
       }
     } catch (error) {
-      setErrorMessage('Lỗi server');
+      // Nếu Backend trả về lỗi, lấy thông báo lỗi
+      setErrorMessage(error.response?.data?.message || 'Lỗi server');
     }
   };
-
-  const handleClose = () => {
-    if (onClose) {
-      onClose();
-    }
-  };
-
-  const handleClickOutside = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) {
-      handleClose();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   return (
-    <div className={`${styles.registerOverlay} ${styles.registerOverlayShow}`}>
-      <div ref={modalRef} className={`${styles.registerModal} ${styles.registerModalShow}`}>
-        <div className={styles.registerContent}>
-          <h2 className={styles.registerModalHeading}>Đăng Ký</h2>
-          {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
-          <form className={styles.registerForm} onSubmit={handleSubmit}>
-            <label className={styles.registerFormLabel}>Họ tên</label>
-            <input
-              type="text"
-              placeholder="Nhập họ tên của bạn"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              className={styles.registerFormInput}
-            />
-            <label className={styles.registerFormLabel}>Email</label>
-            <input
-              type="email"
-              placeholder="Nhập email của bạn"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className={styles.registerFormInput}
-            />
-            <label className={styles.registerFormLabel}>Số điện thoại</label>
-            <input
-              type="text"
-              placeholder="Nhập số điện thoại của bạn"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              className={styles.registerFormInput}
-            />
-            <label className={styles.registerFormLabel}>Mật khẩu</label>
-            <input
-              type="password"
-              placeholder="Nhập mật khẩu"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className={styles.registerFormInput}
-            />
-            <label className={styles.registerFormLabel}>Xác nhận mật khẩu</label>
-            <input
-              type="password"
-              placeholder="Nhập lại mật khẩu"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className={styles.registerFormInput}
-            />
-            <button type="submit" className={styles.btnSubmit}>Đăng Ký</button>
-            <div className={styles.switchText}>
-              <button type="button" className={styles.btnSwitch} onClick={onSwitchToLogin}>Đã có tài khoản? Đăng Nhập</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    <Modal
+      title={<Title level={4} style={{ textAlign: 'center' }}>Đăng Ký</Title>}
+      visible
+      onCancel={onClose}
+      footer={null}
+    >
+      {errorMessage && <Alert message={errorMessage} type="error" showIcon style={{ marginBottom: 16 }} />}
+      <Form layout="vertical" onFinish={handleSubmit}>
+        <Form.Item label="Họ tên" name="fullName" rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}>
+          <Input
+            placeholder="Nhập họ tên của bạn"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Email" name="email" rules={[{ required: true, message: 'Vui lòng nhập email!' }]}>
+          <Input
+            type="email"
+            placeholder="Nhập email của bạn"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Số điện thoại" name="phoneNumber" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}>
+          <Input
+            placeholder="Nhập số điện thoại của bạn"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}>
+          <Input.Password
+            placeholder="Nhập mật khẩu"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item label="Xác nhận mật khẩu" name="confirmPassword" rules={[{ required: true, message: 'Vui lòng nhập lại mật khẩu!' }]}>
+          <Input.Password
+            placeholder="Nhập lại mật khẩu"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" block>
+            Đăng Ký
+          </Button>
+        </Form.Item>
+        <Form.Item>
+          <Button type="link" onClick={onSwitchToLogin} block>
+            Đã có tài khoản? Đăng Nhập
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 }
 

@@ -1,0 +1,30 @@
+
+.auth-links {
+    /* display: flex; */
+    align-items: center;
+  }
+  
+  .auth-button {
+    /* padding: 10px 20px; */
+    font-weight: bold;
+    color: #ffffff;
+    background-color: transparent;
+    /* border: 1px solid #ffffff; */
+    cursor: pointer;
+    /* transition: color 0.3s, background-color 0.3s; */
+    margin-left: 10px;
+  }
+  
+  /* Hiệu ứng hover */
+  .auth-button:hover {
+    color: #000000;
+    /* background-color: #ffffff; */
+  }
+  .auth-username {
+    font-weight: bold;
+    max-width: 120px;     
+    white-space: nowrap;  
+    overflow: hidden;    
+    text-overflow: ellipsis; 
+  }
+  

@@ -20,6 +20,8 @@ import { getAllCustomers } from "../../untills/customersApi";
 import { getEmployeeById } from "../../untills/employeesApi";
 import VoucherDetail from "./VoucherDetail";
 import PaymentMethodSelector from "./Payment";
+import CustomerSelect from "./CustomerSelect";
+import ProductFilter from "./ProductFilter";
 
 const { Option } = Select;
 
@@ -44,9 +46,12 @@ const ProductPrices = () => {
   const [employeeId, setEmployeeId] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [searchPhoneNumber, setSearchPhoneNumber] = useState("");
   const [appliedVoucher, setAppliedVoucher] = useState(null);
-
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const { user } = useContext(AuthContext);
+  const [products, setProducts] = useState([]);
+
   useEffect(() => {
     const fetchEmployeeId = async () => {
       if (user?._id) {
@@ -72,6 +77,13 @@ const ProductPrices = () => {
           setPrices(data.prices);
           setFilteredPrices(data.prices);
           initializeProductState(data.prices);
+          setFilteredProducts(data.prices);
+
+          // Lấy danh mục duy nhất từ sản phẩm
+          const uniqueCategories = [
+            ...new Set(data.prices.map((product) => product.category)),
+          ];
+          setCategories(uniqueCategories);
         } else {
           setError(data.message);
         }
@@ -86,14 +98,45 @@ const ProductPrices = () => {
     };
     fetchPrices();
   }, []);
-  console.log(vouchers);
-  
+  // Cập nhật danh sách sản phẩm đã lọc khi `searchText` hoặc `selectedCategory` thay đổi
+  useEffect(() => {
+    let filtered = prices;
+
+    // Lọc theo danh mục nếu có
+    if (selectedCategory) {
+      filtered = filtered.filter(
+        (product) => product.category === selectedCategory
+      );
+    }
+
+    // Lọc theo tên sản phẩm nếu có `searchText`
+    if (searchText) {
+      filtered = filtered.filter((product) =>
+        product.productName?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [prices, searchText, selectedCategory]);
+  //chọn khách hàng
+  const handleCustomerSelect = (customer) => {
+    if (!customer) {
+      // Reset khi không có khách hàng nào được chọn
+      setSelectedCustomer(null);
+      setSearchPhoneNumber("");
+    } else {
+      // Cập nhật khi chọn khách hàng
+      setSelectedCustomer(customer);
+      setSearchPhoneNumber(customer.phoneNumber);
+    }
+  };
+
 // phần khách hàng 
-const handleCustomerSelect = (value) => {
-  const customer = customers.find((c) => c._id === value);
-  setSelectedCustomer(customer);
-  message.success(`Đã chọn khách hàng: ${customer.fullName}`);
-};
+// const handleCustomerSelect = (value) => {
+//   const customer = customers.find((c) => c._id === value);
+//   setSelectedCustomer(customer);
+//   message.success(`Đã chọn khách hàng: ${customer.fullName}`);
+// };
 
   const initializeProductState = (products) => {
     const defaultUnits = {};
@@ -119,61 +162,61 @@ const handleCustomerSelect = (value) => {
 
 
 
-  const calculateDiscount = (voucher) => {
-    if (!voucher) return;
+  // const calculateDiscount = (voucher) => {
+  //   if (!voucher) return;
 
-    let discount = 0;
-    const totalAmount = cart.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
+  //   let discount = 0;
+  //   const totalAmount = cart.reduce(
+  //     (acc, item) => acc + item.price * item.quantity,
+  //     0
+  //   );
 
-    if (voucher.type === "PercentageDiscount" && voucher.conditions) {
-      const condition = voucher.conditions[0];
-      if (totalAmount >= condition.minOrderValue) {
-        discount = (totalAmount * condition.discountPercentage) / 100;
-        if (discount > condition.maxDiscountAmount) {
-          discount = condition.maxDiscountAmount;
-        }
-      }
-    } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
-      const condition = voucher.conditions[0];
-      if (totalAmount >= condition.minOrderValue) {
-        discount = condition.discountAmount;
-      }
-    } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
-      const condition = voucher.conditions[0];
-      const productXInCart = cart.find(
-        (item) => item.productId === condition.productXId
-      );
-      const productYExists = cart.find(
-        (item) => item.productId === condition.productYId && item.price === 0
-      );
+  //   if (voucher.type === "PercentageDiscount" && voucher.conditions) {
+  //     const condition = voucher.conditions[0];
+  //     if (totalAmount >= condition.minOrderValue) {
+  //       discount = (totalAmount * condition.discountPercentage) / 100;
+  //       if (discount > condition.maxDiscountAmount) {
+  //         discount = condition.maxDiscountAmount;
+  //       }
+  //     }
+  //   } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
+  //     const condition = voucher.conditions[0];
+  //     if (totalAmount >= condition.minOrderValue) {
+  //       discount = condition.discountAmount;
+  //     }
+  //   } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
+  //     const condition = voucher.conditions[0];
+  //     const productXInCart = cart.find(
+  //       (item) => item.productId === condition.productXId
+  //     );
+  //     const productYExists = cart.find(
+  //       (item) => item.productId === condition.productYId && item.price === 0
+  //     );
 
-      if (
-        productXInCart &&
-        productXInCart.quantity >= condition.quantityX &&
-        !productYExists
-      ) {
-        const productY = prices.find(
-          (product) => product.productId === condition.productYId
-        );
-        if (productY) {
-          setCart((prevCart) => [
-            ...prevCart,
-            {
-              ...productY,
-              unit: selectedUnit[condition.productYId],
-              price: 0,
-              quantity: condition.quantityY,
-            },
-          ]);
-        }
-      }
-    }
-    setDiscountAmount(discount);
-    message.success("Áp dụng mã khuyến mãi thành công!");
-  };
+  //     if (
+  //       productXInCart &&
+  //       productXInCart.quantity >= condition.quantityX &&
+  //       !productYExists
+  //     ) {
+  //       const productY = prices.find(
+  //         (product) => product.productId === condition.productYId
+  //       );
+  //       if (productY) {
+  //         setCart((prevCart) => [
+  //           ...prevCart,
+  //           {
+  //             ...productY,
+  //             unit: selectedUnit[condition.productYId],
+  //             price: 0,
+  //             quantity: condition.quantityY,
+  //           },
+  //         ]);
+  //       }
+  //     }
+  //   }
+  //   setDiscountAmount(discount);
+  //   message.success("Áp dụng mã khuyến mãi thành công!");
+  // };
   const removeFromCart = (productId, unitName) => {
     setCart((prevCart) =>
       prevCart.filter(
@@ -217,8 +260,8 @@ const handleCustomerSelect = (value) => {
       }
     });
   
-    setDiscountAmount(maxDiscount);  // Áp dụng mức giảm lớn nhất
-    setSelectedVoucher(bestVoucher); // Chọn voucher có mức giảm lớn nhất
+    setDiscountAmount(maxDiscount); 
+    setSelectedVoucher(bestVoucher); 
   
     // Hiển thị thông báo nếu voucher hiện tại khác với voucher đã được áp dụng trước đó
     if (bestVoucher && bestVoucher._id !== (appliedVoucher ? appliedVoucher._id : null)) {
@@ -273,6 +316,8 @@ const handleCustomerSelect = (value) => {
       setDiscountAmount(0);
       setSelectedVoucher(null);
       setSelectedCustomer(null);
+      setSearchPhoneNumber("");
+    
     } catch (error) {
       message.error("Lỗi khi thanh toán. Vui lòng thử lại.");
       console.error(error);
@@ -336,19 +381,13 @@ const handleCustomerSelect = (value) => {
       >
         
 
-        <h3>Chọn Khách Hàng</h3>
-        <Select
-          placeholder="Chọn khách hàng"
-          onChange={handleCustomerSelect}
-          value={selectedCustomer ? selectedCustomer._id : undefined}
-          style={{ width: "100%", marginBottom: "10px" }}
-        >
-          {customers.map((customer) => (
-            <Option key={customer._id} value={customer._id}>
-              {customer.fullName} - {customer.phoneNumber}
-            </Option>
-          ))}
-            </Select>
+        {/* <h3>Chọn Khách Hàng</h3> */}
+        <CustomerSelect
+        onCustomerSelect={handleCustomerSelect}
+        selectedCustomer={selectedCustomer} 
+        searchPhoneNumber={searchPhoneNumber}
+      />
+     
         {error && <p style={{ color: "red" }}>{error}</p>}
         <h3>Danh sách sản phẩm</h3>
         <Input
@@ -357,6 +396,7 @@ const handleCustomerSelect = (value) => {
           onChange={(e) => setSearchText(e.target.value)}
           style={{ width: "100%", marginBottom: "10px" }}
         />
+
         <Select
           placeholder="Chọn danh mục"
           onChange={(value) => setSelectedCategory(value)}
@@ -370,6 +410,8 @@ const handleCustomerSelect = (value) => {
             </Option>
           ))}
         </Select>
+     
+
 
         <Row gutter={[16, 16]}>
           {filteredPrices.length > 0 &&

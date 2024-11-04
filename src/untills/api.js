@@ -13,9 +13,14 @@ const API_URL = "http://localhost:5000/api";
 
 //đăng kí
 export const postRegister = async (data) => {
-    const res = axios.post(`${API_URL}/auth/register`, data, config)
+  try {
+    const res = await axios.post(`${API_URL}/auth/register`, data, config);
     return res;
+  } catch (error) {
+    console.error("Error during registration:", error.response?.data || error.message);
+    throw error; // Ném lỗi để có thể xử lý ở nơi gọi hàm
   }
+};
   //xác minh email
   export const verifyOTP = async (data) => {
   
@@ -30,9 +35,9 @@ export const postRegister = async (data) => {
     })
   
   }
-  export const sendOTP = async ({ email }) => {
+  export const resendOTP = async ({ email }) => {
     try {
-      const response = await axios.post(`${API_URL}/send-otp`, { email });
+      const response = await axios.post(`${API_URL}/auth/resend-otp`, { email });
       return response;
     } catch (error) {
       console.error('Error sending OTP:', error);
