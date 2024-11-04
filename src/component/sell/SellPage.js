@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Button,
   Modal,
@@ -22,7 +22,6 @@ import VoucherDetail from "./VoucherDetail";
 import PaymentMethodSelector from "./Payment";
 import CustomerSelect from "./CustomerSelect";
 import ProductFilter from "./ProductFilter";
-
 const { Option } = Select;
 
 const ProductPrices = () => {
@@ -50,8 +49,8 @@ const ProductPrices = () => {
   const [appliedVoucher, setAppliedVoucher] = useState(null);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const { user } = useContext(AuthContext);
-  const [products, setProducts] = useState([]);
-
+  const invoiceRef = useRef(null);
+//lấy nhân vien
   useEffect(() => {
     const fetchEmployeeId = async () => {
       if (user?._id) {
@@ -75,14 +74,10 @@ const ProductPrices = () => {
         const data = await getAllPriceProduct();
         if (data.success) {
           setPrices(data.prices);
-          setFilteredPrices(data.prices);
+          setFilteredPrices(data.prices); //lọc
           initializeProductState(data.prices);
-          setFilteredProducts(data.prices);
 
-          // Lấy danh mục duy nhất từ sản phẩm
-          const uniqueCategories = [
-            ...new Set(data.prices.map((product) => product.category)),
-          ];
+          const uniqueCategories = [...new Set(data.prices.map(item => item.category))];
           setCategories(uniqueCategories);
         } else {
           setError(data.message);
@@ -100,24 +95,15 @@ const ProductPrices = () => {
   }, []);
   // Cập nhật danh sách sản phẩm đã lọc khi `searchText` hoặc `selectedCategory` thay đổi
   useEffect(() => {
-    let filtered = prices;
+    // Thực hiện lọc sản phẩm dựa vào tên và danh mục
+    const filtered = prices.filter((product) => {
+      const matchesCategory = selectedCategory ? product.category === selectedCategory : true;
+      const matchesSearch = product.productName.toLowerCase().includes(searchText.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
 
-    // Lọc theo danh mục nếu có
-    if (selectedCategory) {
-      filtered = filtered.filter(
-        (product) => product.category === selectedCategory
-      );
-    }
-
-    // Lọc theo tên sản phẩm nếu có `searchText`
-    if (searchText) {
-      filtered = filtered.filter((product) =>
-        product.productName?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    setFilteredProducts(filtered);
-  }, [prices, searchText, selectedCategory]);
+    setFilteredPrices(filtered);
+  }, [searchText, selectedCategory, prices]);
   //chọn khách hàng
   const handleCustomerSelect = (customer) => {
     if (!customer) {
@@ -131,12 +117,6 @@ const ProductPrices = () => {
     }
   };
 
-// phần khách hàng 
-// const handleCustomerSelect = (value) => {
-//   const customer = customers.find((c) => c._id === value);
-//   setSelectedCustomer(customer);
-//   message.success(`Đã chọn khách hàng: ${customer.fullName}`);
-// };
 
   const initializeProductState = (products) => {
     const defaultUnits = {};
@@ -162,61 +142,7 @@ const ProductPrices = () => {
 
 
 
-  // const calculateDiscount = (voucher) => {
-  //   if (!voucher) return;
-
-  //   let discount = 0;
-  //   const totalAmount = cart.reduce(
-  //     (acc, item) => acc + item.price * item.quantity,
-  //     0
-  //   );
-
-  //   if (voucher.type === "PercentageDiscount" && voucher.conditions) {
-  //     const condition = voucher.conditions[0];
-  //     if (totalAmount >= condition.minOrderValue) {
-  //       discount = (totalAmount * condition.discountPercentage) / 100;
-  //       if (discount > condition.maxDiscountAmount) {
-  //         discount = condition.maxDiscountAmount;
-  //       }
-  //     }
-  //   } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
-  //     const condition = voucher.conditions[0];
-  //     if (totalAmount >= condition.minOrderValue) {
-  //       discount = condition.discountAmount;
-  //     }
-  //   } else if (voucher.type === "BuyXGetY" && voucher.conditions) {
-  //     const condition = voucher.conditions[0];
-  //     const productXInCart = cart.find(
-  //       (item) => item.productId === condition.productXId
-  //     );
-  //     const productYExists = cart.find(
-  //       (item) => item.productId === condition.productYId && item.price === 0
-  //     );
-
-  //     if (
-  //       productXInCart &&
-  //       productXInCart.quantity >= condition.quantityX &&
-  //       !productYExists
-  //     ) {
-  //       const productY = prices.find(
-  //         (product) => product.productId === condition.productYId
-  //       );
-  //       if (productY) {
-  //         setCart((prevCart) => [
-  //           ...prevCart,
-  //           {
-  //             ...productY,
-  //             unit: selectedUnit[condition.productYId],
-  //             price: 0,
-  //             quantity: condition.quantityY,
-  //           },
-  //         ]);
-  //       }
-  //     }
-  //   }
-  //   setDiscountAmount(discount);
-  //   message.success("Áp dụng mã khuyến mãi thành công!");
-  // };
+ 
   const removeFromCart = (productId, unitName) => {
     setCart((prevCart) =>
       prevCart.filter(
@@ -281,8 +207,42 @@ const ProductPrices = () => {
   useEffect(() => {
     filterApplicableVouchers();
   }, [cart, vouchers]);
+   // thêm sp vào giỏ hàng
+   const addToCart = (product) => {
+    const unitName = selectedUnit[product.productId];
+    const unit = product.units.find((unit) => unit.unitName === unitName);
+    const price = unit ? unit.price : 0;
+    const quantity = inputQuantity[product.productId] || 1;
   
-
+    // Kiểm tra nếu không có đơn vị nào có giá > 0
+    if (!product.units.some((unit) => unit.price > 0)) {
+      return message.warning("Sản phẩm này không có giá bán!");
+    }
+  
+    // Kiểm tra nếu số lượng bằng 0
+    if (selectedQuantity[product.productId] === 0) {
+      return message.warning("Đơn vị đã chọn hết hàng!");
+    }
+  
+    const itemInCart = cart.find(
+      (item) => item.productId === product.productId && item.unit === unitName
+    );
+  
+    if (itemInCart) {
+      setCart((prevCart) =>
+        prevCart.map((item) =>
+          item.productId === product.productId && item.unit === unitName
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        )
+      );
+    } else {
+      setCart([...cart, { ...product, unit: unitName, price, quantity }]);
+    }
+  
+    // message.success("Sản phẩm đã được thêm vào giỏ hàng!");
+  };
+//nút xác nhận thanh toán
   const handlePayment = async () => {
     if (!selectedCustomer) {
       return message.warning("Vui lòng chọn khách hàng trước khi thanh toán!");
@@ -300,7 +260,7 @@ const ProductPrices = () => {
       
     }));
 
-    console.log("Items sent to createDirectSaleBill:", items);
+    // console.log("Items sent to createDirectSaleBill:", items);
 
     try {
       await createDirectSaleBill({
@@ -311,13 +271,16 @@ const ProductPrices = () => {
         createBy: employeeId,
       });
       message.success("Thanh toán thành công!");
+
+      
+
       setIsCheckoutModalOpen(false);
       setCart([]);
       setDiscountAmount(0);
       setSelectedVoucher(null);
       setSelectedCustomer(null);
       setSearchPhoneNumber("");
-    
+      handlePrintInvoice();
     } catch (error) {
       message.error("Lỗi khi thanh toán. Vui lòng thử lại.");
       console.error(error);
@@ -340,78 +303,85 @@ const ProductPrices = () => {
     }));
   };
 
-  const addToCart = (product) => {
-    const unitName = selectedUnit[product.productId];
-    const price = selectedPrice[product.productId];
-    const quantity = inputQuantity[product.productId] || 1;
-
-    if (selectedQuantity[product.productId] === 0) {
-      return message.warning("Đơn vị đã chọn hết hàng!");
-    }
-
-    const itemInCart = cart.find(
-      (item) => item.productId === product.productId && item.unit === unitName
-    );
-    if (itemInCart) {
-      setCart((prevCart) =>
-        prevCart.map((item) =>
-          item.productId === product.productId && item.unit === unitName
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        )
-      );
-    } else {
-      setCart([...cart, { ...product, unit: unitName, price, quantity }]);
-    }
-    // message.success("Sản phẩm đã được thêm vào giỏ hàng!");
+  // Hàm tạo PDF từ hóa đơn
+  const handlePrintInvoice = () => {
+    const printContent = invoiceRef.current.innerHTML;
+    const printWindow = window.open("", "_blank", "width=800,height=600");
+    printWindow.document.open();
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Hóa đơn</title>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h2 { text-align: center; margin-bottom: 5px; }
+            .center-text { text-align: center; margin: 5px 0; }
+            .header-section { text-align: left; font-weight: bold; margin-bottom: 10px; }
+            .product-list, .total-section { margin: 20px; }
+            .product-item { display: flex; border-bottom: 1px dashed #ccc; padding: 8px 0; }
+            .product-item div { flex: 1; }
+            .total-right { text-align: right; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          ${printContent}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
 
   return (
     <div style={{ display: "flex", padding: "20px" }}>
-      <div
-        style={{
-          flex: 1,
-          marginRight: "20px",
-          height: "85vh",
-          overflowY: "auto",
-          border: "1px solid #f0f0f0",
-          padding: "10px",
-        }}
-      >
+    <div
+      style={{
+        flex: 1,
+        // marginRight: "20px",
+        height: "85vh",
+        overflowY: "auto",
+        border: "1px solid #f0f0f0",
+       
+      }}
+    >
+      {/* Header cố định */}
+      <div style={{
+        position: "sticky",
+        top: 0,
+        backgroundColor: "#f5f5f5 ",
+        zIndex: 1,
+        paddingBottom: "10px",
+        borderBottom: "2px solid #f0f0f0",
+        border: "1px solid #f0f0f0",
         
-
-        {/* <h3>Chọn Khách Hàng</h3> */}
+      }}>
         <CustomerSelect
-        onCustomerSelect={handleCustomerSelect}
-        selectedCustomer={selectedCustomer} 
-        searchPhoneNumber={searchPhoneNumber}
-      />
-     
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <h3>Danh sách sản phẩm</h3>
+          onCustomerSelect={setSelectedCustomer}
+          selectedCustomer={selectedCustomer}
+        />
+
+        <h3 style={{ fontStyle: "italic", fontWeight: "bold" , padding :"5px"}}>Sản phẩm</h3>
+
         <Input
           placeholder="Tìm kiếm sản phẩm"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: "100%", marginBottom: "10px" }}
+          style={{ width: "40%", marginBottom: "10px" , marginLeft : '10px'}}
         />
-
         <Select
           placeholder="Chọn danh mục"
           onChange={(value) => setSelectedCategory(value)}
           value={selectedCategory}
-          style={{ width: "100%", marginBottom: "10px" }}
+          style={{ width: "40%", marginBottom: "10px", marginLeft : '10px' }}
         >
           <Option value={null}>Tất cả</Option>
           {categories.map((category) => (
-            <Option key={category} value={category}>
-              {category}
-            </Option>
+            <Option key={category} value={category}>{category}</Option>
           ))}
         </Select>
-     
+      </div>
 
+     
 
         <Row gutter={[16, 16]}>
           {filteredPrices.length > 0 &&
@@ -439,7 +409,7 @@ const ProductPrices = () => {
                       }}
                     />
                     <div>
-                      <h2>{product.productName}</h2>
+                    <h2 style={{ fontSize: "20px", fontWeight: "bold" }}>{product.productName}</h2>
                       {product.units.map((unit) => (
                         <Button
                           key={unit.unitName}
@@ -572,98 +542,61 @@ const ProductPrices = () => {
         >
           Thanh toán
         </Button>
-<Modal
-    title="Xác nhận thanh toán"
-    visible={isCheckoutModalOpen}
-    onCancel={() => setIsCheckoutModalOpen(false)}
-    footer={null}
-  >
-    <h4>Sản phẩm mua:</h4>
 
-    {/* Header */}
-    <div
-      style={{
-        display: "flex",
-        fontWeight: "bold",
-        borderBottom: "1px dashed #ccc",
-        paddingBottom: "8px",
-        marginBottom: "10px",
-      }}
-    >
-      <div style={{ flex: 2 }}>Tên sản phẩm</div>
-      <div style={{ flex: 1 }}>Đơn vị</div>
-      <div style={{ flex: 1 }}>Giá</div>
-      <div style={{ flex: 1 }}>Số lượng</div>
-    </div>
+        {/* giao diện xác nhân */}
+        <Modal
+          visible={isCheckoutModalOpen}
+          onCancel={() => setIsCheckoutModalOpen(false)}
+          footer={null}
+        >
+          <div ref={invoiceRef}>
+            {/* Thông tin tiêu đề và siêu thị */}
+            <div style={{ textAlign: "center", marginBottom: "20px" }}>
+              <h2>Siêu thị C'Mart</h2>
+              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Hotline: 076 848 6006</p>
+            </div>
 
-    {/* Product rows */}
-    {cart.map((item) => (
-      <div
-        key={item.productId}
-        style={{
-          display: "flex",
-          borderBottom: "1px dashed #ccc",
-          padding: "8px 0",
-        }}
-      >
-        <div style={{ flex: 2 }}>{item.productName}</div>
-        <div style={{ flex: 1 }}>{item.unit}</div>
-        <div style={{ flex: 1 }}>{formatCurrency(item.price)}</div>
-        <div style={{ flex: 1 }}>{item.quantity}</div>
-      </div>
-    ))}
+            {/* Thông tin người tạo bill và khách hàng */}
+            <div className="header-section" style={{ borderBottom: "1px solid #ccc", paddingBottom: "15px", marginBottom: "15px" }}>
+              <p><strong>Nhân viên:</strong> {user ? user.fullName : "N/A"}</p>
+              <p><strong>Tên khách hàng:</strong> {selectedCustomer ? selectedCustomer.fullName : "Khách vãng lai"}</p>
+              <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
+            </div>
 
-    {/* Voucher Section */}
-    {selectedVoucher && (
-      <div
-        style={{
-          border: "1px dashed #ccc", 
-          padding: "10px",
-          marginTop: "10px",
-        }}
-      >
-        <p>
-          <strong>Mã giảm giá:</strong> {selectedVoucher.code}
-        </p>
-        <p>
-          {/* <strong>Số tiền giảm:</strong> {formatCurrency(discountAmount)} */}
-        </p>
-      </div>
-    )}
+            {/* Sản phẩm mua - Tiêu đề */}
+            <div style={{ display: "flex", fontWeight: "bold", borderBottom: "1px dashed #ccc", paddingBottom: "8px", marginBottom: "10px" }}>
+              <div style={{ flex: 2 }}>Tên sản phẩm</div>
+              <div style={{ flex: 1 }}>Đơn vị</div>
+              <div style={{ flex: 1 }}>Giá</div>
+              <div style={{ flex: 1 }}>Số lượng</div>
+              <div style={{ flex: 1 }}>Thành tiền</div>
+            </div>
 
-    {/* Total Section */}
-    <div
-      style={{
-        border: "1px dashed #ccc",
-        padding: "10px",
-        marginTop: "10px",
-        textAlign: "right", 
-      }}
-    >
-      
-     
-      <p>
-        <strong>Thành tiền:</strong>{" "}
-        {formatCurrency(
-          cart.reduce((acc, item) => acc + item.price * item.quantity, 0)
-        )}
-      </p>
-      <p>
-        <strong>Giảm giá:</strong> {formatCurrency(discountAmount)}
-      </p>
-      <p>
-        <strong>Tổng tiền :</strong>{" "}
-        {formatCurrency(
-          cart.reduce((acc, item) => acc + item.price * item.quantity, 0) -
-          discountAmount
-        )}
-      </p>
-    </div>
+            {/* Danh sách sản phẩm */}
+            {cart.map((item) => (
+              <div key={item.productId} style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0" }}>
+                <div style={{ flex: 2 }}>{item.productName}</div>
+                <div style={{ flex: 1 }}>{item.unit}</div>
+                <div style={{ flex: 1 }}>{formatCurrency(item.price)}</div>
+                <div style={{ flex: 1 }}>{item.quantity}</div>
+                <div style={{ flex: 1 }}>{formatCurrency(item.quantity * item.price)}</div>
 
-    <Button type="primary" onClick={handlePayment} style={{ marginTop: "10px" }}>
-      Xác nhận
-    </Button>
-  </Modal>
+              </div>
+            ))}
+
+            {/* Tổng tiền */}
+            <div style={{ padding: "10px", marginTop: "10px", textAlign: "right" }}>
+              <p><strong>Thành tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0))}</p>
+              <p><strong>Chiết khấu:</strong> {formatCurrency(discountAmount)}</p>
+              <p><strong>Tổng tiền:</strong> {formatCurrency(cart.reduce((acc, item) => acc + item.price * item.quantity, 0) - discountAmount)}</p>
+            </div>
+          </div>
+
+          <Button type="primary" onClick={handlePayment} style={{ marginTop: "20px", width: "100%" }}>
+            Xác nhận và In hóa đơn
+          </Button>
+        </Modal>
 
       </div>
     </div>

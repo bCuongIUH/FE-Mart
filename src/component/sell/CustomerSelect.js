@@ -47,32 +47,19 @@ function CustomerSelect({ onCustomerSelect, selectedCustomer, searchPhoneNumber 
 
   return (
     <div>
+    <h3 style={{ fontStyle: "italic", fontWeight: "bold" , padding : "5px"}}>Khách hàng</h3>
+
       <Input
         placeholder="Nhập số điện thoại khách hàng"
         value={localSearchPhoneNumber}
         onChange={handlePhoneNumberChange}
         maxLength={10}
-        style={{ width: "100%", marginBottom: "10px" }}
+        style={{ width: "40%", marginBottom: "10px", marginLeft : '10px' }}
       />
-      <Select
-        placeholder="Hoặc chọn khách hàng"
-        onChange={(value) => {
-          const customer = customers.find((c) => c._id === value);
-          onCustomerSelect(customer);
-          setLocalSearchPhoneNumber(customer.phoneNumber); 
-        }}
-        value={selectedCustomer ? selectedCustomer._id : undefined}
-        style={{ width: "100%", marginBottom: "10px" }}
-      >
-        {customers.map((customer) => (
-          <Option key={customer._id} value={customer._id}>
-            {customer.fullName} - {customer.phoneNumber}
-          </Option>
-        ))}
-      </Select>
+
       {selectedCustomer && (
-        <Text strong style={{ display: "block", marginTop: "10px" }}>
-          Khách hàng: {selectedCustomer.fullName} - {selectedCustomer.phoneNumber}
+        <Text strong style={{ display: "block", marginBottom: "10px" , marginLeft : '10px'}}>
+           {selectedCustomer.fullName}
         </Text>
       )}
     </div>
