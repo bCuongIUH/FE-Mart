@@ -26,6 +26,8 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
     }
   }, [visible, form]);
 
+
+
   const handleOk = () => {
     form
       .validateFields()
@@ -35,7 +37,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
         // message.success("Thêm voucher thành công!");
       })
       .catch(info => {
-        console.error("Lỗi khi thêm voucher:", info);
+        console.error("Lỗi khi thêm khuyến mãi:", info);
       });
   };
 
@@ -188,7 +190,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
   return (
     <Modal
       visible={visible}
-      title="Thêm Mới Voucher"
+      title="Thêm Mới khuyến mãi"
       okText="Thêm"
       cancelText="Hủy"
       onCancel={onCancel}
@@ -198,16 +200,16 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
       <Form form={form} onFinish={onSubmit} layout="vertical">
         <Form.Item
           name="code"
-          label="Mã voucher"
-          rules={[{ required: true, message: "Vui lòng nhập mã voucher" }]}
+          label="Mã khuyến mãi"
+          rules={[{ required: true, message: "Vui lòng nhập mã khuyến mãi" }]}
           style={{ marginBottom: "50px" }}
         >
           <Input />
         </Form.Item>
         <Form.Item
           name="type"
-          label="Loại voucher"
-          rules={[{ required: true, message: "Vui lòng chọn loại voucher" }]}
+          label="Loại khuyến mãi"
+          rules={[{ required: true, message: "Vui lòng chọn loại khuyến mãi" }]}
           style={{ marginBottom: "50px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>

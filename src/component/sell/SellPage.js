@@ -67,9 +67,6 @@ const ProductPrices = () => {
   }, [user]);
 
 
-console.log('====================================');
-console.log(vouchers);
-console.log('====================================');
 
 
   useEffect(() => {

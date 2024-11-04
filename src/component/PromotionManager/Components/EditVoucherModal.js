@@ -214,7 +214,7 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
   return (
     <Modal
       visible={visible}
-      title="Sửa Voucher"
+      title="Sửa khuyến mãi"
       okText="Sửa"
       cancelText="Hủy"
       onCancel={onCancel}
@@ -223,16 +223,16 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
       <Form form={form} onFinish={onSubmit} layout="vertical">
         <Form.Item
           name="code"
-          label="Mã voucher"
-          rules={[{ required: true, message: "Vui lòng nhập mã voucher" }]}
+          label="Mã khuyến mãi"
+          rules={[{ required: true, message: "Vui lòng nhập mã khuyến mãi" }]}
           style={{ marginBottom: "30px" }}
         >
           <Input />
         </Form.Item>
         <Form.Item
           name="type"
-          label="Loại voucher"
-          rules={[{ required: true, message: "Vui lòng chọn loại voucher" }]}
+          label="Loại khuyến mãi"
+          rules={[{ required: true, message: "Vui lòng chọn loại khuyến mãi" }]}
           style={{ marginBottom: "30px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
