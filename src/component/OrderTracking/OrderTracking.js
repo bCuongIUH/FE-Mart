@@ -1,77 +1,32 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Space, Table, Tag, Modal, Select } from 'antd';
-import { getAllCartPending, getAllUsers, updateCart } from '../../untills/api'; 
+import { Space, Table, Tag, Modal, Select, message, List } from 'antd';
+import { getBillOnline, updateCart } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
 
-const { Option } = Select; 
+const { Option } = Select;
 
 const OrderTracking = () => {
   const [cartData, setCartData] = useState([]);
   const [error, setError] = useState(null);
-  const [users, setUsers] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false); // Modal chi tiết giỏ hàng
+  const [selectedCart, setSelectedCart] = useState(null); // Giữ thông tin giỏ hàng chi tiết
   const [selectedCartId, setSelectedCartId] = useState(null);
   const [newStatus, setNewStatus] = useState('');
-  const { user } = useContext(AuthContext); 
-console.log(user);
+  const { user } = useContext(AuthContext);
 
-  const columns = [
-    {
-      title: 'Mã hóa đơn',
-      dataIndex: 'key', 
-      key: '_id',
-      render: (text) => <a>{text}</a>,
-    },
-    {
-      title: 'Tên khách hàng',
-      dataIndex: 'userName', 
-      key: 'userName',
-    },
-    {
-      title: 'Số lượng',
-      dataIndex: 'quantity', 
-      key: 'quantity',
-    },
-    {
-      title: 'Tổng giá',
-      dataIndex: 'totalPrice', 
-      key: 'totalPrice',
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'status', 
-      key: 'status',
-      render: (status) => {
-        let color = status === 'Shipped' ? 'green' : 'volcano';
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
-      },
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_, record) => (
-        <Space size="middle">
-          <a onClick={() => handleUpdate(record)}>Update</a>
-          <a>Delete</a>
-        </Space>
-      ),
-    },
-  ];
-
-  const fetchAllCartPending = async () => {
+  // Fetch bills from the backend
+  const fetchBills = async () => {
     try {
-      const response = await getAllCartPending();
-      const formattedData = response.map(cart => {
-        const user = users.find(user => user._id === cart.user);
-        return {
-          key: cart._id,
-          userName: user ? user.fullName : 'N/A', 
-          quantity: cart.items[0]?.quantity || 0,
-          totalPrice: cart.items[0]?.totalPrice || 0,
-          status: cart.status,
-          user: cart.user,
-        };
-      });
+      const bills = await getBillOnline();
+      const formattedData = bills.map(bill => ({
+        key: bill._id,
+        userName: bill.customer ? bill.customer.fullName : 'N/A', // Get customer name
+        quantity: bill.items.reduce((total, item) => total + item.quantity, 0),
+        totalPrice: bill.items.reduce((total, item) => total + item.totalPrice, 0),
+        status: bill.status,
+        items: bill.items, // Add items for detailed view
+      }));
 
       setCartData(formattedData);
     } catch (error) {
@@ -80,22 +35,25 @@ console.log(user);
     }
   };
 
+  useEffect(() => {
+    fetchBills();
+  }, []);
+
   const handleUpdate = (record) => {
     setSelectedCartId(record.key); 
-    setNewStatus(record.status); // Lấy trạng thái hiện tại vào modal
+    setNewStatus(record.status); 
     setIsModalVisible(true); 
   };
 
   const handleOk = async () => {
     try {
-      
       await updateCart(selectedCartId, newStatus, user);
       setIsModalVisible(false); 
       setNewStatus(''); 
-      fetchAllCartPending(); 
+      fetchBills(); 
     } catch (error) {
       console.error('Lỗi khi cập nhật trạng thái giỏ hàng:', error);
-      setError('Cập nhật trạng thái thất bại.'); 
+      setError('Cập nhật trạng thái thất bại.');
     }
   };
 
@@ -104,27 +62,64 @@ console.log(user);
     setNewStatus('');
   };
 
-  useEffect(() => {
-    fetchAllCartPending(); 
-  }, [users]);
+  const handleViewDetails = (record) => {
+    setSelectedCart(record); // Lưu thông tin giỏ hàng chi tiết
+    setIsDetailModalVisible(true); // Hiển thị modal chi tiết
+  };
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const userList = await getAllUsers();
-        setUsers(userList);
-      } catch (error) {
-        console.error("Lỗi khi lấy danh sách người dùng:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
+  const closeDetailModal = () => {
+    setIsDetailModalVisible(false);
+    setSelectedCart(null);
+  };
+
+  const columns = [
+    {
+      title: 'Mã hóa đơn',
+      dataIndex: 'key',
+      key: '_id',
+      render: (text, record) => <a onClick={() => handleViewDetails(record)}>{text}</a>, // Thêm onClick để mở modal chi tiết
+    },
+    {
+      title: 'Tên khách hàng',
+      dataIndex: 'userName',
+      key: 'userName',
+    },
+    {
+      title: 'Số lượng',
+      dataIndex: 'quantity',
+      key: 'quantity',
+    },
+    {
+      title: 'Tổng giá',
+      dataIndex: 'totalPrice',
+      key: 'totalPrice',
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        let color = status === 'HoanThanh' ? 'green' : 'volcano';
+        return <Tag color={color}>{status.toUpperCase()}</Tag>;
+      },
+    },
+    {
+      title: 'Hành động',
+      key: 'action',
+      render: (_, record) => (
+        <Space size="middle">
+          <a onClick={() => handleUpdate(record)}>Thay đổi</a>
+        </Space>
+      ),
+    },
+  ];
 
   return (
     <>
       {error && <div style={{ color: 'red' }}>{error}</div>}
       <Table columns={columns} dataSource={cartData} />
       
+      {/* Modal cập nhật trạng thái */}
       <Modal
         title="Cập nhật trạng thái giỏ hàng"
         visible={isModalVisible}
@@ -140,6 +135,39 @@ console.log(user);
           <Option value="DaMua">Đã giao hàng</Option>
           <Option value="HoanTra">Hoàn Trả</Option>
         </Select>
+      </Modal>
+
+      {/* Modal chi tiết giỏ hàng */}
+      <Modal
+        title="Chi tiết giỏ hàng"
+        visible={isDetailModalVisible}
+        onOk={closeDetailModal}
+        onCancel={closeDetailModal}
+        footer={null}
+      >
+        {selectedCart ? (
+          <div>
+            <p><strong>Mã hóa đơn:</strong> {selectedCart.key}</p>
+            <p><strong>Khách hàng:</strong> {selectedCart.userName}</p>
+            <p><strong>Trạng thái:</strong> {selectedCart.status}</p>
+            <p><strong>Tổng giá:</strong> {selectedCart.totalPrice}</p>
+            <p><strong>Số lượng sản phẩm:</strong> {selectedCart.quantity}</p>
+            <h4>Chi tiết sản phẩm:</h4>
+            <List
+              dataSource={selectedCart.items}
+              renderItem={item => (
+                <List.Item>
+                  <List.Item.Meta
+                    title={item.product.name}
+                    description={`Số lượng: ${item.quantity} | Giá: ${item.currentPrice} | Tổng: ${item.totalPrice}`}
+                  />
+                </List.Item>
+              )}
+            />
+          </div>
+        ) : (
+          <p>Không có thông tin chi tiết.</p>
+        )}
       </Modal>
     </>
   );

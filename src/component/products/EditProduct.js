@@ -256,7 +256,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
                 label="Tên đơn vị cơ bản"
                 rules={[{ required: true, message: "Nhập tên đơn vị!" }]}
               >
-                <Input style={{ height: "40px" }} placeholder="Ví dụ: Lon" />
+                <Input  disabled={true} style={{ height: "40px" }} placeholder="Ví dụ: Lon"  />
               </Form.Item>
             </Col>
           </Row>
@@ -265,6 +265,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
             <Row key={index} gutter={8} style={{ marginBottom: "8px" }}>
               <Col span={8}>
                 <Input
+                  disabled={true}
                   style={{ height: "40px" }}
                   placeholder="Tên đơn vị"
                   value={unit.name}
@@ -274,7 +275,8 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
                 />
               </Col>
               <Col span={8}>
-                <Input
+                <Input 
+                  disabled={true}
                   style={{ height: "40px" }}
                   placeholder="Giá trị quy đổi"
                   value={unit.conversionValue}
@@ -289,6 +291,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
               </Col>
               <Col span={8}>
                 <Input
+                 disabled={true}
                   style={{ height: "40px" }}
                   placeholder="Mã vạch"
                   value={unit.barcode}
@@ -297,14 +300,14 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
                   }
                 />
               </Col>
-              <Col>
+              {/* <Col>
                 <MinusCircleOutlined
                   onClick={() => removeConversionUnit(index)}
                 />
-              </Col>
+              </Col> */}
             </Row>
           ))}
-          <Button
+          {/* <Button
             type="dashed"
             onClick={() =>
               setConversionUnits([
@@ -315,7 +318,7 @@ const EditProduct = ({ visible, onCancel, product, fetchAllData }) => {
             style={{ width: "10%" }}
           >
             Thêm đơn vị quy đổi
-          </Button>
+          </Button> */}
         </Card>
       </Form>
     </Modal>

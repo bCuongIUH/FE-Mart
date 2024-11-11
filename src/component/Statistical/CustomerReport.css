@@ -1,0 +1,41 @@
+
+  
+  .back-button {
+    padding: 10px 20px;
+    background-color: #00d084; 
+    color: white;
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+  }
+  
+  .back-button:hover {
+    background-color: #00b870; 
+  }
+  
+  .statistics-container {
+    margin-left: 10px; 
+   
+  }
+  
+  .button-group {
+    margin: 10px 0; 
+  }
+  
+  .chart-revenue-container {
+    display: flex; 
+  }
+  
+  .chart {
+    flex: 1; 
+  }
+  
+  .revenue-summary {
+    margin-left: 20px; 
+    width: 300px; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    background-color: #f8f9fa; 
+  }
+  

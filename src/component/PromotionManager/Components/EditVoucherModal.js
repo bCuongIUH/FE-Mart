@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Select, Switch, Button, Space } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons"; // Icons for add/remove
-import { getAllProducts } from "../../../untills/api"; // Import API để lấy danh sách sản phẩm
+import { Modal, Form, Input, Select, Switch } from "antd";
+import { getAllProducts } from "../../../untills/api";
 
 const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
   const [form] = Form.useForm();
   const [voucherType, setVoucherType] = useState(""); // State để lưu loại voucher
   const [products, setProducts] = useState([]); // State để lưu danh sách sản phẩm
+  const [unitsX, setUnitsX] = useState([]); // Đơn vị cho sản phẩm X
+  const [unitsY, setUnitsY] = useState([]); // Đơn vị cho sản phẩm Y
 
-  // Lấy danh sách sản phẩm chỉ khi Modal hiển thị
+  // Lấy danh sách sản phẩm khi Modal hiển thị
   useEffect(() => {
     if (visible) {
       const fetchProducts = async () => {
@@ -33,11 +34,39 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
         conditions: editingVoucher.conditions || [{}],
       });
       setVoucherType(editingVoucher.type); // Đặt loại voucher ban đầu
+
+      // Nạp đơn vị cho sản phẩm X nếu tồn tại
+      if (editingVoucher.conditions?.[0]?.productXId) {
+        handleProductXChange(editingVoucher.conditions[0].productXId);
+      }
+
+      // Nạp đơn vị cho sản phẩm Y nếu tồn tại
+      if (editingVoucher.conditions?.[0]?.productYId) {
+        handleProductYChange(editingVoucher.conditions[0].productYId);
+      }
     }
   }, [editingVoucher, visible]);
 
   const handleOk = () => {
     form.submit();
+  };
+
+  // Cập nhật đơn vị khi chọn sản phẩm X
+  const handleProductXChange = (productId) => {
+    const product = products.find((p) => p._id === productId);
+    if (product) {
+      const availableUnits = [product.baseUnit, ...product.conversionUnits];
+      setUnitsX(availableUnits);
+    }
+  };
+
+  // Cập nhật đơn vị khi chọn sản phẩm Y
+  const handleProductYChange = (productId) => {
+    const product = products.find((p) => p._id === productId);
+    if (product) {
+      const availableUnits = [product.baseUnit, ...product.conversionUnits];
+      setUnitsY(availableUnits);
+    }
   };
 
   // Điều kiện tương ứng dựa trên loại voucher
@@ -49,7 +78,7 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
             {(fields, { add, remove }) => (
               <>
                 {fields.map(({ key, name, fieldKey, ...restField }) => (
-                  <div>
+                  <div key={key}>
                     <Form.Item
                       {...restField}
                       name={[name, "productXId"]}
@@ -59,10 +88,36 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                         { required: true, message: "Vui lòng chọn sản phẩm X" },
                       ]}
                     >
-                      <Select placeholder="Chọn sản phẩm X">
+                      <Select
+                        placeholder="Chọn sản phẩm X"
+                        onChange={(value) => {
+                          handleProductXChange(value);
+                          form.setFieldValue(
+                            ["conditions", key, "productXId"],
+                            value
+                          );
+                        }}
+                      >
                         {products.map((product) => (
                           <Select.Option key={product._id} value={product._id}>
                             {product.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "unitX"]}
+                      fieldKey={[fieldKey, "unitX"]}
+                      label="Đơn vị sản phẩm X"
+                      rules={[
+                        { required: true, message: "Vui lòng chọn đơn vị X" },
+                      ]}
+                    >
+                      <Select placeholder="Chọn đơn vị sản phẩm X">
+                        {unitsX.map((unit) => (
+                          <Select.Option key={unit._id} value={unit._id}>
+                            {unit.name}
                           </Select.Option>
                         ))}
                       </Select>
@@ -87,10 +142,36 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                         { required: true, message: "Vui lòng chọn sản phẩm Y" },
                       ]}
                     >
-                      <Select placeholder="Chọn sản phẩm Y">
+                      <Select
+                        placeholder="Chọn sản phẩm Y"
+                        onChange={(value) => {
+                          handleProductYChange(value);
+                          form.setFieldValue(
+                            ["conditions", key, "productYId"],
+                            value
+                          );
+                        }}
+                      >
                         {products.map((product) => (
                           <Select.Option key={product._id} value={product._id}>
                             {product.name}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "unitY"]}
+                      fieldKey={[fieldKey, "unitY"]}
+                      label="Đơn vị sản phẩm Y"
+                      rules={[
+                        { required: true, message: "Vui lòng chọn đơn vị Y" },
+                      ]}
+                    >
+                      <Select placeholder="Chọn đơn vị sản phẩm Y">
+                        {unitsY.map((unit) => (
+                          <Select.Option key={unit._id} value={unit._id}>
+                            {unit.name}
                           </Select.Option>
                         ))}
                       </Select>
@@ -225,7 +306,6 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           name="code"
           label="Mã khuyến mãi"
           rules={[{ required: true, message: "Vui lòng nhập mã khuyến mãi" }]}
-          style={{ marginBottom: "30px" }}
         >
           <Input />
         </Form.Item>
@@ -233,22 +313,16 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
           name="type"
           label="Loại khuyến mãi"
           rules={[{ required: true, message: "Vui lòng chọn loại khuyến mãi" }]}
-          style={{ marginBottom: "30px" }}
         >
           <Select onChange={(value) => setVoucherType(value)}>
             <Select.Option value="BuyXGetY">Mua hàng tặng quà</Select.Option>
-            <Select.Option value="FixedDiscount">Tặng tiền theo hóa đơn</Select.Option>
-            <Select.Option value="PercentageDiscount">
-              Giảm %
+            <Select.Option value="FixedDiscount">
+              Tặng tiền theo hóa đơn
             </Select.Option>
+            <Select.Option value="PercentageDiscount">Giảm %</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item
-          name="isActive"
-          label="Kích hoạt"
-          valuePropName="checked"
-          style={{ marginBottom: "30px" }}
-        >
+        <Form.Item name="isActive" label="Kích hoạt" valuePropName="checked">
           <Switch />
         </Form.Item>
 

@@ -15,7 +15,7 @@ const VoucherModal = ({ vouchers }) => {
     setIsModalVisible(false);
   };
 
-  // tên type
+  // Đổi tên loại khuyến mãi sang tiếng Việt
   const getVoucherTypeInVietnamese = (type) => {
     switch (type) {
       case "FixedDiscount":
@@ -30,14 +30,23 @@ const VoucherModal = ({ vouchers }) => {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-      <GiftOutlined 
-        style={{ fontSize: "20px", color: "#ff85c0", cursor: "pointer" ,  marginLeft :'10px'}} 
+    <div
+      style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}
+    >
+      <GiftOutlined
+        style={{
+          fontSize: "20px",
+          color: "#ff85c0",
+          cursor: "pointer",
+          marginLeft: "10px",
+        }}
         onClick={showModal}
       />
-      <Text style={{ cursor: "pointer" }} onClick={showModal}></Text>
+      <Text style={{ cursor: "pointer" }} onClick={showModal}>
+        Danh sách khuyến mãi
+      </Text>
 
-      <Modal 
+      <Modal
         title="Danh sách Khuyến mãi"
         visible={isModalVisible}
         onCancel={handleCancel}
@@ -47,30 +56,59 @@ const VoucherModal = ({ vouchers }) => {
           </Button>,
         ]}
       >
-        {vouchers && vouchers.length > 0 ? (
+        {vouchers &&
+        vouchers.filter((voucher) => !voucher.isDeleted).length > 0 ? (
           <List
-            dataSource={vouchers}
+            dataSource={vouchers.filter((voucher) => !voucher.isDeleted)}
             renderItem={(voucher) => (
               <List.Item>
                 <div style={{ padding: "10px" }}>
-                  <Text strong>{voucher.code || "N/A"}</Text> - <Text>{getVoucherTypeInVietnamese(voucher.type)}</Text>
+                  <Text strong>{voucher.code || "N/A"}</Text> -{" "}
+                  <Text>{getVoucherTypeInVietnamese(voucher.type)}</Text>
                   <br />
-                  {voucher.conditions?.map((condition, index) => (
-                    <div key={index} style={{ marginTop: "5px" }}>
+                  {voucher.type === "FixedDiscount" && voucher.conditions && (
+                    <div style={{ marginTop: "5px" }}>
                       <Text type="secondary">
-                        Mức giảm giá:{" "}
-                        {voucher.type === "FixedDiscount"
-                          ? `${condition.discountAmount || 0} VND`
-                          : `${condition.discountPercentage || 0}%`}{" "}
+                        Mức giảm giá: {voucher.conditions?.discountAmount ?? 0}{" "}
+                        VND
                         <br />
-                        Yêu cầu đơn tối thiểu: {condition.minOrderValue || 0} VND
-                        <br />
-                        {voucher.type === "PercentageDiscount" && condition.maxDiscountAmount && (
-                          <span>Mức giảm tối đa: {condition.maxDiscountAmount} VND</span>
-                        )}
+                        Yêu cầu đơn tối thiểu:{" "}
+                        {voucher.conditions?.minOrderValue ?? 0} VND
                       </Text>
                     </div>
-                  ))}
+                  )}
+                  {voucher.type === "PercentageDiscount" &&
+                    voucher.conditions && (
+                      <div style={{ marginTop: "5px" }}>
+                        <Text type="secondary">
+                          Mức giảm giá:{" "}
+                          {voucher.conditions?.discountPercentage ?? 0}%
+                          <br />
+                          Yêu cầu đơn tối thiểu:{" "}
+                          {voucher.conditions?.minOrderValue ?? 0} VND
+                          <br />
+                          {voucher.conditions?.maxDiscountAmount && (
+                            <>
+                              Mức giảm tối đa:{" "}
+                              {voucher.conditions?.maxDiscountAmount} VND
+                            </>
+                          )}
+                        </Text>
+                      </div>
+                    )}
+                  {voucher.type === "BuyXGetY" && voucher.conditions && (
+                    <div style={{ marginTop: "5px" }}>
+                      <Text type="secondary">
+                        Mua {voucher.conditions?.quantityX ?? 0}{" "}
+                        {voucher.conditions?.unitXName || "N/A"}{" "}
+                        {voucher.conditions?.productXName || "N/A"}
+                        <br />
+                        Tặng {voucher.conditions?.quantityY ?? 0}{" "}
+                        {voucher.conditions?.unitYName || "N/A"}{" "}
+                        {voucher.conditions?.productYName || "N/A"}
+                      </Text>
+                    </div>
+                  )}
                 </div>
               </List.Item>
             )}

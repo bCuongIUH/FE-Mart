@@ -12,13 +12,13 @@ import {
   createVoucher,
   updateVoucher,
   deleteVoucher,
-} from "../../services/voucherService"; 
+} from "../../services/voucherService";
 import moment from "moment";
 import AddPromotionProgramModal from "./Components/AddPromotionProgramModal";
 import EditPromotionProgramModal from "./Components/EditPromotionProgramModal";
-import AddVoucherModal from "./Components/AddVoucherModal"; 
-import EditVoucherModal from "./Components/EditVoucherModal"; 
-import { EditOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons"; 
+import AddVoucherModal from "./Components/AddVoucherModal";
+import EditVoucherModal from "./Components/EditVoucherModal";
+import { EditOutlined, DeleteOutlined, DownOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 
 const PromotionProgramList = () => {
@@ -26,8 +26,8 @@ const PromotionProgramList = () => {
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingProgram, setEditingProgram] = useState(null);
-  const [expandedRowKeys, setExpandedRowKeys] = useState([]); 
-  const [voucherData, setVoucherData] = useState({}); 
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
+  const [voucherData, setVoucherData] = useState({});
   const [isAddVoucherModalVisible, setIsAddVoucherModalVisible] =
     useState(false);
   const [isEditVoucherModalVisible, setIsEditVoucherModalVisible] =
@@ -47,8 +47,7 @@ const PromotionProgramList = () => {
       message.error("Có lỗi xảy ra khi tải danh sách chương trình khuyến mãi");
     }
   };
- 
-  
+
   // Gọi API để lấy danh sách voucher khi mở rộng một dòng
   const fetchVouchers = async (promotionProgramId) => {
     try {
@@ -121,14 +120,24 @@ const PromotionProgramList = () => {
   };
 
   const handleVoucherEdit = (voucher, promotionProgramId) => {
-    setEditingVoucher(voucher);
-    setCurrentPromotionId(promotionProgramId);
-    setIsEditVoucherModalVisible(true);
+    const promotionProgram = promotionPrograms.find(
+      (program) => program._id === promotionProgramId
+    );
+
+    if (!promotionProgram.isActive) {
+      setEditingVoucher(voucher);
+      setCurrentPromotionId(promotionProgramId);
+      setIsEditVoucherModalVisible(true);
+    } else {
+      message.error(
+        "Chỉ có thể chỉnh sửa voucher khi chương trình khuyến mãi đang ngưng hoạt động"
+      );
+    }
   };
 
   const handleAddVoucher = (promotionProgramId) => {
     setCurrentPromotionId(promotionProgramId);
-      setEditingVoucher(null); 
+    setEditingVoucher(null);
     setIsAddVoucherModalVisible(true);
   };
 
@@ -146,9 +155,9 @@ const PromotionProgramList = () => {
   const voucherTypeNames = {
     BuyXGetY: "Mua hàng Tặng quà",
     FixedDiscount: "Giảm giá cố định",
-    PercentageDiscount: "Giảm giá theo phần trăm"
+    PercentageDiscount: "Giảm giá theo phần trăm",
   };
-  
+
   // Bảng hiển thị voucher khi mở rộng một dòng
   const expandedRowRender = (record) => {
     const vouchers = voucherData[record._id] || [];
@@ -198,18 +207,22 @@ const PromotionProgramList = () => {
 
     return (
       <div>
-      
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginBottom: 16,
+          }}
+        >
           <Button
             type="primary"
             onClick={() => handleAddVoucher(record._id)}
             danger
-            
           >
             Thêm mới khuyến mãi
           </Button>
         </div>
-        
+
         <Table
           columns={voucherColumns}
           dataSource={vouchers}
@@ -218,7 +231,6 @@ const PromotionProgramList = () => {
         />
       </div>
     );
-    
   };
 
   const columns = [
@@ -233,7 +245,6 @@ const PromotionProgramList = () => {
           fontWeight: "bold",
         },
       }),
-      
     },
     {
       title: "Mô tả",
@@ -321,14 +332,26 @@ const PromotionProgramList = () => {
 
   return (
     <div>
-         <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí chương trình khuyến mãi</Title>
-      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
-        <Button type="primary" onClick={handleAddNew} danger
-           style={{ marginTop: 16 }}>
+      <Title style={{ fontWeight: "bold", fontStyle: "italic" }} level={2}>
+        Quản lí chương trình khuyến mãi
+      </Title>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: 16,
+        }}
+      >
+        <Button
+          type="primary"
+          onClick={handleAddNew}
+          danger
+          style={{ marginTop: 16 }}
+        >
           Thêm mới chương trình khuyến mãi
         </Button>
       </div>
-      
+
       <Table
         dataSource={promotionPrograms}
         columns={columns}

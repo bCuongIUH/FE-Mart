@@ -4,17 +4,18 @@ import { AuthContext } from '../../untills/context/AuthContext';
 import { Table, Input, Select, Button, message, AutoComplete } from 'antd';
 import { MinusCircleOutlined,SaveOutlined, CloseOutlined } from '@ant-design/icons'; 
 import styles from './WarehouseEntryForm.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
-const WarehouseEntryForm = ({ onCancel }) => {
+const WarehouseEntryForm = ({ onCancel, onEntryCreated  }) => {
   const { user } = useContext(AuthContext); 
   const [suppliers, setSuppliers] = useState([]);
   const [entryCode, setEntryCode] = useState('');
   const [selectedSupplier, setSelectedSupplier] = useState(null); 
   const [entryProducts, setEntryProducts] = useState([{ productCode: '', unit: '', quantity: 0, name: '', image: '', conversionUnits: [], baseUnit: '' }]);
   const [allProducts, setAllProducts] = useState([]);
-
+    const navigate = useNavigate();
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
@@ -40,63 +41,74 @@ const WarehouseEntryForm = ({ onCancel }) => {
     fetchProducts();
   }, []);
 
+
   const handleProductCodeChange = (index, code) => {
     const updatedProducts = [...entryProducts];
-    updatedProducts[index].productCode = code;
-
     const product = allProducts.find(p => p.code === code);
+
     if (product) {
-      updatedProducts[index].unit = ''; 
-      updatedProducts[index].baseUnit = product.baseUnit?.name || ''; 
-      updatedProducts[index].name = product.name; 
-      updatedProducts[index].image = product.image; 
-      updatedProducts[index].conversionUnits = product.conversionUnits;
-      updatedProducts[index].productId = product._id;
+        // Lấy thông tin sản phẩm từ cơ sở dữ liệu
+        updatedProducts[index] = {
+            productCode: code,
+            unit: '',
+            quantity: 0,
+            name: product.name,
+            image: product.image,
+            conversionUnits: product.conversionUnits,
+            baseUnit: product.baseUnit?.name || '',
+            productId: product._id
+        };
     } else {
-      updatedProducts[index] = { 
-        productCode: code, 
-        unit: '', 
-        quantity: 0, 
-        name: '', 
-        image: '', 
-        conversionUnits: [], 
-        baseUnit: '',
-        productId: ''
-      };
+        updatedProducts[index] = {
+            productCode: code,
+            unit: '',
+            quantity: 0,
+            name: '',
+            image: '',
+            conversionUnits: [],
+            baseUnit: '',
+            productId: ''
+        };
     }
-
     setEntryProducts(updatedProducts);
-  };
+};
 
-  const handleUnitChange = (index, unit) => {
-    const updatedProducts = [...entryProducts];
-    updatedProducts[index].unit = unit;
+const handleUnitChange = (index, unit) => {
+  const updatedProducts = [...entryProducts];
+  const product = updatedProducts[index];
 
-    const hasDuplicateUnit = updatedProducts.some((product, i) => i !== index && product.unit === unit);
-    if (hasDuplicateUnit) {
-      message.warning('Đơn vị này đã được chọn cho sản phẩm khác. Vui lòng chọn đơn vị khác.');
-      return; 
-    }
+  // Kiểm tra nếu `productId` và `unit` đã có trong danh sách
+  const isDuplicate = updatedProducts.some(
+      (p, i) => i !== index && p.productId === product.productId && p.unit === unit
+  );
 
-    const selectedUnit = updatedProducts[index].conversionUnits.find(u => u.name === unit);
-    updatedProducts[index].quantity = selectedUnit ? 1 : 1;
+  if (isDuplicate) {
+      message.warning("Sản phẩm này với đơn vị này đã tồn tại trong danh sách nhập kho.");
+      // Xóa sản phẩm trùng lặp khỏi danh sách
+      updatedProducts.splice(index, 1);
+      setEntryProducts(updatedProducts);
+      return; // Dừng lại nếu trùng lặp
+  }
 
-    setEntryProducts(updatedProducts);
-  };
+  // Cập nhật đơn vị nếu không trùng lặp
+  updatedProducts[index].unit = unit;
+  setEntryProducts(updatedProducts);
+};
+
+
+const handleAddProduct = () => {
+    setEntryProducts(prevProducts => [
+        ...prevProducts,
+        { productCode: '', unit: '', quantity: 0, name: '', image: '', conversionUnits: [], baseUnit: '' }
+    ]);
+};
+
 
   const handleQuantityChange = (index, quantity) => {
     const updatedProducts = [...entryProducts];
     updatedProducts[index].quantity = Number.isNaN(parseInt(quantity)) ? 0 : parseInt(quantity);
     setEntryProducts(updatedProducts);
   };
-
-  const handleAddProduct = () => {
-    setEntryProducts(prevProducts => [
-      ...prevProducts,
-      { productCode: '', unit: '', quantity: 0, name: '', image: '', conversionUnits: [], baseUnit: '' }
-    ]);
-  };
-
   const handleRemoveProduct = (index) => {
     const updatedProducts = entryProducts.filter((_, i) => i !== index);
     setEntryProducts(updatedProducts);
@@ -106,19 +118,11 @@ const WarehouseEntryForm = ({ onCancel }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const units = entryProducts.map(product => product.unit); 
-    const hasDuplicateUnits = units.some((unit, index) => units.indexOf(unit) !== index);
-
-    if (hasDuplicateUnits) {
-        message.error('Có sản phẩm có cùng đơn vị, không thể lưu phiếu nhập!');
-        return; 
-    }
-
     // Tạo đối tượng phiếu nhập kho
     const entryData = {
         entryCode: entryCode,
         supplierId: selectedSupplier, 
-        enteredBy: user._id, // ID của người tạo phiếu
+        enteredBy: user._id,
         products: entryProducts.map(product => ({
             productId: product.productId, 
             quantity: product.quantity,     
@@ -126,26 +130,30 @@ const WarehouseEntryForm = ({ onCancel }) => {
         }))
     };
 
-    // Log dữ liệu vào console
-    console.log('Dữ liệu phiếu nhập kho:', entryData);
-
     try {
-        // Gọi hàm createWarehouseEntry để lưu phiếu nhập kho
         const result = await createWarehouseEntry(entryData);
-        
-        // Xử lý kết quả sau khi tạo thành công
-        console.log("Phiếu nhập kho đã được tạo:", result);
         message.success('Phiếu nhập kho đã được lưu thành công!');
 
+        onEntryCreated();
+        onCancel(); // Đóng form
         // Reset các trường nhập liệu sau khi lưu thành công
         setEntryCode('');
         setSelectedSupplier('');
-        setEntryProducts([]); // Reset danh sách sản phẩm nếu cần
+        setEntryProducts([]);
     } catch (error) {
         console.error("Có lỗi xảy ra khi tạo phiếu nhập kho:", error);
-        message.error('Có lỗi xảy ra khi lưu phiếu nhập kho. Vui lòng thử lại!');
+
+        // Kiểm tra mã lỗi để hiển thị thông báo cụ thể cho người dùng
+        if (error.response && error.response.status === 400 && error.response.data.message) {
+            // Hiển thị thông báo lỗi từ phản hồi của API
+            message.error(error.response.data.message);
+        } else {
+            // Hiển thị thông báo lỗi chung nếu không có thông báo chi tiết từ API
+            message.error('Có lỗi xảy ra khi lưu phiếu nhập kho. Vui lòng thử lại!');
+        }
     }
 };
+
 
 
 

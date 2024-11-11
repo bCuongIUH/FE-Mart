@@ -411,7 +411,7 @@ const PriceProduct = () => {
         }),
       },
       {
-        title: "Giá Bán",
+        title: "Nhập giá mới",
         key: "newPrice",
         render: (text, record) => (
           <Input

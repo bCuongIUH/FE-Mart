@@ -73,4 +73,4 @@ export const changeVoucherStatus = async (id, isActive) => {
   } catch (error) {
     throw new Error("Lỗi khi thay đổi trạng thái voucher");
   }
-};
+}

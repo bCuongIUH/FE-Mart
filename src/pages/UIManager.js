@@ -34,6 +34,7 @@ import Transaction from '../component/Transaction/Transaction';
 import { getAllEmployee, getEmployeeById } from '../untills/employeesApi';
 import UserProfile from '../component/profile/UserProfile';
 import CustomerList from '../component/Customers/customerList';
+import CustomerReport from '../component/Statistical/CustomerReport';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -184,7 +185,7 @@ const WarehouseManager = () => {
 
           <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">
             <Menu.Item key="18" onClick={() => handleNavigate(<StatisticsChart />)}>Báo cáo doanh thu</Menu.Item>
-            <Menu.Item key="19" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
+            <Menu.Item key="19" onClick={() => handleNavigate(<CustomerReport/>)}>Báo cáo khách hàng</Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>

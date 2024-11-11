@@ -6,6 +6,8 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
   const [form] = Form.useForm();
   const [voucherType, setVoucherType] = useState("");
   const [products, setProducts] = useState([]);
+  const [unitsX, setUnitsX] = useState([]);
+  const [unitsY, setUnitsY] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -19,24 +21,36 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
     fetchProducts();
   }, []);
 
-
   useEffect(() => {
     if (visible) {
-      form.resetFields(); 
+      form.resetFields();
     }
   }, [visible, form]);
 
+  const handleProductXChange = (productId) => {
+    const product = products.find((p) => p._id === productId);
+    if (product) {
+      const availableUnits = [product.baseUnit, ...product.conversionUnits];
+      setUnitsX(availableUnits);
+    }
+  };
 
+  const handleProductYChange = (productId) => {
+    const product = products.find((p) => p._id === productId);
+    if (product) {
+      const availableUnits = [product.baseUnit, ...product.conversionUnits];
+      setUnitsY(availableUnits);
+    }
+  };
 
   const handleOk = () => {
     form
       .validateFields()
-      .then(values => {
+      .then((values) => {
         onSubmit(values);
         form.resetFields();
-        // message.success("Thêm voucher thành công!");
       })
-      .catch(info => {
+      .catch((info) => {
         console.error("Lỗi khi thêm khuyến mãi:", info);
       });
   };
@@ -52,10 +66,27 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               rules={[{ required: true, message: "Vui lòng chọn sản phẩm X" }]}
               style={{ marginBottom: "30px" }}
             >
-              <Select placeholder="Chọn sản phẩm mua">
+              <Select
+                placeholder="Chọn sản phẩm mua"
+                onChange={handleProductXChange}
+              >
                 {products.map((product) => (
                   <Select.Option key={product._id} value={product._id}>
                     {product.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name={["conditions", "unitX"]}
+              label="Đơn vị sản phẩm mua"
+              rules={[{ required: true, message: "Vui lòng chọn đơn vị X" }]}
+              style={{ marginBottom: "30px" }}
+            >
+              <Select placeholder="Chọn đơn vị sản phẩm mua">
+                {unitsX.map((unit) => (
+                  <Select.Option key={unit._id} value={unit._id}>
+                    {unit.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -74,10 +105,27 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
               rules={[{ required: true, message: "Vui lòng chọn sản phẩm Y" }]}
               style={{ marginBottom: "30px" }}
             >
-              <Select placeholder="Chọn sản phẩm tặng">
+              <Select
+                placeholder="Chọn sản phẩm tặng"
+                onChange={handleProductYChange}
+              >
                 {products.map((product) => (
                   <Select.Option key={product._id} value={product._id}>
                     {product.name}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name={["conditions", "unitY"]}
+              label="Đơn vị sản phẩm tặng"
+              rules={[{ required: true, message: "Vui lòng chọn đơn vị Y" }]}
+              style={{ marginBottom: "30px" }}
+            >
+              <Select placeholder="Chọn đơn vị sản phẩm tặng">
+                {unitsY.map((unit) => (
+                  <Select.Option key={unit._id} value={unit._id}>
+                    {unit.name}
                   </Select.Option>
                 ))}
               </Select>
@@ -195,7 +243,7 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
       cancelText="Hủy"
       onCancel={onCancel}
       onOk={handleOk}
-      style={{ marginTop: '20px' }}
+      style={{ marginTop: "20px" }}
     >
       <Form form={form} onFinish={onSubmit} layout="vertical">
         <Form.Item
@@ -214,7 +262,9 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
         >
           <Select onChange={(value) => setVoucherType(value)}>
             <Select.Option value="BuyXGetY">Mua hàng tặng quà</Select.Option>
-            <Select.Option value="FixedDiscount">Tặng tiền theo hóa đơn</Select.Option>
+            <Select.Option value="FixedDiscount">
+              Tặng tiền theo hóa đơn
+            </Select.Option>
             <Select.Option value="PercentageDiscount">Giảm %</Select.Option>
           </Select>
         </Form.Item>
@@ -233,4 +283,3 @@ const AddVoucherModal = ({ visible, onCancel, onSubmit }) => {
 };
 
 export default AddVoucherModal;
-

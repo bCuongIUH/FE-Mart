@@ -13,7 +13,7 @@ const NhapKho = () => {
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [products, setProducts] = useState([]);
   const [showAddEntry, setShowAddEntry] = useState(false);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,22 +21,22 @@ const NhapKho = () => {
   const [users, setUsers] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
 
-  // Fetch các phiếu nhập kho
+   // Hàm để lấy dữ liệu phiếu nhập kho
+   const fetchWarehouseEntries = async () => {
+    try {
+      const data = await getAllWarehouse();
+      const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setWarehouseEntries(sortedData);
+      setFilteredEntries(sortedData); 
+    } catch (error) {
+      console.error('Lỗi khi lấy phiếu nhập kho:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchWarehouseEntries = async () => {
-      try {
-        const data = await getAllWarehouse();
-        const sortedData = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        setWarehouseEntries(sortedData);
-        setFilteredEntries(sortedData); // Khởi tạo danh sách đã lọc
-      } catch (error) {
-        console.error('Lỗi khi lấy phiếu nhập kho:', error);
-      }
-    };
     fetchWarehouseEntries();
   }, []);
 
-  // Fetch sản phẩm
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -50,7 +50,6 @@ const NhapKho = () => {
     fetchProducts();
   }, []);
 
-  // Fetch người dùng
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -63,7 +62,6 @@ const NhapKho = () => {
     fetchUsers();
   }, []);
 
-  // Fetch nhà cung cấp
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
@@ -86,19 +84,16 @@ const NhapKho = () => {
     return user ? user.fullName : 'Không xác định';
   };
 
-  // Thêm phiếu nhập kho
   const handleAddEntry = async (entryData) => {
     try {
       const response = await createWarehouseEntry(entryData);
       message.success(response.message);
 
-      // Thêm phiếu nhập kho mới vào đầu danh sách và sắp xếp lại
       setWarehouseEntries(prevEntries => {
         const updatedEntries = [response.warehouseEntry, ...prevEntries];
-        return updatedEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sắp xếp mới nhất lên đầu
+        return updatedEntries.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
       });
       
-      // Cập nhật danh sách đã lọc
       setFilteredEntries(prevEntries => [response.warehouseEntry, ...prevEntries].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       
       setShowAddEntry(false);
@@ -107,13 +102,11 @@ const NhapKho = () => {
     }
   };
 
-  // Hàm để mở modal chi tiết
   const showDetail = (entry) => {
-    setSelectedEntry(entry);
-    setShowDetailModal(true);
+    setSelectedEntry(entry); 
+    setIsModalVisible(true); 
   };
 
-  // Hàm lọc danh sách theo mã phiếu
   const handleSearch = (value) => {
     setSearchTerm(value);
     const filtered = warehouseEntries.filter(entry => 
@@ -124,14 +117,15 @@ const NhapKho = () => {
 
   return (
     <div>
-        <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí nhập kho</Title>
+      <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí nhập kho</Title>
       {showAddEntry ? (
         <WarehouseEntryForm 
           onCancel={() => setShowAddEntry(false)} 
           onCreate={handleAddEntry} 
           suppliers={suppliers} 
           products={products} 
-          enteredBy={enteredBy} 
+          enteredBy={enteredBy}
+          onEntryCreated={fetchWarehouseEntries}  
         />
       ) : (
         <>
@@ -139,7 +133,7 @@ const NhapKho = () => {
             <Input
               placeholder="Tìm kiếm phiếu nhập kho"
               value={searchTerm}
-              onChange={(e) => handleSearch(e.target.value)} // Gọi hàm lọc khi thay đổi
+              onChange={(e) => handleSearch(e.target.value)}
               style={{ width: 500 }}
             />
             <Button type="primary" onClick={() => setShowAddEntry(true)}
@@ -211,15 +205,17 @@ const NhapKho = () => {
 
           {error && <p style={{ color: 'red' }}>{error}</p>}
 
-          {/* Hiển thị modal chi tiết */}
-          <WarehouseEntryDetailModal 
-                visible={showDetailModal} 
-                onCancel={() => setShowDetailModal(false)} 
-                entry={selectedEntry} 
-                getSupplierNameById={getSupplierNameById} 
-                getUserNameById={getUserNameById} 
-                products={products}
-              />
+          <WarehouseEntryDetailModal
+              visible={isModalVisible}
+              onCancel={() => {
+                setIsModalVisible(false);
+                setSelectedEntry(null);
+              }}
+              entry={selectedEntry}
+              getSupplierNameById={getSupplierNameById}
+              getUserNameById={getUserNameById}
+              products={products}
+            />
         </>
       )}
     </div>

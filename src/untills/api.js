@@ -56,7 +56,6 @@ export const postRegister = async (data) => {
           resolve(err)
         })
     })
-  
   }
   //token và session
   export const removeCookie = async () => {
