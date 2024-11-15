@@ -198,10 +198,16 @@ const AuditForm = ({ onClose }) => {
         form.resetFields();
         setEntryProducts([{ productCode: '', unit: '', actualQuantity: 0, name: '', stockQuantity: 0, productId: '', reason: '' }]);
         onClose(newAdjustment);
+        
     } catch (error) {
+      if (error.response?.status === 400 && error.response.data.message) {
+        message.error(error.response.data.message);
+      } else {
         console.error("Lỗi khi lưu phiếu kiểm kê:", error.response?.data?.message || error.message);
         message.error('Lỗi khi lưu phiếu kiểm kê.');
+      }
     }
+    
 };
 
 

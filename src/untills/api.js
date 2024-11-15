@@ -1,8 +1,10 @@
 import axios from "axios";
+// const needsContentType = true;
 const config = {
   withCredentials: true,
   headers: {
     Authorization: `Bearer ${localStorage.getItem('token')}`, 
+    //  ...(needsContentType && { "Content-Type": "application/json" }),
   
   },
 };
@@ -466,19 +468,28 @@ export const createBill = async (userId, paymentMethod) => {
 //     throw error;
 //   }
 // };
-export const createDirectSaleBill = async ({ paymentMethod, items, customerId, voucherCode ,createBy}) => {
+export const createDirectSaleBill = async ({ paymentMethod, items, customerId, voucherCodes, createBy }) => {
   try {
     const response = await axios.post(
       `${API_URL}/bill/create-buy-directly`,
-      { paymentMethod, items, customerId, voucherCode,createBy },
-      config
+      { paymentMethod, items, customerId, voucherCodes, createBy },
+      {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json",
+        },
+      }
     );
     return response.data;
   } catch (error) {
-    console.error("Lỗi từ createDirectSaleBill:", error.response?.data);
+    console.error("Lỗi từ createDirectSaleBill:", error.response?.data || error.message);
     throw error;
   }
 };
+
+
+
 
 //lấy toàn bộ bill của người dùng
 export const getAllBills = async () => {

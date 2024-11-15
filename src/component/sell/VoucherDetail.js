@@ -29,6 +29,8 @@ const VoucherModal = ({ vouchers }) => {
     }
   };
 
+
+
   return (
     <div
       style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}
@@ -100,11 +102,11 @@ const VoucherModal = ({ vouchers }) => {
                     <div style={{ marginTop: "5px" }}>
                       <Text type="secondary">
                         Mua {voucher.conditions?.quantityX ?? 0}{" "}
-                        {voucher.conditions?.unitXName || "N/A"}{" "}
+                        {voucher.conditions?.unitX || "N/A"}{" "}
                         {voucher.conditions?.productXName || "N/A"}
                         <br />
                         Tặng {voucher.conditions?.quantityY ?? 0}{" "}
-                        {voucher.conditions?.unitYName || "N/A"}{" "}
+                        {voucher.conditions?.unitY || "N/A"}{" "}
                         {voucher.conditions?.productYName || "N/A"}
                       </Text>
                     </div>
