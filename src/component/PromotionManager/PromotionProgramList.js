@@ -110,6 +110,17 @@ const PromotionProgramList = () => {
   };
 
   const handleVoucherDelete = async (voucherId, promotionProgramId) => {
+    // Tìm chương trình khuyến mãi tương ứng với voucher
+    const promotionProgram = promotionPrograms.find(
+      (program) => program._id === promotionProgramId
+    );
+
+    // Kiểm tra nếu chương trình đang hoạt động
+    if (promotionProgram && promotionProgram.isActive) {
+      message.error("Không thể xóa khuyến mãi vì chương trình khuyến mãi đang hoạt động");
+      return;
+    }
+
     try {
       await deleteVoucher(voucherId);
       message.success("Khuyến mãi đã được xóa");
@@ -130,7 +141,7 @@ const PromotionProgramList = () => {
       setIsEditVoucherModalVisible(true);
     } else {
       message.error(
-        "Chỉ có thể chỉnh sửa voucher khi chương trình khuyến mãi đang ngưng hoạt động"
+        "Không thể chỉnh sửa khuyến mãi vì chương trình khuyến mãi đang hoạt động"
       );
     }
   };
@@ -392,6 +403,7 @@ const PromotionProgramList = () => {
         onSubmit={handleVoucherSubmit}
         editingVoucher={editingVoucher}
       />
+      
     </div>
   );
 };

@@ -323,7 +323,7 @@ function CustomerReport() {
   return (
     <div style={{ paddingTop: "50px" }}>
       <div className="statistics-container">
-        <h2>Thống kê doanh thu khách hàng</h2>
+      <h2 style={{fontWeight: "bold", padding: "5px" }}>Thống kê doanh thu khách hàng</h2>
         <Row gutter={16} style={{ marginTop: 20 }}>
           <Col>
             <RangePicker

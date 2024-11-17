@@ -182,44 +182,49 @@ const Sell = () => {
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 
-
     const filterApplicableVouchers = () => {
       const voucherList = Array.isArray(vouchers)
         ? vouchers.filter((voucher) => voucher.isActive && !voucher.isDeleted)
         : [];
     
-      const totalAmount = cart.reduce(
-        (acc, item) => acc + item.price * item.quantity,
-        0
-      );
+        const totalAmount = cart
+        .filter((item) => !item.isGift) // Loại bỏ sản phẩm khuyến mãi
+        .reduce((acc, item) => acc + item.price * item.quantity, 0);
     
-      const applicableVouchers = [];
+    
+      let bestVoucher = null;
+      let maxDiscount = 0;
+    
+      // Lọc qua tất cả voucher để tìm voucher có mức giảm giá tốt nhất
+      voucherList.forEach((voucher) => {
+        const discount = calculateVoucherDiscount(voucher, totalAmount);
+    
+        if (discount > maxDiscount) {
+          maxDiscount = discount;
+          bestVoucher = voucher;
+        }
+      });
+    
+      // Áp dụng voucher tốt nhất (nếu có)
+      const applicableVouchers = bestVoucher ? [bestVoucher] : [];
+      setSelectedVouchers(applicableVouchers);
+    
+      // Tính tổng giảm giá
+      setDiscountAmount(maxDiscount);
+    
+      // Quà tặng (nếu có Buy X Get Y)
       const buyXGetYResults = [];
       const updatedCart = [...cart];
     
       voucherList.forEach((voucher) => {
-        let isApplicable = false;
-    
-        // Percentage Discount
-        if (voucher.type === "PercentageDiscount" && voucher.conditions) {
-          if (totalAmount >= voucher.conditions.minOrderValue) {
-            isApplicable = true;
-          }
-        }
-        // Fixed Discount
-        else if (voucher.type === "FixedDiscount" && voucher.conditions) {
-          if (totalAmount >= voucher.conditions.minOrderValue) {
-            isApplicable = true;
-          }
-        }
-        // Buy X Get Y
-        else if (voucher.type === "BuyXGetY" && voucher.conditions) {
+        if (voucher.type === "BuyXGetY" && voucher.conditions) {
           const buyCondition = voucher.conditions;
     
           cart.forEach((cartItem) => {
             if (
               cartItem.productId === buyCondition.productXId &&
-              cartItem.unit === buyCondition.unitX
+              cartItem.unit === buyCondition.unitX &&
+              !cartItem.isGift
             ) {
               const applicableQuantity = Math.floor(
                 cartItem.quantity / buyCondition.quantityX
@@ -237,53 +242,9 @@ const Sell = () => {
             }
           });
         }
-    
-        if (isApplicable) {
-          applicableVouchers.push(voucher);
-        }
       });
     
-      // Filter only the most beneficial FixedDiscount voucher if multiple apply
-      const bestFixedDiscountVoucher = applicableVouchers
-        .filter((voucher) => voucher.type === "FixedDiscount")
-        .reduce((best, current) => {
-          if (!best) return current;
-          return current.conditions.minOrderValue > best.conditions.minOrderValue
-            ? current
-            : best;
-        }, null);
-    
-      if (bestFixedDiscountVoucher) {
-        applicableVouchers.splice(
-          applicableVouchers.findIndex((v) => v === bestFixedDiscountVoucher),
-          1
-        );
-        applicableVouchers.unshift(bestFixedDiscountVoucher);
-      }
-    
-      let bestVoucher = null;
-      if (applicableVouchers.length > 0) {
-        bestVoucher = applicableVouchers.reduce((best, current) => {
-          const currentDiscount = calculateVoucherDiscount(current, totalAmount);
-          const bestDiscount = calculateVoucherDiscount(best, totalAmount);
-          return currentDiscount > bestDiscount ? current : best;
-        });
-      }
-    
-      const newSelectedVouchers = [
-        ...(bestVoucher ? [bestVoucher] : []),
-        ...buyXGetYResults.map((result) => result.voucher),
-      ];
-    
-      setSelectedVouchers(newSelectedVouchers);
-    
-      const newDiscountAmount = bestVoucher
-        ? calculateVoucherDiscount(bestVoucher, totalAmount)
-        : 0;
-    
-      setDiscountAmount(newDiscountAmount);
-    
-      // Add gifts to the cart
+      // Thêm quà tặng vào giỏ hàng
       buyXGetYResults.forEach((result) => {
         const giftProductDetails = findGiftProductDetails(
           result.giftProductId,
@@ -294,7 +255,6 @@ const Sell = () => {
           const effectiveQuantity = result.totalGiftQuantity * (result.conversionValue || 1);
     
           if (giftProductDetails.quantity >= effectiveQuantity) {
-            // Còn đủ hàng để làm quà tặng
             const giftIndex = updatedCart.findIndex(
               (item) =>
                 item.productId === result.giftProductId &&
@@ -326,9 +286,6 @@ const Sell = () => {
             console.warn(
               `Quà tặng không đủ tồn kho: ${result.giftProductId} (Yêu cầu: ${effectiveQuantity}, Có sẵn: ${giftProductDetails.quantity})`
             );
-            setSelectedVouchers((prev) =>
-              prev.filter((voucher) => voucher.code !== result.voucher.code)
-            ); // Remove the voucher if gift is not available
           }
         } else {
           console.error(
@@ -337,7 +294,7 @@ const Sell = () => {
         }
       });
     
-      // Chỉ cập nhật cart nếu thực sự có thay đổi
+      // Cập nhật giỏ hàng nếu thay đổi
       if (JSON.stringify(updatedCart) !== JSON.stringify(cart)) {
         setCart(updatedCart);
       }
@@ -345,25 +302,21 @@ const Sell = () => {
     
     
     
+    const calculateVoucherDiscount = (voucher, totalAmount) => {
+      if (voucher.type === "PercentageDiscount" && voucher.conditions) {
+        const discount = Math.min(
+          (totalAmount * voucher.conditions.discountPercentage) / 100,
+          voucher.conditions.maxDiscountAmount || totalAmount
+        );
+        return totalAmount >= voucher.conditions.minOrderValue ? discount : 0;
+      } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
+        return totalAmount >= voucher.conditions.minOrderValue
+          ? voucher.conditions.discountAmount
+          : 0;
+      }
+      return 0;
+    };
     
-    
-  
-const calculateVoucherDiscount = (voucher, totalAmount) => {
-  if (voucher.type === "PercentageDiscount" && voucher.conditions) {
-    const discount = Math.min(
-      (totalAmount * voucher.conditions.discountPercentage) / 100,
-      voucher.conditions.maxDiscountAmount || totalAmount
-    );
-    return discount;
-  } else if (voucher.type === "FixedDiscount" && voucher.conditions) {
-  
-    if (totalAmount >= voucher.conditions.minOrderValue) {
-      return Math.min(voucher.conditions.discountAmount, totalAmount);
-    }
-    return 0; 
-  }
-  return 0;
-};
 
     
     useEffect(() => {
@@ -546,20 +499,21 @@ const calculateVoucherDiscount = (voucher, totalAmount) => {
         {/* Cart Table */}
         <div className="flex-grow-1 overflow-auto">
           <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Mã SP</th>
-                <th>Tên sản phẩm</th>
-                <th>Đơn vị</th>
-                <th>Barcode</th>
-                <th>Đơn giá</th>
-                <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th>Ghi chú</th>
-                <th></th>
-              </tr>
-            </thead>
+          <thead>
+            <tr>
+              <th style={{ width: "50px" }}>STT</th>
+              <th style={{ width: "80px" }}>Mã SP</th>
+              <th style={{ width: "150px" }}>Tên sản phẩm</th>
+              <th style={{ width: "80px" }}>Đơn vị</th>
+              <th style={{ width: "120px" }}>Barcode</th>
+              <th style={{ width: "100px" }}>Đơn giá</th>
+              <th style={{ width: "80px" }}>Số lượng</th>
+              <th style={{ width: "80px" }}>Thành tiền</th>
+              <th style={{ width: "100px" }}>Ghi chú</th>
+              <th style={{ width: "50px" }}></th>
+            </tr>
+          </thead>
+
             <tbody>
               {cart.map((item, index) => (
                 <tr key={`${item.code}-${item.unit}-${index}`}>

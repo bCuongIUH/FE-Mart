@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Input, DatePicker, Select, Button, Space, Tag, Modal } from 'antd';
-import { getBillOffline } from '../../../untills/api';
-import { getAllEmployee } from '../../../untills/employeesApi';
-import { getAllCustomers } from '../../../untills/customersApi';
+import { getBillOffline } from '../../untills/api';
+import { getAllEmployee } from '../../untills/employeesApi';
+import { getAllCustomers } from '../../untills/customersApi';
 import { EyeOutlined, PrinterOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import dayjs from 'dayjs';
@@ -28,17 +28,20 @@ const ManagerBill = () => {
   });
   const invoiceRef = useRef();
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const billData = (await getBillOffline()).map((bill) => ({
-          ...bill,
-          createdAt: dayjs(bill.createdAt), // Sử dụng Day.js
-        }));
-    
+        const billData = (await getBillOffline())
+          .map((bill) => ({
+            ...bill,
+            createdAt: dayjs(bill.createdAt), 
+          }))
+          .sort((a, b) => b.createdAt.valueOf() - a.createdAt.valueOf()); 
+  
         const employeeData = await getAllEmployee();
         const customerData = await getAllCustomers();
-    
+  
         setBills(billData);
         setFilteredBills(billData);
         setEmployees(employeeData);
@@ -47,10 +50,10 @@ const ManagerBill = () => {
         console.error('Lỗi khi tải dữ liệu:', error.message);
       }
     };
-    
   
     fetchData();
   }, []);
+  
   
 
   useEffect(() => {
@@ -85,7 +88,7 @@ const ManagerBill = () => {
   const isDateInRange = (date, range) => {
     if (!range || range.length !== 2) return true;
     const [startDate, endDate] = range;
-    const billDate = dayjs(date); // Chuyển sang Day.js
+    const billDate = dayjs(date);
     return billDate.isBetween(dayjs(startDate), dayjs(endDate), 'day', '[]');
   };
   
@@ -110,8 +113,18 @@ const ManagerBill = () => {
     const customer = customers.find(cust => cust._id === customerId);
     return customer ? customer.fullName : 'Khách vãng lai';
   };
+  const getCustomerPhone = (customerId) => {
+    const customerPhone = customers.find(cust => cust._id === customerId);
+    return customerPhone ? customerPhone.phoneNumber : 'Chưa cập nhật';
+  };
+
 
   const handlePrint = () => {
+    if (!invoiceRef.current) {
+      console.error("Không thể tìm thấy nội dung hóa đơn để in.");
+      return;
+    }
+  
     const printContent = invoiceRef.current.innerHTML;
     const printWindow = window.open('', '_blank', 'width=800,height=600');
     printWindow.document.open();
@@ -138,6 +151,7 @@ const ManagerBill = () => {
     `);
     printWindow.document.close();
   };
+  
 
   const columns = [
     {
@@ -166,6 +180,13 @@ const ManagerBill = () => {
       key: 'customer',
       width: 150, 
       render: (customer) => getCustomerName(customer),
+    },
+    {
+      title: 'SĐT KHÁCH HÀNG',
+      dataIndex: 'customer',
+      key: 'customer',
+      width: 150, 
+      render: (customer) => getCustomerPhone(customer),
     },
     {
       title: 'NGÀY LẬP',
@@ -201,14 +222,17 @@ const ManagerBill = () => {
             icon={<EyeOutlined />}
             onClick={() => handleViewDetail(record)}
           />
-          <Button
+         <Button
             type="text"
             icon={<PrinterOutlined />}
             onClick={() => {
-              setSelectedBill(record);
-              setTimeout(() => handlePrint(), 0);
+              setSelectedBill(record); // Gán bill hiện tại
+              setTimeout(() => {
+                if (record) handlePrint();
+              }, 0); 
             }}
           />
+
         </Space>
       ),
     },
@@ -275,7 +299,7 @@ const ManagerBill = () => {
               options={[
                 { value: 'all', label: 'Tất cả' },
                 { value: 'HoanThanh', label: 'Hoàn Thành' },
-                { value: 'ChuaThanhToan', label: 'Chưa Thanh Toán' },
+                { value: 'ChuaThanhToan', label: 'Hoàn Trả' },
               ]}
             />
           </div>
@@ -326,9 +350,10 @@ const ManagerBill = () => {
               <thead>
                 <tr>
                   <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Tên sản phẩm</th>
-                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
                   <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Đơn vị</th>
-                  <th style={{ border: '1px dashed #ddd', padding: '8px'}}>Giá</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Số lượng</th>
+                  <th style={{ border: '1px dashed #ddd', padding: '8px'}}>Đơn giá</th>
+                  
                   <th style={{ border: '1px dashed #ddd', padding: '8px' }}>Thành tiền</th>
                 </tr>
               </thead>
@@ -336,9 +361,11 @@ const ManagerBill = () => {
                 {selectedBill.items.map((item, index) => (
                   <tr key={index}>
                     <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.product.name}</td>
-                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.quantity}</td>
+                   
                     <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.unit}</td>
+                    <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.quantity}</td>
                     <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.currentPrice.toLocaleString()} VND</td>
+                    
                     <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{(item.currentPrice * item.quantity).toLocaleString()} VND</td>
                   </tr>
                 ))}

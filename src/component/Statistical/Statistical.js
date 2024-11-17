@@ -350,7 +350,7 @@ function StatisticsChart() {
   return (
     <div style={{ paddingTop: "50px" }}>
       <div className="statistics-container">
-        <h2>Thống kê doanh thu</h2>
+        <h2 style={{fontWeight: "bold", padding: "5px" }}>Thống kê doanh thu</h2>
         <Row gutter={[16, 16]}>
           <Col span={8}>
             <Card

@@ -54,9 +54,13 @@ const Transaction = () => {
             case 'huy':
                 return 'Hủy';
             case 'ban':
+                
                 return 'Bán hàng';
+            case 'khuyenmai':
+                return 'Khuyến mãi';
             case 'nhap':
                 return 'Nhập kho';
+           
             default:
                 return type;
         }
@@ -154,6 +158,7 @@ const Transaction = () => {
                     <Option value="huy">Hủy</Option>
                     <Option value="ban">Bán hàng</Option>
                     <Option value="nhap">Nhập kho</Option>
+                    <Option value="khuyenmai">Khuyến mãi</Option>
                 </Select>
             </Menu.Item>
         </Menu>

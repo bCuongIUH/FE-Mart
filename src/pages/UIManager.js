@@ -36,7 +36,7 @@ import UserProfile from '../component/profile/UserProfile';
 import CustomerList from '../component/Customers/customerList';
 import CustomerReport from '../component/Statistical/CustomerReport';
 import Sell from '../component/sell/Sell';
-import BillManagement from '../component/shopping/item/BillManagement';
+import BillManagement from '../component/sell/BillManagement';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -148,9 +148,9 @@ const WarehouseManager = () => {
           onOpenChange={handleOpenChange} // Handles open state of SubMenus
         >
           <SubMenu key="sub1" icon={<ShoppingCartOutlined />} title="Quản lí bán hàng">
-            <Menu.Item key="1" onClick={() => handleNavigate(<SellPage />)}>Bán hàng</Menu.Item>
-            <Menu.Item key="20" onClick={() => handleNavigate(<Sell />)}>Giao diện bán test</Menu.Item>
-            <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart />)}>Hóa đơn bán hàng</Menu.Item>
+            {/* <Menu.Item key="1" onClick={() => handleNavigate(<SellPage />)}>Bán hàng</Menu.Item> */}
+            <Menu.Item key="1" onClick={() => handleNavigate(<Sell />)}>Bán hàng</Menu.Item>
+            <Menu.Item key="2" onClick={() => handleNavigate(<BillManagement />)}>Hóa đơn bán hàng</Menu.Item>
           </SubMenu>
 
           <SubMenu key="sub2" icon={<ProductOutlined />} title="Quản lí sản phẩm">
@@ -183,7 +183,7 @@ const WarehouseManager = () => {
 
           <SubMenu key="sub7" icon={<EyeOutlined />} title="Theo dõi đơn hàng">
             <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking />)}>Theo dõi đơn hàng</Menu.Item>
-            <Menu.Item key="17" onClick={() => handleNavigate(<BillManagement/>)}>Báo cáo sản phẩm</Menu.Item>
+            <Menu.Item key="17" onClick={() => handleNavigate()}>Báo cáo sản phẩm</Menu.Item>
           </SubMenu>
 
           <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">
