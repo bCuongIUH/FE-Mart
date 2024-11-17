@@ -35,6 +35,7 @@ import { getAllEmployee, getEmployeeById } from '../untills/employeesApi';
 import UserProfile from '../component/profile/UserProfile';
 import CustomerList from '../component/Customers/customerList';
 import CustomerReport from '../component/Statistical/CustomerReport';
+import Sell from '../component/sell/Sell';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -147,6 +148,7 @@ const WarehouseManager = () => {
         >
           <SubMenu key="sub1" icon={<ShoppingCartOutlined />} title="Quản lí bán hàng">
             <Menu.Item key="1" onClick={() => handleNavigate(<SellPage />)}>Bán hàng</Menu.Item>
+            <Menu.Item key="20" onClick={() => handleNavigate(<Sell />)}>Giao diện bán test</Menu.Item>
             <Menu.Item key="2" onClick={() => handleNavigate(<CompletedCart />)}>Hóa đơn bán hàng</Menu.Item>
           </SubMenu>
 

@@ -470,6 +470,7 @@ export const createBill = async (userId, paymentMethod) => {
 // };
 export const createDirectSaleBill = async ({ paymentMethod, items, customerId, voucherCodes, createBy }) => {
   try {
+    console.log("Sending payload:", { paymentMethod, items, customerId, voucherCodes, createBy });
     const response = await axios.post(
       `${API_URL}/bill/create-buy-directly`,
       { paymentMethod, items, customerId, voucherCodes, createBy },
@@ -481,9 +482,15 @@ export const createDirectSaleBill = async ({ paymentMethod, items, customerId, v
         },
       }
     );
+    console.log("Response from server:", response.data);
     return response.data;
   } catch (error) {
-    console.error("Lỗi từ createDirectSaleBill:", error.response?.data || error.message);
+    console.error("Detailed error from createDirectSaleBill:", {
+      message: error.message,
+      responseData: error.response?.data,
+      status: error.response?.status,
+      headers: error.response?.headers,
+    });
     throw error;
   }
 };

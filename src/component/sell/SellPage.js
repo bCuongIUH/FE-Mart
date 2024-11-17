@@ -55,6 +55,8 @@ const ProductPrices = () => {
   const { user } = useContext(AuthContext);
   const invoiceRef = useRef(null);
 
+  
+
   useEffect(() => {
     const fetchEmployeeId = async () => {
       if (user?._id) {
@@ -129,17 +131,20 @@ const ProductPrices = () => {
     setIsRemoving(false);
   };
 
+
   const filterApplicableVouchers = () => {
     const voucherList = Array.isArray(vouchers)
       ? vouchers.filter((voucher) => voucher.isActive && !voucher.isDeleted)
       : [];
+    
     const totalAmount = cart.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
   
     const applicableVouchers = [];
-    const buyXGetYVouchers = [];
+    let bestBuyXGetYVoucher = null; // Voucher tặng quà tốt nhất
+    let maxGiftQuantity = 0; // Số lượng quà tặng lớn nhất
   
     voucherList.forEach((voucher) => {
       let isApplicable = false;
@@ -159,12 +164,25 @@ const ProductPrices = () => {
         const targetProduct = cart.find(
           (item) =>
             item.productId === buyCondition.productXId &&
-            item.quantity >= buyCondition.quantityX &&
             item.unit === buyCondition.unitX
         );
   
         if (targetProduct) {
-          buyXGetYVouchers.push(voucher);
+          const applicableQuantity = Math.floor(
+            targetProduct.quantity / buyCondition.quantityX
+          );
+  
+          if (applicableQuantity > 0) {
+            const totalGiftQuantity = applicableQuantity * buyCondition.quantityY;
+            // Chỉ chọn voucher có số lượng quà tặng lớn nhất
+            if (totalGiftQuantity > maxGiftQuantity) {
+              maxGiftQuantity = totalGiftQuantity;
+              bestBuyXGetYVoucher = {
+                voucher,
+                totalGiftQuantity,
+              };
+            }
+          }
         }
       }
   
@@ -174,31 +192,44 @@ const ProductPrices = () => {
     });
   
     setApplicableVouchers(applicableVouchers);
-    
-    // Apply BuyXGetY vouchers
-    buyXGetYVouchers.forEach(voucher => {
-      const giftExists = cart.some(
-        (item) =>
-          item.productId === voucher.conditions.productYId &&
-          item.isGift === true
+  
+    // Nếu có voucher BuyXGetY tốt nhất, cập nhật quà tặng vào giỏ hàng
+    if (bestBuyXGetYVoucher) {
+      const { voucher, totalGiftQuantity } = bestBuyXGetYVoucher;
+      const giftProductId = voucher.conditions.productYId;
+      const giftProductName = voucher.conditions.productYName;
+      const giftUnit = voucher.conditions.unitY;
+  
+      const giftIndex = cart.findIndex(
+        (item) => item.productId === giftProductId && item.isGift === true
       );
   
-      if (!giftExists) {
+      if (giftIndex >= 0) {
+        // Nếu quà tặng đã tồn tại, cập nhật số lượng
+        setCart((prevCart) =>
+          prevCart.map((item, index) =>
+            index === giftIndex
+              ? { ...item, quantity: totalGiftQuantity }
+              : item
+          )
+        );
+      } else {
+        // Nếu chưa có quà tặng, thêm mới
         setCart((prevCart) => [
           ...prevCart,
           {
-            productId: voucher.conditions.productYId,
-            productName: voucher.conditions.productYName,
-            unit: voucher.conditions.unitY,
+            productId: giftProductId,
+            productName: giftProductName,
+            unit: giftUnit,
             price: 0,
-            quantity: voucher.conditions.quantityY,
+            quantity: totalGiftQuantity,
             isGift: true,
           },
         ]);
       }
-    });
+    }
   
-    // Automatically apply the best discount voucher
+    // Áp dụng voucher giảm giá tốt nhất
     if (applicableVouchers.length > 0) {
       const bestVoucher = applicableVouchers.reduce((best, current) => {
         const currentDiscount = calculateVoucherDiscount(current, totalAmount);
@@ -206,15 +237,20 @@ const ProductPrices = () => {
         return currentDiscount > bestDiscount ? current : best;
       });
   
-      setAppliedVouchers([bestVoucher, ...buyXGetYVouchers]);
+      setAppliedVouchers([
+        bestVoucher,
+        ...(bestBuyXGetYVoucher ? [bestBuyXGetYVoucher.voucher] : []),
+      ]);
       const totalDiscount = calculateVoucherDiscount(bestVoucher, totalAmount);
       setDiscountAmount(totalDiscount);
-      message.success(`Áp dụng mã khuyến mãi ${bestVoucher.code} thành công!`);
     } else {
-      setAppliedVouchers(buyXGetYVouchers);
+      setAppliedVouchers(bestBuyXGetYVoucher ? [bestBuyXGetYVoucher.voucher] : []);
       setDiscountAmount(0);
     }
   };
+  
+  
+  
 
   const calculateVoucherDiscount = (voucher, totalAmount) => {
     if (voucher.type === "PercentageDiscount" && voucher.conditions) {
@@ -299,7 +335,7 @@ const ProductPrices = () => {
       voucherCodes: appliedVouchers.map((voucher) => voucher.code), // Truyền mảng voucherCodes
       createBy: employeeId,
     };
-  
+  //  price: giftProductDetails.price || 0,
     console.log("Payload gửi đi:", payload);
   
     try {
@@ -609,10 +645,12 @@ const ProductPrices = () => {
           Thanh toán
         </Button>
 
+
         <Modal
           visible={isCheckoutModalOpen}
           onCancel={() => setIsCheckoutModalOpen(false)}
           footer={null}
+          centered
         >
           <div ref={invoiceRef}>
             <div style={{ textAlign: "center", marginBottom: "20px" }}>
@@ -734,6 +772,8 @@ const ProductPrices = () => {
             </Button>
           </div>
         </Modal>
+
+
       </div>
     </div>
   );
