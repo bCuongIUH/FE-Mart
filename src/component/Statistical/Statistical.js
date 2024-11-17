@@ -63,6 +63,7 @@ function StatisticsChart() {
   const [dailyRevenue, setDailyRevenue] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [employees, setEmployees] = useState([]);
+console.log(dailyRevenue);
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -213,8 +214,8 @@ function StatisticsChart() {
       "Mã NV",
       "Tên NV",
       "Ngày",
-      "Chiết khấu",
       "Doanh số trước CK",
+      "Chiết khấu",
       "Doanh số sau CK",
     ]);
     headerRow.font = { name: "Times New Roman", bold: true, size: 14 };
@@ -233,7 +234,7 @@ function StatisticsChart() {
     worksheet.getColumn(2).width = 15;
     worksheet.getColumn(3).width = 25;
     worksheet.getColumn(4).width = 15;
-    worksheet.getColumn(5).width = 20;
+    worksheet.getColumn(5).width = 25;
     worksheet.getColumn(6).width = 25;
     worksheet.getColumn(7).width = 25;
 
@@ -244,8 +245,8 @@ function StatisticsChart() {
         "",
         "",
         dayData.date,
+        dayData.totalAmount ,
         dayData.discountAmount,
-        dayData.totalAmount,
         dayData.revenueAfterDiscount,
       ]);
       totalRow.font = { name: "Times New Roman", bold: true, size: 12 };
@@ -261,7 +262,7 @@ function StatisticsChart() {
           employee.employeeName,
           "",
           employee.discountAmount,
-          employee.totalAmount,
+          employee.totalAmount ,
           employee.revenueAfterDiscount,
         ]);
         empRow.font = { name: "Times New Roman", size: 12 };
@@ -281,7 +282,7 @@ function StatisticsChart() {
       "",
       "",
       dailyRevenue.reduce((sum, item) => sum + item.discountAmount, 0),
-      dailyRevenue.reduce((sum, item) => sum + item.totalAmount, 0),
+      dailyRevenue.reduce((sum, item) => sum + item.totalAmount , 0),
       dailyRevenue.reduce((sum, item) => sum + item.revenueAfterDiscount, 0),
     ]);
     finalRow.font = { name: "Times New Roman", bold: true, size: 14 };
@@ -295,20 +296,22 @@ function StatisticsChart() {
     message.success("Xuất dữ liệu ra Excel thành công!");
   };
 
+
   const columns = [
     { title: "Ngày", dataIndex: "date", key: "date" },
     { title: "Mã Nhân Viên", dataIndex: "employeeCode", key: "employeeCode" },
     { title: "Tên Nhân Viên", dataIndex: "employeeName", key: "employeeName" },
-    {
-      title: "Chiết Khấu",
-      dataIndex: "discountAmount",
-      key: "discountAmount",
-      render: (text) => formatCurrency(text),
-    },
+    
     {
       title: "Doanh Thu Trước CK",
       dataIndex: "totalAmount",
       key: "totalAmount",
+      render: (text) => formatCurrency(text),
+    },
+    {
+      title: "Chiết Khấu",
+      dataIndex: "discountAmount",
+      key: "discountAmount",
       render: (text) => formatCurrency(text),
     },
     {
