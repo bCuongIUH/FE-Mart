@@ -56,12 +56,12 @@ function CustomerReport() {
         selectedCustomer
       );
 
-      // Sort data first by customer ID, then by date in ascending order
+      // Sort data first by customer phone number, then by date in ascending order
       data = data.sort((a, b) => {
-        if (a.customerId === b.customerId) {
+        if (a.phoneNumber === b.phoneNumber) {
           return new Date(a.date) - new Date(b.date);
         }
-        return a.customerId > b.customerId ? 1 : -1;
+        return a.phoneNumber > b.phoneNumber ? 1 : -1;
       });
 
       setCustomerStatistics(processDataForRowSpan(data));
@@ -72,17 +72,17 @@ function CustomerReport() {
   };
 
   const processDataForRowSpan = (data) => {
-    let lastCustomerId = null;
+    let lastPhoneNumber = null;
     let lastDate = null;
     let customerIndex = 1;
 
     return data.map((stat, index) => {
-      if (stat.customerId !== lastCustomerId) {
+      if (stat.phoneNumber !== lastPhoneNumber) {
         stat.rowSpanCustomer = data.filter(
-          (item) => item.customerId === stat.customerId
+          (item) => item.phoneNumber === stat.phoneNumber
         ).length;
         stat.stt = customerIndex++;
-        lastCustomerId = stat.customerId;
+        lastPhoneNumber = stat.phoneNumber;
         lastDate = null; // Reset lastDate for new customer
       } else {
         stat.rowSpanCustomer = 0;
@@ -91,7 +91,7 @@ function CustomerReport() {
       if (stat.date !== lastDate || stat.rowSpanCustomer > 0) {
         stat.rowSpanDate = data.filter(
           (item) =>
-            item.date === stat.date && item.customerId === stat.customerId
+            item.date === stat.date && item.phoneNumber === stat.phoneNumber
         ).length;
         lastDate = stat.date;
       } else {
@@ -104,7 +104,7 @@ function CustomerReport() {
 
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet("DOANH SỐ THEO KHÁCH HÀNG");
+    const worksheet = workbook.addWorksheet("DOANH SỐ THEO KHÁCH HÀNG");
 
     // Store title
     worksheet.mergeCells("A1:L1");
@@ -132,7 +132,7 @@ function CustomerReport() {
 
     // Report title
     worksheet.mergeCells("A4:L4");
-    worksheet.getCell("A4").value = "DOANH SỐ THEO KHÁCH HÀNG";
+    worksheet.getCell("A4").value = "DOANH SỐ THEO KHÁCH HÀNG";
     worksheet.getCell("A4").font = {
       name: "Times New Roman",
       bold: true,
@@ -180,7 +180,7 @@ function CustomerReport() {
     const headerRow = worksheet.addRow([
       "STT",
       "Ngày",
-      "Mã KH",
+      "Số điện thoại",
       "Tên KH",
       "Số nhà",
       "Phường/Xã",
@@ -211,17 +211,17 @@ function CustomerReport() {
 
     // Data rows with conditional STT and Ngày display
     let customerCounter = 1;
-    let lastCustomerId = null;
+    let lastPhoneNumber = null;
     let lastDate = null;
 
     customerStatistics.forEach((stat) => {
-      const showCustomerNumber = stat.customerId !== lastCustomerId;
+      const showCustomerNumber = stat.phoneNumber !== lastPhoneNumber;
       const showDate = stat.date !== lastDate || showCustomerNumber;
 
       const row = worksheet.addRow([
         showCustomerNumber ? customerCounter++ : "", // Show STT only once per customer
         showDate ? stat.date : "", // Show date only once per unique date per customer
-        stat.customerId,
+        stat.phoneNumber,
         stat.customerName,
         stat.address?.houseNumber || "Chưa cập nhật",
         stat.address?.ward || "Chưa cập nhật",
@@ -244,7 +244,7 @@ function CustomerReport() {
       row.getCell(11).numFmt = "#,##0"; // Chiết Khấu
       row.getCell(12).numFmt = "#,##0"; // Tổng Sau CK
 
-      lastCustomerId = stat.customerId;
+      lastPhoneNumber = stat.phoneNumber;
       lastDate = stat.date;
     });
 
@@ -273,7 +273,7 @@ function CustomerReport() {
         rowSpan: record.rowSpanDate,
       }),
     },
-    { title: "Mã Khách Hàng", dataIndex: "customerId", key: "customerId" },
+    { title: "Số điện thoại", dataIndex: "phoneNumber", key: "phoneNumber" },
     { title: "Tên Khách Hàng", dataIndex: "customerName", key: "customerName" },
     {
       title: "Số nhà",
@@ -299,7 +299,6 @@ function CustomerReport() {
       key: "province",
       render: (text) => text || "Chưa cập nhật",
     },
-
     { title: "Danh mục", dataIndex: "category", key: "category" },
     {
       title: "Tổng Số Tiền",
@@ -353,9 +352,8 @@ function CustomerReport() {
                     <span style={{ fontWeight: "bold" }}>
                       {customer.fullName}
                     </span>
-                    <span>Mã KH: {customer.customerCode}</span>
-                    <span>Email: {customer.email}</span>
                     <span>Số điện thoại: {customer.phoneNumber}</span>
+                    <span>Email: {customer.email}</span>
                   </div>
                 </Option>
               ))}

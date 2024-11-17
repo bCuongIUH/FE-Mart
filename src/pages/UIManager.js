@@ -36,6 +36,7 @@ import UserProfile from '../component/profile/UserProfile';
 import CustomerList from '../component/Customers/customerList';
 import CustomerReport from '../component/Statistical/CustomerReport';
 import Sell from '../component/sell/Sell';
+import BillManagement from '../component/shopping/item/BillManagement';
 
 const { Header, Sider, Content } = Layout;
 const { SubMenu } = Menu;
@@ -182,7 +183,7 @@ const WarehouseManager = () => {
 
           <SubMenu key="sub7" icon={<EyeOutlined />} title="Theo dõi đơn hàng">
             <Menu.Item key="16" onClick={() => handleNavigate(<OrderTracking />)}>Theo dõi đơn hàng</Menu.Item>
-            <Menu.Item key="17" onClick={() => handleNavigate('/ProductReport')}>Báo cáo sản phẩm</Menu.Item>
+            <Menu.Item key="17" onClick={() => handleNavigate(<BillManagement/>)}>Báo cáo sản phẩm</Menu.Item>
           </SubMenu>
 
           <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">

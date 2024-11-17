@@ -15,8 +15,7 @@ const CompletedCart = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [customers, setCustomers] = useState([]);
-  
-  // Tham chiếu đến nội dung hóa đơn
+
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -52,6 +51,7 @@ const CompletedCart = () => {
         console.error(error);
       }
     };
+
     const fetchCustomers = async () => {
       try {
         const customersData = await getAllCustomers();
@@ -61,11 +61,11 @@ const CompletedCart = () => {
         console.error(error);
       }
     };
-    
+
     fetchCustomers();
     fetchEmployee();
     fetchBillOffline();
-    fetchUsers(); 
+    fetchUsers();
   }, []);
 
   const showModal = (bill) => {
@@ -77,7 +77,6 @@ const CompletedCart = () => {
     setIsModalVisible(false);
   };
 
-  // Hàm in hóa đơn
   const handlePrint = () => {
     const printContent = invoiceRef.current.innerHTML;
     const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -88,9 +87,14 @@ const CompletedCart = () => {
           <title>In hóa đơn</title>
           <style>
             body { font-family: Arial, sans-serif; }
-            .invoice-details, .product-list { margin: 20px; }
-            .product-item { display: flex; border-bottom: 1px dashed #ccc; padding: 8px 0; }
-            .product-item div { flex: 1; }
+            .invoice-header { text-align: center; margin-bottom: 20px; }
+            .invoice-details { margin-bottom: 20px; }
+            .product-list { width: 100%; border-collapse: collapse; }
+            .product-list th, .product-list td { border-bottom: 1px dashed #ccc; padding: 8px; text-align: left; }
+            .product-list th { font-weight: bold; }
+            .promotional-item { font-style: italic; color: red; }
+            .total-section { margin-top: 20px; text-align: right; }
+            .thank-you { text-align: center; margin-top: 20px; font-weight: bold; color: #888; }
           </style>
         </head>
         <body onload="window.print(); window.close();">
@@ -121,7 +125,7 @@ const CompletedCart = () => {
         renderItem={(item) => (
           <List.Item actions={[<a key="list-loadmore-more">.</a>]}>
             <Skeleton avatar title={false} loading={initLoading} active>
-              <List.Item.Meta title={<a onClick={() => showModal(item)}>Hóa đơn #{item._id}</a>} />
+              <List.Item.Meta title={<a onClick={() => showModal(item)}>{item.billCode}</a>} />
               <Row gutter={20} style={{ width: '100%', alignItems: 'center' }}>
                 <Col span={6} style={{ marginLeft: '250px' }}>
                   <strong>Tổng tiền:</strong> {item.totalAmount} VND
@@ -147,10 +151,10 @@ const CompletedCart = () => {
               <p>Hotline: 076 848 6006</p>
               <p>* * *</p>
             </div>
-            <p><strong>NV bán hàng:</strong> {getCreatorName(selectedBill.createBy)}</p>
+            <p><strong>Người tạo đơn:</strong> {getCreatorName(selectedBill.createBy)}</p>
             <p><strong>Tên khách hàng:</strong> {getCustomerName(selectedBill.customer)}</p>
-            <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
-            <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p>
+            <p><strong>Ngày tạo:</strong> {new Date(selectedBill.createdAt).toLocaleString()}</p>
+            {/* <p><strong>Phương thức thanh toán:</strong> {selectedBill.paymentMethod === 'Card' ? 'Thẻ' : 'Tiền mặt'}</p> */}
 
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
@@ -172,7 +176,6 @@ const CompletedCart = () => {
                     <td style={{ border: '1px dashed #ddd', padding: '8px' }}>{item.currentPrice * item.quantity} VND</td>
                   </tr>
                 ))}
-                {/* Tổng cộng và chiết khấu */}
                 {(() => {
                   const actualTotal = selectedBill.items.reduce((acc, item) => acc + item.currentPrice * item.quantity, 0);
                   const discountAmount = actualTotal - selectedBill.totalAmount;
