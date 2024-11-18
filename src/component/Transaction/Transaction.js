@@ -60,7 +60,8 @@ const Transaction = () => {
                 return 'Khuyến mãi';
             case 'nhap':
                 return 'Nhập kho';
-           
+            case 'hoantra':
+                return 'Trả hàng';
             default:
                 return type;
         }

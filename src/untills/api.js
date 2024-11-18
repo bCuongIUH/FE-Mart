@@ -540,6 +540,19 @@ export const getBillOnline = async () => {
   }
 };
 
+//hoàn trả bill
+export const returnPurchaseBill = async (billId, returnedItems) => {
+  try {
+    const response = await axios.post(`${API_URL}/bill/return-bill`, {
+      billId,
+      returnedItems,
+    });
+    return response.data; // Trả về dữ liệu từ server
+  } catch (error) {
+    console.error('Lỗi khi trả hóa đơn:', error.response?.data || error.message);
+    throw error; // Ném lỗi để xử lý phía trên nếu cần
+  }
+};
 // Lấy danh sách hóa đơn theo trạng thái
 export const getBillsByStatus = async (status) => {
   try {

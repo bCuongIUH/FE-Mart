@@ -10,8 +10,12 @@ const formatTransactionType = (type) => {
             return 'Hủy';
         case 'ban':
             return 'Bán hàng';
+        case 'khuyenmai':
+            return 'Khuyến mãi';
         case 'nhap':
             return 'Nhập kho';
+        case 'hoantra':
+            return 'Trả hàng';
         default:
             return type;
     }

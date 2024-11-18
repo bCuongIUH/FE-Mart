@@ -124,44 +124,137 @@ const Sell = () => {
   };
 
   const addToCart = (product) => {
-    setCart(prev => {
-      const existing = prev.find(item => 
-        item.productId === product.code && item.unit === product.selectedUnit.unitName
-      );
-      if (existing) {
-        return prev.map(item => 
+    setCart((prev) => {
+      const updatedCart = [...prev];
+  
+      const existing = updatedCart.find(
+        (item) =>
           item.productId === product.code && item.unit === product.selectedUnit.unitName
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
+      );
+  
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        updatedCart.push({
+          code: product.code,
+          productId: product.productId,
+          productName: product.productName,
+          price: product.selectedUnit.price,
+          quantity: 1,
+          unit: product.selectedUnit.unitName,
+          barcode: product.selectedUnit.barcode,
+          isGift: false, // Sản phẩm thêm mới không phải quà tặng
+        });
       }
-      return [...prev, { 
-        code: product.code,
-        productId: product.productId,
-        productName: product.productName,
-        price: product.selectedUnit.price,
-        quantity: 1,
-        unit: product.selectedUnit.unitName,
-        barcode: product.selectedUnit.barcode
-      }];
+  
+      // Kiểm tra và cập nhật quà tặng nếu đủ điều kiện
+      return updateGiftItems(updatedCart);
     });
     setSearchTerm("");
     setSuggestions([]);
     setShowSuggestions(false);
   };
-
+  
   const removeFromCart = (productId, unit) => {
     setIsRemoving(true);
-    setCart(prev => prev.filter(item => !(item.productId === productId && item.unit === unit)));
+  
+    setCart((prev) => {
+      let updatedCart = prev.filter((item) => !(item.productId === productId && item.unit === unit));
+  
+      // Loại bỏ quà tặng nếu không còn đáp ứng điều kiện
+      return updateGiftItems(updatedCart);
+    });
+  
     setIsRemoving(false);
   };
+  
+  // Hàm cập nhật các quà tặng
+  const updateGiftItems = (cart) => {
+    const updatedCart = [...cart];
+  
+    // Lấy danh sách các voucher áp dụng được
+    const voucherList = Array.isArray(vouchers)
+      ? vouchers.filter((voucher) => voucher.isActive && !voucher.isDeleted)
+      : [];
+  
+    // Duyệt qua các voucher loại "BuyXGetY"
+    voucherList.forEach((voucher) => {
+      if (voucher.type === "BuyXGetY" && voucher.conditions) {
+        const buyCondition = voucher.conditions;
+  
+        // Tìm sản phẩm X trong giỏ hàng
+        const productX = updatedCart.find(
+          (item) =>
+            item.productId === buyCondition.productXId &&
+            item.unit === buyCondition.unitX &&
+            !item.isGift
+        );
+  
+        const applicableQuantity = productX
+          ? Math.floor(productX.quantity / buyCondition.quantityX)
+          : 0;
+  
+        // Tìm quà tặng Y trong giỏ hàng
+        const giftIndex = updatedCart.findIndex(
+          (item) =>
+            item.productId === buyCondition.productYId &&
+            item.unit === buyCondition.unitY &&
+            item.isGift
+        );
+  
+        if (applicableQuantity > 0) {
+          // Nếu có đủ điều kiện, thêm hoặc cập nhật số lượng quà tặng
+          const effectiveQuantity = applicableQuantity * buyCondition.quantityY;
+  
+          if (giftIndex >= 0) {
+            // Cập nhật số lượng quà tặng
+            updatedCart[giftIndex].quantity = effectiveQuantity;
+          } else {
+            // Thêm mới quà tặng vào giỏ hàng
+            const giftProductDetails = findGiftProductDetails(
+              buyCondition.productYId,
+              buyCondition.unitY
+            );
+            if (giftProductDetails) {
+              updatedCart.push({
+                productId: buyCondition.productYId,
+                productName: giftProductDetails.productName,
+                code: giftProductDetails.code,
+                barcode: giftProductDetails.barcode,
+                unit: giftProductDetails.unitName,
+                price: giftProductDetails.price || 0, 
+                quantity: effectiveQuantity,
+                isGift: true,
+              });
+            }
+          }
+        } else if (giftIndex >= 0) {
+          // Nếu không đủ điều kiện, xóa quà tặng khỏi giỏ hàng
+          updatedCart.splice(giftIndex, 1);
+        }
+      }
+    });
+  
+    return updatedCart;
+  };
+  
 
   const updateQuantity = (productId, unit, newQuantity) => {
     if (newQuantity < 1) return;
-    setCart(prev => prev.map(item => 
-      item.productId === productId && item.unit === unit ? { ...item, quantity: newQuantity } : item
-    ));
+  
+    setCart((prev) => {
+      // Cập nhật số lượng sản phẩm trong giỏ hàng
+      const updatedCart = prev.map((item) =>
+        item.productId === productId && item.unit === unit
+          ? { ...item, quantity: newQuantity }
+          : item
+      );
+  
+      // Kiểm tra và cập nhật lại quà tặng
+      return updateGiftItems(updatedCart);
+    });
   };
+  
 
   const handleCustomerSearch = (value) => {
     setCustomerSearchTerm(value);
@@ -353,95 +446,229 @@ const Sell = () => {
   
   // xác nhận thanh toán 
   const confirmPayment = async () => {
+    // Kiểm tra khách hàng được chọn
     if (!selectedCustomer) {
       message.warning("Vui lòng chọn khách hàng trước khi thanh toán.");
       return;
     }
-
-    
+  
+    // Xác minh giỏ hàng hợp lệ
     if (!validateCart()) {
       return;
     }
   
+    // Tạo payload từ dữ liệu giỏ hàng và thông tin khách hàng
     const payload = {
-      paymentMethod: paymentMethod,
+      paymentMethod,
       items: cart.map((item) => ({
         product: item.productId,
         quantity: item.quantity,
         unit: item.unit,
-        currentPrice: item.isGift || item.discountedPrice === 0 ? 0 : (item.discountedPrice || item.price),
+        currentPrice: item.isGift || item.discountedPrice === 0 
+          ? 0 
+          : (item.discountedPrice || item.price),
       })),
       createBy: employeeId,
       customerId: selectedCustomer._id,
       voucherCodes: selectedVouchers.map((voucher) => voucher.code),
     };
   
-    // console.log("Payload before sending:", JSON.stringify(payload, null, 2));
-  
     try {
+      // Gọi API để tạo hóa đơn
       const response = await createDirectSaleBill(payload);
   
+      // Xử lý kết quả trả về từ API
       if (response && response.bill) {
         message.success("Thanh toán thành công!");
+  
+        // Lấy mã hóa đơn từ phản hồi API
+        const billCode = response.bill.billCode;
+  
+        // Đóng modal thanh toán và đặt lại trạng thái
         setIsCheckoutModalOpen(false);
-        setCart([]);
-        setDiscountAmount(0);
-        setSelectedCustomer(null);
-        handlePrintInvoice();
+        setCart([]); // Xóa giỏ hàng sau khi thanh toán thành công
+        setDiscountAmount(0); // Đặt lại giảm giá
+        setSelectedCustomer(null); // Xóa khách hàng đã chọn
+  
+        // In hóa đơn với mã hóa đơn (billCode)
+        handlePrintInvoice(billCode);
       } else {
+        // Nếu không trả về hóa đơn hợp lệ, hiển thị lỗi
         throw new Error(response.message || "Không thể tạo hóa đơn.");
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        console.error("Error details:", error.response.data);
-        const errorDetails = error.response.data;
-  
-        if (errorDetails.errors) {
-          const messages = errorDetails.errors.map((err) => `${err.field}: ${err.message}`).join("\n");
-          message.error(`Lỗi khi thanh toán:\n${messages}`);
-        } else {
-          message.error(` ${errorDetails.message || "Không xác định."}`);
-        }
-      } else {
-        console.error("Error in handlePayment:", error);
-        message.error(`Lỗi không xác định: ${error.message}`);
-      }
+      // Xử lý lỗi nếu xảy ra
+      console.error("Error during payment confirmation:", error);
+      message.error(`Đã xảy ra lỗi khi thanh toán: ${error.message}`);
     }
   };
   
   
+  
 
-
-  const handlePrintInvoice = () => {
-    const printContent = invoiceRef.current.innerHTML;
-    const printWindow = window.open("", "_blank", "width=800,height=600");
-    printWindow.document.open();
-    printWindow.document.write(`
+  const handlePrintInvoice = (billCode) => {
+    const printContent = `
       <html>
         <head>
           <title>Hóa đơn</title>
           <style>
-            body { font-family: Arial, sans-serif; }
-            h2 { text-align: center; margin-bottom: 5px; }
-            .center-text { text-align: center; margin: 5px 0; }
-            .header-section { text-align: left; font-weight: bold; margin-bottom: 10px; }
-            .product-list, .total-section { margin: 20px; }
-            .product-item { display: flex; border-bottom: 1px dashed #ccc; padding: 8px 0; }
-            .product-item div { flex: 1; }
-            .total-right { text-align: right; }
+            @page {
+              size: 100mm auto; /* Kích thước giấy */
+              margin: 0; /* Xóa margin */
+            }
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              margin: 0;
+              padding: 0;
+              width: 100mm; /* Chiều rộng hóa đơn */
+            }
+            .bill-container {
+              padding: 5px;
+              box-sizing: border-box;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 10px;
+            }
+            .header h4 {
+              margin: 0;
+              font-size: 14px;
+              font-weight: bold;
+            }
+            .header p {
+              margin: 2px 0;
+            }
+            .bill-details {
+              margin: 10px 0;
+            }
+            .bill-details div {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 5px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 10px 0;
+            }
+            table thead th {
+              text-align: left;
+              border-bottom: 1px dashed #000;
+              padding: 5px 0;
+            }
+            table tbody td {
+              padding: 5px 0;
+              vertical-align: top;
+            }
+            table tbody tr:not(:last-child) td {
+              border-bottom: 1px dashed #000;
+            }
+            .col-name {
+              width: 50%; /* Tên hàng chiếm 50% chiều rộng */
+              word-wrap: break-word;
+              overflow-wrap: break-word;
+            }
+            .col-unit {
+              width: 10%;
+              text-align: center;
+              white-space: nowrap; /* Không cho xuống dòng */
+            }
+            .col-price,
+            .col-quantity,
+            .col-total {
+              width: 10%;
+              text-align: right;
+              white-space: nowrap;
+            }
+            .total-section {
+              margin: 10px 0;
+            }
+            .total-section div {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 5px;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 10px;
+              font-size: 12px;
+              font-weight: bold;
+            }
+            .promo-note {
+              color: red;
+              font-style: italic;
+              display: block;
+            }
           </style>
         </head>
-        <body onload="window.print(); window.close();">
-          ${printContent}
+        <body>
+          <div class="bill-container">
+            <div class="header">
+              <h4>Hóa Đơn Siêu Thị C'Mart</h4>
+              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Hotline: 076 848 6006</p>
+              <p>---</p>
+            </div>
+            <div class="bill-details">
+              <div><span><strong>Mã hóa đơn:</strong></span> <span>${billCode}</span></div>
+              <div><span><strong>Nhân viên lập:</strong></span> <span>${user ? user.fullName : "N/A"}</span></div>
+              <div><span><strong>Khách hàng:</strong></span> <span>${selectedCustomer ? selectedCustomer.fullName : "Khách vãng lai"}</span></div>
+              <div><span><strong>Ngày:</strong></span> <span>${new Date().toLocaleString()}</span></div>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-name">Tên hàng</th>
+                  <th class="col-unit">Đ.Vị</th>
+                  <th class="col-price">Đ.Gía</th>
+                  <th class="col-quantity">SL</th>
+                  <th class="col-total">Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${cart.map(item => `
+                  <tr>
+                    <td class="col-name">
+                      ${item.productName} 
+                      ${item.isGift ? '<span class="promo-note">(Khuyến mãi)</span>' : ''}
+                    </td>
+                    <td class="col-unit">${item.unit}</td>
+                    <td class="col-price">${item.price.toLocaleString()}đ</td>
+                    <td class="col-quantity">${item.quantity}</td>
+                    <td class="col-total">${(item.quantity * item.price).toLocaleString()}đ</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+            <div class="total-section">
+              <div><span><strong>Thành tiền:</strong></span> <span>${total.toLocaleString()}đ</span></div>
+              <div><span><strong>Chiết khấu:</strong></span> <span>${discountAmount.toLocaleString()}đ</span></div>
+              <div><span><strong>Tổng cộng:</strong></span> <span>${(total - discountAmount).toLocaleString()}đ</span></div>
+            </div>
+            <div class="footer">
+              <p>Cảm ơn quý khách, hẹn gặp lại!</p>
+            </div>
+          </div>
         </body>
       </html>
-    `);
+    `;
+  
+    const printWindow = window.open("", "_blank", "width=100,height=auto");
+    printWindow.document.open();
+    printWindow.document.write(printContent);
     printWindow.document.close();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500); 
+  
+    setTimeout(() => printWindow.print(), 500);
   };
+  
+  
+  
+  
+  
+  
+
+  
 
   const totalDiscounted = total - discountAmount;
 
@@ -711,6 +938,7 @@ const Sell = () => {
               <p>* * *</p>
             </div>
             <div className="header-section" style={{ borderBottom: "1px solid #ccc", paddingBottom: "15px", marginBottom: "15px" }}>
+           
               <p><strong>Người tạo đơn:</strong> {user ? user.fullName : "N/A"}</p>
               <p><strong>Tên khách hàng:</strong> {selectedCustomer ? selectedCustomer.fullName : "Khách vãng lai"}</p>
               <p><strong>Ngày tạo:</strong> {new Date().toLocaleString()}</p>
