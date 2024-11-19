@@ -54,3 +54,18 @@ export const getCustomerStatistics = async (startDate, endDate, customerId) => {
     throw error;
   }
 };
+export const getVoucherStatistics = async (startDate, endDate, voucherType) => {
+  try {
+    const url = `${STATISTICS_API_URL}/voucher-statistics`;
+    const params = {
+      startDate,
+      endDate,
+      ...(voucherType && { voucherType }), // Thêm voucherType vào params nếu có
+    };
+    const response = await axios.get(url, { ...config, params });
+    return response.data;
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi lấy thống kê voucher:", error);
+    throw error;
+  }
+};

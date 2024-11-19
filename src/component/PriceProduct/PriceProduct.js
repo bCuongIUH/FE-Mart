@@ -10,10 +10,12 @@ import {
   Tag,
   Select,
   Modal,
+  Form
 } from "antd";
-import { getAllProducts, getCategories } from "../../untills/api";
 import { SaveOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Option } from "antd/es/mentions";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import Title from "antd/es/typography/Title";
+import moment from 'moment';
 import {
   addPricesToPriceList,
   getAllPriceLists,
@@ -21,9 +23,10 @@ import {
   deletePriceList,
   deletePriceFromPriceList
 } from "../../untills/priceApi";
+import { getAllProducts, getCategories } from "../../untills/api";
 import EditPriceListModal from "./EditPriceListModal";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import Title from "antd/es/typography/Title";
+
+const { Option } = Select;
 
 const PriceProduct = () => {
   const [products, setProducts] = useState([]);
@@ -50,8 +53,9 @@ const PriceProduct = () => {
   const [selectedPrices, setSelectedPrices] = useState([]);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [editingPriceList, setEditingPriceList] = useState(null);
-  const [showPriceListForm, setShowPriceListForm] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [error, setError] = useState(null);
+
   const fetchAllData = useCallback(async () => {
     setLoading(true);
     try {
@@ -70,6 +74,11 @@ const PriceProduct = () => {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchAllData();
+  }, [fetchAllData]);
+
   const handleSearch = () => {
     setLoading(true);
     setError(null);
@@ -77,29 +86,24 @@ const PriceProduct = () => {
     try {
       setFlagFilter(0);
   
-      // Nếu mã tìm kiếm trống, xóa kết quả và dừng xử lý
       if (!searchCode) {
         setFilteredProducts([]);
         setFlagFilter(1);
         return;
       }
   
-      // Tìm sản phẩm theo mã
       let filtered = products.filter(
         (product) => product.code.toLowerCase() === searchCode.toLowerCase()
       );
   
-      // Nếu không tìm thấy sản phẩm theo mã, hiển thị thông báo lỗi
       if (filtered.length === 0) {
         setError("Không tìm thấy sản phẩm với mã này.");
         return;
       }
   
-      // Lọc các sản phẩm không thuộc bảng giá khác trong khoảng thời gian trùng lặp
       filtered = filtered.filter((product) => {
-        // Kiểm tra nếu sản phẩm tồn tại trong bảng giá khác có khoảng thời gian trùng
         const isOverlappingInOtherPriceList = priceLists.some((priceList) => {
-          const isInOtherPriceList = priceList._id !== recordColumn.key; // Khác bảng giá hiện tại
+          const isInOtherPriceList = priceList._id !== recordColumn.key;
           const isProductInPriceList = priceList.products.some(
             (p) => p.productId.toString() === product._id.toString()
           );
@@ -107,17 +111,14 @@ const PriceProduct = () => {
             priceList.startDate <= recordColumn.endDate &&
             priceList.endDate >= recordColumn.startDate;
   
-          // Trả về true nếu có bảng giá khác chứa sản phẩm trong thời gian trùng lặp và đang có hiệu lực
           const isActivePriceList = new Date() >= new Date(priceList.startDate) && new Date() <= new Date(priceList.endDate);
   
           return isInOtherPriceList && isProductInPriceList && isOverlappingTime && isActivePriceList;
         });
   
-        // Loại bỏ sản phẩm nếu tồn tại trong bảng giá khác có thời gian trùng và đang có hiệu lực
         return !isOverlappingInOtherPriceList;
       });
   
-      // Nếu tất cả sản phẩm bị loại bỏ do trùng thời gian, hiển thị cảnh báo và dừng
       if (filtered.length === 0) {
         message.warning("Sản phẩm này đã nằm trong một bảng giá khác có thời gian hiệu lực và không thể thêm vào bảng giá hiện tại.");
         setError(
@@ -126,20 +127,35 @@ const PriceProduct = () => {
         return;
       }
   
-      // Cập nhật danh sách sản phẩm tìm được để hiển thị
       setFilteredProducts(filtered);
-      console.log(filtered);
     } catch (error) {
       setError("Đã xảy ra lỗi trong quá trình tìm kiếm.");
     } finally {
       setLoading(false);
     }
   };
-  
 
-  useEffect(() => {
-    fetchAllData();
-  }, [fetchAllData]);
+  const handleStartDateChange = (date) => {
+    setNewPriceList(prev => ({
+      ...prev,
+      startDate: date,
+      endDate: date && prev.endDate && date >= prev.endDate ? null : prev.endDate
+    }));
+  };
+
+  const handleEndDateChange = (date) => {
+    setNewPriceList(prev => ({
+      ...prev,
+      endDate: date
+    }));
+  };
+
+  const disabledEndDate = (endDate) => {
+    if (!endDate || !newPriceList.startDate) {
+      return false;
+    }
+    return endDate.isBefore(newPriceList.startDate, 'day');
+  };
 
   const handleSelectPrice = (productId, unitName) => {
     const product = products.find((p) => p.productId === productId);
@@ -148,7 +164,6 @@ const PriceProduct = () => {
       const selectedPrice = product.prices.find((p) => p.unitName === unitName);
 
       if (selectedPrice) {
-        // Nếu tìm thấy giá, thêm vào mảng
         setSelectedPrices((prev) => [
           ...prev,
           { productId, unitName, price: selectedPrice.price },
@@ -156,6 +171,7 @@ const PriceProduct = () => {
       }
     }
   };
+console.log(priceLists);
 
   const handleAddPriceList = async () => {
     try {
@@ -179,9 +195,7 @@ const PriceProduct = () => {
           endDate: null,
           isActive: true,
         });
-        setProductPrices({});
-        setShowPriceListForm(false);
-
+        setIsModalVisible(false);
         message.success("Bảng giá đã được tạo thành công!");
       } else {
         message.error("Không thể tạo bảng giá.");
@@ -191,7 +205,6 @@ const PriceProduct = () => {
     }
   };
 
-  // thêm giá vào sp
   const handleSavePrices = async (priceListId) => {
     const pricesToUpdate = Object.entries(productPrices).flatMap(
       ([productId, units]) =>
@@ -210,13 +223,12 @@ const PriceProduct = () => {
       const response = await addPricesToPriceList(priceListId, pricesToUpdate);
       if (response.success) {
         message.success("Giá đã được cập nhật thành công!");
-        setProductPrices({}); // Reset giá trị sau khi lưu thành công
+        setProductPrices({});
         setFlagFilter(1);
-        // Cập nhật `savedPrices` với các đơn vị đã có giá
         const updatedSavedPrices = pricesToUpdate.reduce(
           (acc, { productId, prices }) => {
             acc[productId] = prices.reduce((unitAcc, { unitName, price }) => {
-              if (price > 0) unitAcc[unitName] = price; // Chỉ lưu giá trị đã có giá
+              if (price > 0) unitAcc[unitName] = price;
               return unitAcc;
             }, {});
             return acc;
@@ -239,14 +251,12 @@ const PriceProduct = () => {
     let productData;
 
     if (flagFilter === 1) {
-      // Tạo danh sách các sản phẩm với đơn vị và giá cho bảng chi tiết
       productData = products.flatMap((product) => {
         const priceEntry = recordColumn.products.find(
           (p) => p.productId === product._id
         );
 
-        // Chỉ tiếp tục nếu sản phẩm có trong bảng giá
-        if (!priceEntry) return []; // Loại bỏ sản phẩm nếu không có trong bảng giá
+        if (!priceEntry) return [];
 
         const prices = priceEntry.prices;
 
@@ -257,7 +267,7 @@ const PriceProduct = () => {
           image: product.image,
           unitName: price.unitName,
           price: price.price,
-          unitId: price._id, // thêm unitId vào return
+          unitId: price._id,
         }));
       });
     } else {
@@ -296,11 +306,10 @@ const PriceProduct = () => {
           };
         });
 
-        return combinedPrices; // Hiển thị tất cả sản phẩm, không lọc theo giá khác 0
+        return combinedPrices;
       });
     }
 
-    // Xử lý thay đổi giá cho mỗi dòng
     const handlePriceChange = (productId, unitName, newPrice) => {
       if (newPrice < 0) {
         message.error("Giá không được là số âm!");
@@ -313,8 +322,8 @@ const PriceProduct = () => {
           [unitName]: newPrice,
         },
       }));
-      console.log("Cập nhật giá mới:", productPrices);
     };
+
     const handleDelete = async (priceListId, productId, priceId) => {
       Modal.confirm({
         title: "Xác nhận xóa sản phẩm",
@@ -327,14 +336,12 @@ const PriceProduct = () => {
             await deletePriceFromPriceList(priceListId, productId, priceId);
             message.success("Sản phẩm đã được xóa khỏi bảng giá!");
             setFlagFilter(1);
-            // Cập nhật danh sách sản phẩm sau khi xóa
             setProductPrices((prevPrices) => {
               const updatedPrices = { ...prevPrices };
               delete updatedPrices[productId];
               return updatedPrices;
             });
 
-            // Thực hiện cập nhật lại bảng
             fetchAllData();
           } catch (error) {
             message.error(
@@ -344,7 +351,7 @@ const PriceProduct = () => {
         },
       });
     };
-    // Cấu hình các cột cho bảng chi tiết
+
     const columns = [
       {
         title: "Mã sản phẩm",
@@ -489,7 +496,7 @@ const PriceProduct = () => {
           columns={columns}
           dataSource={productData}
           rowKey={(record) => `${record.productId}-${record.unitName}`}
-          pagination={{ pageSize: 6 }} // Hiển thị 6 sản phẩm mỗi trang
+          pagination={{ pageSize: 6 }}
         />
     
         <Button
@@ -503,22 +510,19 @@ const PriceProduct = () => {
         </Button>
       </>
     );
-    
-  }
+  };
   
-  // Hiển thị modal chỉnh sửa bảng giá
   const handleEditPriceList = (priceListId) => {
     const priceList = priceLists.find((list) => list._id === priceListId);
     setEditingPriceList(priceList);
     setIsEditModalVisible(true);
   };
 
-  // Hàm đóng modal chỉnh sửa
   const closeEditModal = () => {
     setIsEditModalVisible(false);
     setEditingPriceList(null);
   };
-  // Hàm hiển thị modal xác nhận xóa
+
   const confirmDeletePriceList = (priceListId, isActive) => {
     if (isActive) {
       message.error("Không thể xóa bảng giá đang hoạt động!");
@@ -535,12 +539,10 @@ const PriceProduct = () => {
     });
   };
 
-  // Hàm xử lý xóa bảng giá
   const handleDeletePriceList = async (priceListId) => {
     try {
       await deletePriceList(priceListId);
       message.success("Xóa bảng giá thành công!");
-      // Cập nhật danh sách bảng giá sau khi xóa
       fetchAllData();
       setPriceLists((prevPriceList) =>
         prevPriceList.filter((price) => price.key !== priceListId)
@@ -551,78 +553,77 @@ const PriceProduct = () => {
     }
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setNewPriceList({
+      code: "",
+      name: "",
+      description: "",
+      startDate: null,
+      endDate: null,
+      isActive: true,
+    });
+  };
+
   return (
     <>
-        <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí bảng giá</Title>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          marginBottom: 16,
-        }}
-      >
-        <Button type="primary" danger onClick={() => setShowPriceListForm(true)}>
+      <Title style={{ fontWeight: 'bold', fontStyle: 'italic' }} level={2}>Quản lí bảng giá</Title>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <Button type="primary" danger onClick={showModal}>
           Thêm bảng giá
         </Button>
       </div>
 
-      {showPriceListForm && (
-        <div style={{ marginBottom: 16 }}>
-          <Input
-            placeholder="Mã bảng giá"
-          
-            value={newPriceList.code}
-            onChange={(e) =>
-              setNewPriceList({ ...newPriceList, code: e.target.value })
-            }
-          />
-          <Input
-            placeholder="Tên bảng giá"
-            value={newPriceList.name}
-            onChange={(e) =>
-              setNewPriceList({ ...newPriceList, name: e.target.value })
-            }
-          />
-          <Input
-            placeholder="Mô tả"
-            value={newPriceList.description}
-            onChange={(e) =>
-              setNewPriceList({ ...newPriceList, description: e.target.value })
-            }
-          />
-          <DatePicker
-            placeholder="Ngày bắt đầu"
-            showTime={{ format: "HH:mm" }}
-            format="YYYY-MM-DD HH:mm"
-            onChange={(date) =>
-              setNewPriceList({ ...newPriceList, startDate: date })
-            }
-          />
-
-          <DatePicker
-            placeholder="Ngày kết thúc"
-            showTime={{ format: "HH:mm" }}
-            format="YYYY-MM-DD HH:mm"
-            onChange={(date) =>
-              setNewPriceList({ ...newPriceList, endDate: date })
-            }
-          />
-
-          <Button
-            type="primary"
-            onClick={handleAddPriceList}
-            style={{ marginTop: 16 }}
-          >
-            Lưu bảng giá
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => setShowPriceListForm(false)}
-          >
-            Đóng
-          </Button>
-        </div>
-      )}
+      <Modal
+        title="Thêm bảng giá mới"
+        visible={isModalVisible}
+        onOk={handleAddPriceList}
+        onCancel={handleCancel}
+        okText="Lưu"
+        cancelText="Hủy"
+      >
+        <Form layout="vertical">
+          <Form.Item label="Mã bảng giá">
+            <Input
+              value={newPriceList.code}
+              onChange={(e) => setNewPriceList({ ...newPriceList, code: e.target.value })}
+            />
+          </Form.Item>
+          <Form.Item label="Tên bảng giá">
+            <Input
+              value={newPriceList.name}
+              onChange={(e) => setNewPriceList({ ...newPriceList, name: e.target.value })}
+            />
+          </Form.Item>
+          <Form.Item label="Mô tả">
+            <Input
+              value={newPriceList.description}
+              onChange={(e) => setNewPriceList({ ...newPriceList, description: e.target.value })}
+            />
+          </Form.Item>
+          <Form.Item label="Ngày bắt đầu">
+            <DatePicker
+              showTime={{ format: "HH:mm" }}
+              format="YYYY-MM-DD HH:mm"
+              value={newPriceList.startDate}
+              onChange={handleStartDateChange}
+            />
+          </Form.Item>
+          <Form.Item label="Ngày kết thúc">
+            <DatePicker
+              showTime={{ format: "HH:mm" }}
+              format="YYYY-MM-DD HH:mm"
+              value={newPriceList.endDate}
+              onChange={handleEndDateChange}
+              disabledDate={disabledEndDate}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {loading ? (
         <Spin tip="Loading..." />
@@ -632,6 +633,7 @@ const PriceProduct = () => {
             key: list._id,
             code: list.code,
             name: list.name,
+            description: list.description,
             startDate: new Date(list.startDate).toLocaleString(),
             endDate: new Date(list.endDate).toLocaleString(),
             isActive: list.isActive,
@@ -647,6 +649,11 @@ const PriceProduct = () => {
               title: "Tên bảng giá",
               dataIndex: "name",
               key: "name",
+            },
+            {
+              title: "Mô tả",
+              dataIndex: "description",
+              key: "description",
             },
             {
               title: "Ngày bắt đầu",
@@ -677,13 +684,17 @@ const PriceProduct = () => {
                     icon={<FaEdit />}
                     onClick={() => handleEditPriceList(record.key)}
                     style={{ marginRight: 8 }}
-                  >Sửa</Button>
+                  >
+                    Sửa
+                  </Button>
                   <Button
                     type="text"
                     danger
                     icon={<FaTrash />}
-                    onClick={() => confirmDeletePriceList(record.key)}
-                  >Xóa</Button>
+                    onClick={() => confirmDeletePriceList(record.key, record.isActive)}
+                  >
+                    Xóa
+                  </Button>
                 </>
               ),
             },
@@ -692,17 +703,16 @@ const PriceProduct = () => {
             expandedRowRender,
             onExpand: (expanded, record) => {
               if (expanded) {
-                setRecordColumn(record); 
+                setRecordColumn(record);
               } else {
-                setRecordColumn(null); 
+                setRecordColumn(null);
               }
             },
           }}
-          expandedRowKeys={recordColumn ? [recordColumn.key] : []} 
+          expandedRowKeys={recordColumn ? [recordColumn.key] : []}
         />
       )}
 
-      {/* Modal chỉnh sửa bảng giá */}
       {editingPriceList && (
         <EditPriceListModal
           visible={isEditModalVisible}
@@ -714,4 +724,5 @@ const PriceProduct = () => {
     </>
   );
 };
+
 export default PriceProduct;

@@ -1,10 +1,8 @@
 export const formatCurrency = (amount) => {
   if (amount === undefined || amount === null || isNaN(amount)) {
-    return "0₫";
+    return "0 VNĐ";
   }
 
-  return amount.toLocaleString("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  });
+  
+  return amount.toLocaleString("vi-VN") + " VNĐ";
 };
