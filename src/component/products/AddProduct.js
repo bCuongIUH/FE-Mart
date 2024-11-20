@@ -21,7 +21,7 @@ import {
   getCategories,
   getAllSuppliers,
 } from "../../untills/api";
-import "./AddProduct.css";
+
 
 const { Option } = Select;
 

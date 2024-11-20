@@ -281,8 +281,8 @@ console.log(dailyRevenue);
       "",
       "",
       "",
-      dailyRevenue.reduce((sum, item) => sum + item.discountAmount, 0),
       dailyRevenue.reduce((sum, item) => sum + item.totalAmount , 0),
+      dailyRevenue.reduce((sum, item) => sum + item.discountAmount, 0),
       dailyRevenue.reduce((sum, item) => sum + item.revenueAfterDiscount, 0),
     ]);
     finalRow.font = { name: "Times New Roman", bold: true, size: 14 };

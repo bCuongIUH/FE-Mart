@@ -17,10 +17,10 @@ import { useNavigate } from 'react-router-dom';
 import styles from './UIManager.module.css';
 
 import { AuthContext } from '../untills/context/AuthContext';
-import SellPage from '../component/sell/SellPage';
+
 import SuppliersInfo from '../component/suppliers/item/suppliersInfo';
 import StatisticsChart from '../component/Statistical/Statistical';
-import CompletedCart from '../component/shopping/item/completedCart';
+
 import ManageEmployees from '../component/employees/ManageEmployees';
 import OrderTracking from '../component/OrderTracking/OrderTracking';
 import ProductPage from '../component/products/ProductPage';
@@ -28,10 +28,10 @@ import PriceProduct from '../component/PriceProduct/PriceProduct';
 import NhapKho from '../component/warehouseManager/WarehouseManager';
 import PromotionProgramList from '../component/PromotionManager/PromotionProgramList';
 import StockList from '../component/Stock/StockList';
-import ProductPrices from '../component/PriceProduct/ProductPrices';
+
 import InventoryList from '../component/InvenStock/InventoryList';
 import Transaction from '../component/Transaction/Transaction';
-import { getAllEmployee, getEmployeeById } from '../untills/employeesApi';
+import { getEmployeeById } from '../untills/employeesApi';
 import UserProfile from '../component/profile/UserProfile';
 import CustomerList from '../component/Customers/customerList';
 import CustomerReport from '../component/Statistical/CustomerReport';

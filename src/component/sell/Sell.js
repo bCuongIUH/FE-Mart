@@ -457,6 +457,7 @@ const Sell = () => {
       return;
     }
   
+  
     // Tạo payload từ dữ liệu giỏ hàng và thông tin khách hàng
     const payload = {
       paymentMethod,
@@ -481,7 +482,6 @@ const Sell = () => {
       if (response && response.bill) {
         message.success("Thanh toán thành công!");
   
-        // Lấy mã hóa đơn từ phản hồi API
         const billCode = response.bill.billCode;
   
         // Đóng modal thanh toán và đặt lại trạng thái
@@ -498,10 +498,18 @@ const Sell = () => {
       }
     } catch (error) {
       // Xử lý lỗi nếu xảy ra
+      if (error.response && error.response.data && error.response.data.message) {
+        // Hiển thị thông báo lỗi từ API
+        message.error(`${error.response.data.message}`);
+      } else {
+        // Hiển thị thông báo lỗi chung
+        message.error(`Đã xảy ra lỗi khi thanh toán: ${error.message}`);
+      }
+  
       console.error("Error during payment confirmation:", error);
-      message.error(`Đã xảy ra lỗi khi thanh toán: ${error.message}`);
     }
   };
+  
   
   
   
@@ -606,7 +614,7 @@ const Sell = () => {
           <div class="bill-container">
             <div class="header">
               <h4>Hóa Đơn Siêu Thị C'Mart</h4>
-              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Địa chỉ: 12 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
               <p>Hotline: 076 848 6006</p>
               <p>---</p>
             </div>
@@ -933,7 +941,7 @@ const Sell = () => {
             <div style={{ textAlign: "center", marginBottom: "20px" }}>
               <h4 style={{ textAlign: "center", fontWeight: "bold" }}>Hóa Đơn Siêu Thị C'Mart</h4>
               <br />
-              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Địa chỉ: 12 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
               <p>Hotline: 076 848 6006</p>
               <p>* * *</p>
             </div>
@@ -950,7 +958,7 @@ const Sell = () => {
               <div style={{ flex: 1 }}>SL</div>
               <div style={{ flex: 1 }}>Thành tiền</div>
             </div>
-            {/* {cart.map((item) => (
+            {cart.map((item) => (
               <div key={item.productId} style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0" }}>
                 <div style={{ flex: 2 }}>
                   {item.productName}<br />
@@ -961,29 +969,7 @@ const Sell = () => {
                 <div style={{ flex: 1 }}>{item.quantity}</div>
                 <div style={{ flex: 1 }}>{(item.quantity * item.price).toLocaleString()}đ</div>
               </div>
-            ))} */}
-{cart.map((item) => (
-  <React.Fragment key={item.productId}>
-    {/* Nếu là sản phẩm khuyến mãi */}
-    {item.isGift && (
-      <div style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0", fontStyle: "italic", color: "red" }}>
-        <div style={{ flex: 2 }}>Khuyến mãi:</div>
-        <div style={{ flex: 1 }}>-</div>
-        <div style={{ flex: 1 }}>-</div>
-        <div style={{ flex: 1 }}>-</div>
-        <div style={{ flex: 1 }}>-</div>
-      </div>
-    )}
-    {/* Hiển thị sản phẩm */}
-    <div style={{ display: "flex", borderBottom: "1px dashed #ccc", padding: "8px 0" }}>
-      <div style={{ flex: 2 }}>{item.productName}</div>
-      <div style={{ flex: 1 }}>{item.unit}</div>
-      <div style={{ flex: 1 }}>{item.price.toLocaleString()}đ</div>
-      <div style={{ flex: 1 }}>{item.quantity}</div>
-      <div style={{ flex: 1 }}>{(item.quantity * item.price).toLocaleString()}đ</div>
-    </div>
-  </React.Fragment>
-))}
+            ))}
 
             <div style={{ padding: "10px", marginTop: "10px", textAlign: "right" }}>
               <p><strong>Thành tiền:</strong> {total.toLocaleString()}đ</p>

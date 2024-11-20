@@ -19,7 +19,7 @@ function CustomerReport() {
   const [customerStatistics, setCustomerStatistics] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customers, setCustomers] = useState([]);
-console.log(customerStatistics);
+
 
   useEffect(() => {
     const fetchCustomers = async () => {

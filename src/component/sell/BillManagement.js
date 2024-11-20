@@ -206,7 +206,7 @@ const handleReturn = (record) => {
       <div>
         <h4 style="text-align: center; font-weight: bold;">${title}</h4><br />
         <div style="text-align: center; margin-bottom: 10px;">
-          <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+          <p>Địa chỉ: 12 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
           <p>Hotline: 076 848 6006</p>
           <p>* * *</p>
         </div>
@@ -486,7 +486,7 @@ const handleReturn = (record) => {
           <div>
             <h4 style={{ textAlign: 'center', fontWeight: 'bold' }}>Hóa Đơn Siêu Thị C'Mart</h4><br />
             <div style={{ textAlign: "center", marginBottom: "10px" }}>
-              <p>Địa chỉ: 04 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
+              <p>Địa chỉ: 12 Nguyễn Văn Bảo, phường 4, Gò Vấp, TP.HCM</p>
               <p>Hotline: 076 848 6006</p>
               <p>* * *</p>
             </div>

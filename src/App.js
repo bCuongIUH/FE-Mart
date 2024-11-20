@@ -9,18 +9,19 @@ import  RequireAuth from "./untills/context/AuthenticatedRouter";
 import { UserProvider } from './untills/context/UserContext';
 import { AuthProvider } from './untills/context/AuthContext'; 
 import UIManager from "./pages/UIManager";
-import Profile from "../src/component/profile/profile";
-import UserInfo from "./component/profile/profile.UserInfo";
+// import Profile from "../src/component/profile/profile";
+
 import ChangePassword from "./component/password/ChangePassword";
 import ManageEmployees from './component/employees/ManageEmployees';
 import WarehouseManager from "./component/warehouseManager/WarehouseManager";
 // import Suppliers from "./component/suppliers/suppliers";
-import ShoppingCart from "./component/shopping/shoppingCart";
+
 import SignupContext from "./untills/context/SignupContext";
 import SellPage from './component/sell/SellPage';
 import StatisticsChart from "./component/Statistical/Statistical";
 import ProductPage from "./component/products/ProductPage";
 import HomePageDemo from "./component/HomePage/HomePageDemo";
+import SupermarketLanding from "./component/HomePage/HomePageDemo";
 
 
 // import CreateUnitList from "./component/units/CreateUnitList";
@@ -66,16 +67,16 @@ function App() {
               }
             />
              <Route path="/ManagerPage" element={<ProductPage />} />
-             <Route path="/Profile" element={<Profile />} /> 
-             <Route path="/user-info" element={<UserInfo />} /> 
+           
+    
              <Route path="/change-password" element={<ChangePassword />} /> 
              <Route path="/ManageEmployees" element={<ManageEmployees />} />
              <Route path="/WarehouseManager" element={<WarehouseManager />} />
              {/* <Route path="/Suppliers" element={<Suppliers />} /> */}
-             <Route path="/ShoppingCart" element={<ShoppingCart />} />
+         
              <Route path="/ManagerSales" element={<SellPage />} />
              <Route path="/statistics" element={<StatisticsChart />} />
-             <Route path="/HomePageDemo" element={<HomePageDemo />} />
+             <Route path="/HomePageDemo" element={<SupermarketLanding />} />
        
              
                   

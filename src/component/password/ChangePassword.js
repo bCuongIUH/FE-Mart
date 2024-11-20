@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { changePassword } from '../../untills/api'; // Giả định là bạn đã có API này
-import './ChangePassword.css'; 
+// import './ChangePassword.css'; 
 import { AuthContext } from '../../untills/context/AuthContext'; // Context cho xác thực
 
 const ChangePassword = () => {
