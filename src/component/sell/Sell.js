@@ -62,7 +62,8 @@ const Sell = () => {
         }
 
         const vouchersData = await getAllActiveVouchers();
-        setVouchers(vouchersData || []);
+        // setVouchers(vouchersData || []);
+        setVouchers(Array.isArray(vouchersData) ? vouchersData : []);
 
         const customersData = await getAllCustomers();
         setCustomers(customersData || []);
@@ -73,6 +74,7 @@ const Sell = () => {
     fetchData();
   }, []);
 
+  
   // Tìm thông tin chi tiết của sản phẩm quà tặng
   const findGiftProductDetails = (productId, unitName) => {
     const product = products.find((prod) => prod.productId === productId);
@@ -256,12 +258,34 @@ const Sell = () => {
   };
   
 
+
   const handleCustomerSearch = (value) => {
     setCustomerSearchTerm(value);
-    const customer = customers.find(c => c.phoneNumber === value);
-    setSelectedCustomer(customer || null);
+  
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(value)) {
+      setSelectedCustomer(null);
+      // message.warning("Vui lòng nhập số điện thoại hợp lệ (bắt đầu bằng 0 và có 10 chữ số).");
+      return;
+    }
+  
+    const customer = customers.find((c) => c.phoneNumber === value);
+  
+    if (customer) {
+      setSelectedCustomer(customer);
+      message.success(`Đã tìm thấy khách hàng: ${customer.fullName}`);
+    } else {
+      setSelectedCustomer({
+        fullName: "Khách vãng lai",
+        phoneNumber: value,
+        _id: null, // Khách vãng lai không có ID
+      });
+      message.info(`Đã thêm khách hàng vãng lai với số điện thoại: ${value}`);
+    }
   };
-
+  
+  
+  
   const handleVoucherModal = () => {
     setShowVoucherModal(true);
   };
@@ -275,40 +299,152 @@ const Sell = () => {
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
 
+    // const filterApplicableVouchers = () => {
+    //   const voucherList = Array.isArray(vouchers)
+    //     ? vouchers.filter((voucher) => voucher.isActive && !voucher.isDeleted)
+    //     : [];
+    
+    //     const totalAmount = cart
+    //     .filter((item) => !item.isGift) // Loại bỏ sản phẩm khuyến mãi
+    //     .reduce((acc, item) => acc + item.price * item.quantity, 0);
+    
+    
+    //   let bestVoucher = null;
+    //   let maxDiscount = 0;
+    
+    //   // Lọc qua tất cả voucher để tìm voucher có mức giảm giá tốt nhất
+    //   voucherList.forEach((voucher) => {
+    //     const discount = calculateVoucherDiscount(voucher, totalAmount);
+    
+    //     if (discount > maxDiscount) {
+    //       maxDiscount = discount;
+    //       bestVoucher = voucher;
+    //     }
+    //   });
+    
+    //   // Áp dụng voucher tốt nhất (nếu có)
+    //   const applicableVouchers = bestVoucher ? [bestVoucher] : [];
+    //   setSelectedVouchers(applicableVouchers);
+    
+    //   // Tính tổng giảm giá
+    //   setDiscountAmount(maxDiscount);
+    
+    //   // Quà tặng (nếu có Buy X Get Y)
+    //   const buyXGetYResults = [];
+    //   const updatedCart = [...cart];
+    
+    //   voucherList.forEach((voucher) => {
+    //     if (voucher.type === "BuyXGetY" && voucher.conditions) {
+    //       const buyCondition = voucher.conditions;
+    
+    //       cart.forEach((cartItem) => {
+    //         if (
+    //           cartItem.productId === buyCondition.productXId &&
+    //           cartItem.unit === buyCondition.unitX &&
+    //           !cartItem.isGift
+    //         ) {
+    //           const applicableQuantity = Math.floor(
+    //             cartItem.quantity / buyCondition.quantityX
+    //           );
+    
+    //           if (applicableQuantity > 0) {
+    //             buyXGetYResults.push({
+    //               voucher,
+    //               totalGiftQuantity: applicableQuantity * buyCondition.quantityY,
+    //               giftProductId: buyCondition.productYId,
+    //               giftUnit: buyCondition.unitY,
+    //               conversionValue: buyCondition.conversionValueY,
+    //             });
+    //           }
+    //         }
+    //       });
+    //     }
+    //   });
+    
+    //   // Thêm quà tặng vào giỏ hàng
+    //   buyXGetYResults.forEach((result) => {
+    //     const giftProductDetails = findGiftProductDetails(
+    //       result.giftProductId,
+    //       result.giftUnit
+    //     );
+    
+    //     if (giftProductDetails) {
+    //       const effectiveQuantity = result.totalGiftQuantity * (result.conversionValue || 1);
+    
+    //       if (giftProductDetails.quantity >= effectiveQuantity) {
+    //         const giftIndex = updatedCart.findIndex(
+    //           (item) =>
+    //             item.productId === result.giftProductId &&
+    //             item.unit === result.giftUnit &&
+    //             item.isGift
+    //         );
+    
+    //         if (giftIndex >= 0) {
+    //           const currentGift = updatedCart[giftIndex];
+    //           if (currentGift.quantity !== effectiveQuantity) {
+    //             updatedCart[giftIndex] = {
+    //               ...currentGift,
+    //               quantity: effectiveQuantity,
+    //             };
+    //           }
+    //         } else {
+    //           updatedCart.push({
+    //             productId: result.giftProductId,
+    //             productName: giftProductDetails.productName,
+    //             code: giftProductDetails.code,
+    //             barcode: giftProductDetails.barcode,
+    //             unit: giftProductDetails.unitName,
+    //             price: giftProductDetails.price || 0,
+    //             quantity: effectiveQuantity,
+    //             isGift: true,
+    //           });
+    //         }
+    //       } else {
+    //         console.warn(
+    //           `Quà tặng không đủ tồn kho: ${result.giftProductId} (Yêu cầu: ${effectiveQuantity}, Có sẵn: ${giftProductDetails.quantity})`
+    //         );
+    //       }
+    //     } else {
+    //       console.error(
+    //         `Không tìm thấy thông tin sản phẩm quà tặng: ${result.giftProductId}`
+    //       );
+    //     }
+    //   });
+    
+    //   // Cập nhật giỏ hàng nếu thay đổi
+    //   if (JSON.stringify(updatedCart) !== JSON.stringify(cart)) {
+    //     setCart(updatedCart);
+    //   }
+    // };
+    
+    
+
     const filterApplicableVouchers = () => {
       const voucherList = Array.isArray(vouchers)
         ? vouchers.filter((voucher) => voucher.isActive && !voucher.isDeleted)
         : [];
     
-        const totalAmount = cart
+      const totalAmount = cart
         .filter((item) => !item.isGift) // Loại bỏ sản phẩm khuyến mãi
         .reduce((acc, item) => acc + item.price * item.quantity, 0);
     
-    
-      let bestVoucher = null;
+      let bestDiscountVoucher = null; // Voucher giảm giá tốt nhất
       let maxDiscount = 0;
-    
-      // Lọc qua tất cả voucher để tìm voucher có mức giảm giá tốt nhất
-      voucherList.forEach((voucher) => {
-        const discount = calculateVoucherDiscount(voucher, totalAmount);
-    
-        if (discount > maxDiscount) {
-          maxDiscount = discount;
-          bestVoucher = voucher;
-        }
-      });
-    
-      // Áp dụng voucher tốt nhất (nếu có)
-      const applicableVouchers = bestVoucher ? [bestVoucher] : [];
-      setSelectedVouchers(applicableVouchers);
-    
-      // Tính tổng giảm giá
-      setDiscountAmount(maxDiscount);
-    
-      // Quà tặng (nếu có Buy X Get Y)
       const buyXGetYResults = [];
       const updatedCart = [...cart];
     
+      // Lọc voucher giảm giá
+      voucherList.forEach((voucher) => {
+        if (voucher.type === "PercentageDiscount" || voucher.type === "FixedDiscount") {
+          const discount = calculateVoucherDiscount(voucher, totalAmount);
+          if (discount > maxDiscount) {
+            maxDiscount = discount;
+            bestDiscountVoucher = voucher;
+          }
+        }
+      });
+    
+      // Lọc voucher "Buy X Get Y"
       voucherList.forEach((voucher) => {
         if (voucher.type === "BuyXGetY" && voucher.conditions) {
           const buyCondition = voucher.conditions;
@@ -339,10 +475,7 @@ const Sell = () => {
     
       // Thêm quà tặng vào giỏ hàng
       buyXGetYResults.forEach((result) => {
-        const giftProductDetails = findGiftProductDetails(
-          result.giftProductId,
-          result.giftUnit
-        );
+        const giftProductDetails = findGiftProductDetails(result.giftProductId, result.giftUnit);
     
         if (giftProductDetails) {
           const effectiveQuantity = result.totalGiftQuantity * (result.conversionValue || 1);
@@ -387,12 +520,26 @@ const Sell = () => {
         }
       });
     
+      // Chọn voucher "BuyXGetY" đầu tiên (chỉ lấy 1 voucher)
+      const selectedBuyXGetYVoucher = buyXGetYResults.length > 0 ? buyXGetYResults[0].voucher : null;
+    
+      // Cập nhật danh sách voucher đã chọn
+      const finalVouchers = [
+        ...(bestDiscountVoucher ? [bestDiscountVoucher] : []),
+        ...(selectedBuyXGetYVoucher ? [selectedBuyXGetYVoucher] : []),
+      ];
+      setSelectedVouchers(finalVouchers);
+    
+      // Cập nhật giảm giá
+      setDiscountAmount(maxDiscount);
+    
       // Cập nhật giỏ hàng nếu thay đổi
       if (JSON.stringify(updatedCart) !== JSON.stringify(cart)) {
         setCart(updatedCart);
       }
-    };
     
+      console.log("Selected Vouchers:", finalVouchers);
+    };
     
     
     const calculateVoucherDiscount = (voucher, totalAmount) => {
@@ -445,10 +592,12 @@ const Sell = () => {
   };
   
   // xác nhận thanh toán 
+
+  
   const confirmPayment = async () => {
-    // Kiểm tra khách hàng được chọn
-    if (!selectedCustomer) {
-      message.warning("Vui lòng chọn khách hàng trước khi thanh toán.");
+    // Kiểm tra khách hàng được chọn hoặc số điện thoại hợp lệ
+    if (!selectedCustomer || !selectedCustomer.phoneNumber) {
+      message.warning("Vui lòng nhập số điện thoại cho khách hàng vãng lai.");
       return;
     }
   
@@ -457,7 +606,6 @@ const Sell = () => {
       return;
     }
   
-  
     // Tạo payload từ dữ liệu giỏ hàng và thông tin khách hàng
     const payload = {
       paymentMethod,
@@ -465,20 +613,22 @@ const Sell = () => {
         product: item.productId,
         quantity: item.quantity,
         unit: item.unit,
-        currentPrice: item.isGift || item.discountedPrice === 0 
-          ? 0 
+        currentPrice: item.isGift || item.discountedPrice === 0
+          ? 0
           : (item.discountedPrice || item.price),
       })),
       createBy: employeeId,
-      customerId: selectedCustomer._id,
+      customerId: selectedCustomer._id || null,
+      phoneNumber: selectedCustomer ? selectedCustomer.phoneNumber : customerSearchTerm, 
       voucherCodes: selectedVouchers.map((voucher) => voucher.code),
     };
   
+
+
     try {
       // Gọi API để tạo hóa đơn
       const response = await createDirectSaleBill(payload);
   
-      // Xử lý kết quả trả về từ API
       if (response && response.bill) {
         message.success("Thanh toán thành công!");
   
@@ -486,27 +636,22 @@ const Sell = () => {
   
         // Đóng modal thanh toán và đặt lại trạng thái
         setIsCheckoutModalOpen(false);
-        setCart([]); // Xóa giỏ hàng sau khi thanh toán thành công
-        setDiscountAmount(0); // Đặt lại giảm giá
-        setSelectedCustomer(null); // Xóa khách hàng đã chọn
+        setCart([]);
+        setDiscountAmount(0);
+        setSelectedCustomer(null);
   
-        // In hóa đơn với mã hóa đơn (billCode)
         handlePrintInvoice(billCode);
       } else {
-        // Nếu không trả về hóa đơn hợp lệ, hiển thị lỗi
         throw new Error(response.message || "Không thể tạo hóa đơn.");
       }
     } catch (error) {
       // Xử lý lỗi nếu xảy ra
-      if (error.response && error.response.data && error.response.data.message) {
-        // Hiển thị thông báo lỗi từ API
-        message.error(`${error.response.data.message}`);
+      if (error.response?.data?.message) {
+        message.error(error.response.data.message);
       } else {
-        // Hiển thị thông báo lỗi chung
         message.error(`Đã xảy ra lỗi khi thanh toán: ${error.message}`);
       }
-  
-      console.error("Error during payment confirmation:", error);
+      console.error("Lỗi khi thanh toán:", error);
     }
   };
   
@@ -845,7 +990,7 @@ const Sell = () => {
   
       {/* Right Panel */}
       <div className="w-25 d-flex flex-column">
-        <div className="p-3 border-bottom">
+        {/* <div className="p-3 border-bottom">
         <InputGroup>
             <Form.Control
               placeholder="Thêm khách hàng vào đơn "
@@ -864,7 +1009,40 @@ const Sell = () => {
           )}
          
         </div>
-  
+   */}
+  <div className="p-3 border-bottom">
+  <InputGroup>
+  <Form.Control
+      placeholder="Thêm khách hàng vào đơn"
+      value={customerSearchTerm}
+      onChange={(e) => {
+        const value = e.target.value;
+        // Kiểm tra nếu giá trị hợp lệ: bắt đầu bằng 0 và chỉ chứa số
+        if (/^0\d*$/.test(value) || value === "") {
+          handleCustomerSearch(value);
+        } else {
+          message.warning("Số điện thoại phải bắt đầu bằng 0 và chỉ chứa số.");
+        }
+      }}
+      maxLength={10} // Giới hạn tối đa 10 ký tự
+    />
+
+
+    <Button variant="light" style={{ marginLeft: 10, borderRadius: 5 }}>
+      <Plus size={16} />
+    </Button>
+  </InputGroup>
+
+  {selectedCustomer && (
+    <div className="mt-2">
+      <strong>Khách hàng: </strong> 
+      {selectedCustomer.fullName} <br />
+      <strong>Số điện thoại: </strong> {selectedCustomer.phoneNumber || "N/A"}
+    </div>
+  )}
+</div>
+
+
         <div className="flex-grow-1 p-3">
           <Card className="mb-3">
             <Card.Body>

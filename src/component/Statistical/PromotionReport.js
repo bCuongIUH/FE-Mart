@@ -171,7 +171,7 @@ function PromotionReport() {
         item.conditions
           ?.map(
             (cond) =>
-              `SP: ${cond.productXName || cond.productXId}, SL: ${cond.quantityX}, ĐVT: ${cond.unitX}`
+              `Mua ${cond.quantityX} ${cond.unitX} ${cond.productXName || cond.productXId} ${cond.unitX}`
           )
           .join("; "), 
         dayjs(item.startDate).format("DD/MM/YYYY"),
@@ -330,8 +330,8 @@ function PromotionReport() {
                 color="blue"
                 style={{ fontSize: "14px", padding: "5px 10px" }}
               >
-                Mua SP: {cond.productXName || cond.productXId}, SL:{" "}
-                {cond.quantityX} - {cond.unitX}
+              Mua {cond.quantityX} {cond.unitX} {cond.productXName || cond.productXId}
+                {/* {cond.quantityX} - {cond.unitX} */}
               </div>
             </div>
           ))}
@@ -340,8 +340,8 @@ function PromotionReport() {
               color="green"
               style={{ fontSize: "14px", padding: "5px 10px" }}
             >
-              Tặng SP: {record.productYName || record.productYId}, SL:{" "}
-              {record.quantityY} - {record.unitY}
+              {/* Tặng   {record.quantityY1}  {record.unitY} {record.productYName || record.productYId} */}
+              {/* {record.quantityY1} - {record.unitY} */}
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Space, Table, Tag, Modal, Select, message, List } from 'antd';
 import { getBillOnline, updateCart } from '../../untills/api';
 import { AuthContext } from '../../untills/context/AuthContext';
+import { formatCurrency } from '../../untills/formatCurrency';
 
 const { Option } = Select;
 
@@ -9,8 +10,8 @@ const OrderTracking = () => {
   const [cartData, setCartData] = useState([]);
   const [error, setError] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false); // Modal chi tiết giỏ hàng
-  const [selectedCart, setSelectedCart] = useState(null); // Giữ thông tin giỏ hàng chi tiết
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false)
+  const [selectedCart, setSelectedCart] = useState(null); 
   const [selectedCartId, setSelectedCartId] = useState(null);
   const [newStatus, setNewStatus] = useState('');
   const { user } = useContext(AuthContext);
@@ -19,13 +20,16 @@ const OrderTracking = () => {
   const fetchBills = async () => {
     try {
       const bills = await getBillOnline();
+      console.log('====================================');
+      console.log('Bills:', bills);
+      console.log('====================================');
       const formattedData = bills.map(bill => ({
-        key: bill._id,
-        userName: bill.customer ? bill.customer.fullName : 'N/A', // Get customer name
+        key: bill.billCode,
+        userName: bill.customer ? bill.customer.fullName : 'N/A', 
         quantity: bill.items.reduce((total, item) => total + item.quantity, 0),
-        totalPrice: bill.items.reduce((total, item) => total + item.totalPrice, 0),
+        totalAmount: bill.totalAmount,
         status: bill.status,
-        items: bill.items, // Add items for detailed view
+        items: bill.items,
       }));
 
       setCartData(formattedData);
@@ -91,8 +95,9 @@ const OrderTracking = () => {
     },
     {
       title: 'Tổng giá',
-      dataIndex: 'totalPrice',
-      key: 'totalPrice',
+      dataIndex: 'totalAmount',
+      key: 'totalAmount',
+      render: (text) => formatCurrency(text),
     },
     {
       title: 'Trạng thái',
@@ -159,7 +164,7 @@ const OrderTracking = () => {
                 <List.Item>
                   <List.Item.Meta
                     title={item.product.name}
-                    description={`Số lượng: ${item.quantity} | Giá: ${item.currentPrice} | Tổng: ${item.totalPrice}`}
+                    description={`Số lượng: ${item.quantity} | Giá: ${item.currentPrice} | Tổng: ${item.totalAmount}`}
                   />
                 </List.Item>
               )}

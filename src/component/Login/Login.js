@@ -17,13 +17,15 @@ function Login({ onClose, onSwitchToRegister }) {
   const handleSubmit = async () => {
     try {
       const response = await postLogin({ email, password });
-      if (response.status === 200) {
-        const data = response.data;
-        localStorage.setItem('token', data.token);
-        login(data.user);
-        data.user.role === 'admin' ? navigate('/UIManager') : navigate('/UIPage');
+  
+      const data = response.data;
+      localStorage.setItem('token', data.token);
+      login(data.user);
+  
+      if (data.user.role === 'admin') {
+        navigate('/UIManager');
       } else {
-        setErrorMessage(response.data.message || 'Đăng nhập thất bại');
+        navigate('/UIPage');
       }
     } catch (error) {
       setErrorMessage(
@@ -33,6 +35,7 @@ function Login({ onClose, onSwitchToRegister }) {
       );
     }
   };
+  ;
 
   return (
     <Modal

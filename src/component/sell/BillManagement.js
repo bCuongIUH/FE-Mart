@@ -40,7 +40,8 @@ const ManagerBill = () => {
         const employeeData = await getAllEmployee();
         const customerData = await getAllCustomers();
   
-        setBills(billData);
+        // setBills(billData);
+        setBills(Array.isArray(billData) ? billData : []);
         setFilteredBills(billData);
         setEmployees(employeeData);
         setCustomers(customerData);

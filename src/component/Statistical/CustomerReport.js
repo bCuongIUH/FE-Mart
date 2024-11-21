@@ -20,6 +20,8 @@ function CustomerReport() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customers, setCustomers] = useState([]);
 
+  console.log("Processed data for table:", customerStatistics);
+
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -229,9 +231,9 @@ function CustomerReport() {
         stat.address?.district || "Chưa cập nhật",
         stat.address?.province || "Chưa cập nhật",
         stat.category,
-        stat.totalAmount,
+        stat.actualTotalAmount,
         stat.discountAmount,
-        stat.totalAfterDiscountAmount,
+        stat.totalAmount,
       ]);
 
       row.font = { name: "Times New Roman", size: 12 };
@@ -303,8 +305,8 @@ function CustomerReport() {
     { title: "Danh mục", dataIndex: "category", key: "category" },
     {
       title: "Tổng Số Tiền",
-      dataIndex: "totalAmount",
-      key: "totalAmount",
+      dataIndex: "actualTotalAmount",
+      key: "actualTotalAmount",
       render: (text) => formatCurrency(text),
     },
     {
@@ -315,8 +317,8 @@ function CustomerReport() {
     },
     {
       title: "Tổng Sau CK",
-      dataIndex: "totalAfterDiscountAmount",
-      key: "totalAfterDiscountAmount",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
       render: (text) => formatCurrency(text),
     },
   ];

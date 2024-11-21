@@ -1,11 +1,10 @@
 import axios from "axios";
 // const needsContentType = true;
+const token = localStorage.getItem('token');
 const config = {
   withCredentials: true,
   headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`, 
-    //  ...(needsContentType && { "Content-Type": "application/json" }),
-  
+    ...(token && { Authorization: `Bearer ${token}` }),
   },
 };
 
@@ -48,17 +47,17 @@ export const postRegister = async (data) => {
   };
   //đăng nhập
   export const postLogin = async (data) => {
-  
-    return new Promise((rejects, resolve) => {
+    return new Promise((resolve, reject) => {
       axios.post(`${API_URL}/auth/login`, data, config)
         .then(res => {
-          rejects(res)
+          resolve(res); // Gọi `resolve` khi thành công
         })
         .catch(err => {
-          resolve(err)
-        })
-    })
-  }
+          reject(err); // Gọi `reject` khi thất bại
+        });
+    });
+  };
+  
   //token và session
   export const removeCookie = async () => {
     try {
@@ -468,12 +467,12 @@ export const createBill = async (userId, paymentMethod) => {
 //     throw error;
 //   }
 // };
-export const createDirectSaleBill = async ({ paymentMethod, items, customerId, voucherCodes, createBy }) => {
+export const createDirectSaleBill = async ({ paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy }) => {
   try {
-    console.log("Sending payload:", { paymentMethod, items, customerId, voucherCodes, createBy });
+    console.log("Sending payload:", { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy });
     const response = await axios.post(
       `${API_URL}/bill/create-buy-directly`,
-      { paymentMethod, items, customerId, voucherCodes, createBy },
+      { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy },
       {
         withCredentials: true,
         headers: {

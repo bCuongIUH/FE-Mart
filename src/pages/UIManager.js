@@ -190,7 +190,7 @@ const WarehouseManager = () => {
           <SubMenu key="sub8" icon={<LineChartOutlined />} title="Thống kê">
             <Menu.Item key="18" onClick={() => handleNavigate(<StatisticsChart />)}>Báo cáo doanh thu</Menu.Item>
             <Menu.Item key="19" onClick={() => handleNavigate(<CustomerReport/>)}>Báo cáo khách hàng</Menu.Item>
-            <Menu.Item key="20" onClick={() => handleNavigate(<PromotionReport />)}>Báo cáo khách hàng</Menu.Item>
+            <Menu.Item key="20" onClick={() => handleNavigate(<PromotionReport />)}>Thống kê khuyến mãi</Menu.Item>
           </SubMenu>
         </Menu>
       </Sider>

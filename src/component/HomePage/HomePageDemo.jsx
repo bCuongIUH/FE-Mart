@@ -21,7 +21,7 @@ export default function SupermarketLanding() {
     },
     {
       id: 2,
-      image: 'https://cdn-media.sforum.vn/storage/app/media/ctvseocps123/hinh-nen-8d-thumbnail.jpg',
+      image: require('../../assets/img/ben-ngoai.png'),
       title: 'EL NIDO ISLAND',
       location: 'Palawan, Philippines',
       description: 'El Nido is known for its white-sand beaches, coral reefs, and as the gateway to the Bacuit archipelago, a group of islands with steep karst cliffs.',
@@ -29,7 +29,7 @@ export default function SupermarketLanding() {
     },
     {
       id: 3,
-      image: 'https://img4.thuthuatphanmem.vn/uploads/2020/06/22/hinh-nen-anime-cho-may-tinh_092518501.jpg',
+      image: require('../../assets/img/ben-trong.png'),
       title: 'MAYON VOLCANO',
       location: 'Albay, Philippines',
       description: 'Mayon Volcano is an active stratovolcano famous for its perfect cone shape. It\'s the centerpiece of the Albay Biosphere Reserve.',
