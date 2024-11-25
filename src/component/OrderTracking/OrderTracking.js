@@ -1,100 +1,113 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Space, Table, Tag, Modal, Select, message, List } from 'antd';
-import { getBillOnline, updateCart } from '../../untills/api';
-import { AuthContext } from '../../untills/context/AuthContext';
+import React, { useState, useEffect } from 'react';
+import { Table, Tag, Space, Modal, List, Image, message, Button, Tooltip } from 'antd';
 import { formatCurrency } from '../../untills/formatCurrency';
-
-const { Option } = Select;
+import dayjs from 'dayjs';
+import { gettAllBillReturnOnline, updateBillStatusOnl } from '../../untills/api';
+import { getAllPriceProduct } from '../../untills/priceApi';
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons';
 
 const OrderTracking = () => {
-  const [cartData, setCartData] = useState([]);
-  const [error, setError] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false)
-  const [selectedCart, setSelectedCart] = useState(null); 
-  const [selectedCartId, setSelectedCartId] = useState(null);
-  const [newStatus, setNewStatus] = useState('');
-  const { user } = useContext(AuthContext);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Fetch bills from the backend
-  const fetchBills = async () => {
-    try {
-      const bills = await getBillOnline();
-      console.log('====================================');
-      console.log('Bills:', bills);
-      console.log('====================================');
-      const formattedData = bills.map(bill => ({
-        key: bill.billCode,
-        userName: bill.customer ? bill.customer.fullName : 'N/A', 
-        quantity: bill.items.reduce((total, item) => total + item.quantity, 0),
-        totalAmount: bill.totalAmount,
-        status: bill.status,
-        items: bill.items,
-      }));
-
-      setCartData(formattedData);
-    } catch (error) {
-      setError('Lỗi khi lấy dữ liệu hóa đơn');
-      console.error(error);
-    }
-  };
 
   useEffect(() => {
-    fetchBills();
+    fetchOrders();
   }, []);
 
-  const handleUpdate = (record) => {
-    setSelectedCartId(record.key); 
-    setNewStatus(record.status); 
-    setIsModalVisible(true); 
-  };
-
-  const handleOk = async () => {
+  const fetchOrders = async () => {
     try {
-      await updateCart(selectedCartId, newStatus, user);
-      setIsModalVisible(false); 
-      setNewStatus(''); 
-      fetchBills(); 
+      setLoading(true);
+      const billsResponse = await gettAllBillReturnOnline();
+  
+      // Fetch product details
+      const productsResponse = await getAllPriceProduct();
+      const productsMap = productsResponse.prices.reduce((map, product) => {
+        map[product.productId] = product.productName; 
+        return map;
+      }, {});
+  
+    
+      const formattedOrders = billsResponse.data
+        .map((order) => {
+          const updatedItems = order.items.map((item) => ({
+            ...item,
+            productName: productsMap[item.product] || 'Không xác định', 
+          }));
+          return { ...order, items: updatedItems };
+        })
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
+  
+      setOrders(formattedOrders);
     } catch (error) {
-      console.error('Lỗi khi cập nhật trạng thái giỏ hàng:', error);
-      setError('Cập nhật trạng thái thất bại.');
+      console.error('Error fetching orders:', error);
+      message.error('Failed to fetch orders');
+    } finally {
+      setLoading(false);
     }
   };
+  
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    setNewStatus('');
+  // Show order detail modal
+  const showOrderDetail = (order) => {
+    setSelectedOrder(order);
+    setDetailModalVisible(true);
   };
 
-  const handleViewDetails = (record) => {
-    setSelectedCart(record); // Lưu thông tin giỏ hàng chi tiết
-    setIsDetailModalVisible(true); // Hiển thị modal chi tiết
-  };
-
+  // Close detail modal
   const closeDetailModal = () => {
-    setIsDetailModalVisible(false);
-    setSelectedCart(null);
+    setDetailModalVisible(false);
+    setSelectedOrder(null);
   };
 
+  // Handle accept or reject actions
+  const handleAcceptReturn = async (order) => {
+    try {
+      const response = await updateBillStatusOnl(order._id, 'accept');
+      message.success(response.message || 'Cập nhật trạng thái thành công');
+      fetchOrders(); // Làm mới danh sách đơn hàng sau khi cập nhật
+    } catch (error) {
+      message.error('Cập nhật trạng thái thất bại.');
+    }
+  };
+  
+const handleRejectReturn = async (order) => {
+  try {
+    const response = await updateBillStatusOnl(order._id, 'reject');
+    message.success(response.message || 'Cập nhật trạng thái thành công');
+    fetchOrders(); // Làm mới danh sách đơn hàng sau khi cập nhật
+  } catch (error) {
+    message.error('Cập nhật trạng thái thất bại.');
+  }
+};
+const statusMap = {
+  HoanThanh: 'Đã Thanh toán',
+  HoanTra: 'Hoàn Trả',
+  DangXuLy: 'Yêu cầu trả hàng',
+  KiemHang: 'Kiểm tra hàng',
+  Canceled: 'Từ Chối Trả Hàng',
+};
+
+  // Table columns
   const columns = [
     {
       title: 'Mã hóa đơn',
-      dataIndex: 'key',
-      key: '_id',
-      render: (text, record) => <a onClick={() => handleViewDetails(record)}>{text}</a>, // Thêm onClick để mở modal chi tiết
+      dataIndex: 'billCode',
+      key: 'billCode',
+      render: (text, record) => (
+        <a onClick={() => showOrderDetail(record)}>{text}</a>
+      ),
     },
     {
-      title: 'Tên khách hàng',
-      dataIndex: 'userName',
-      key: 'userName',
+      title: 'Ngày tạo',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm'),
     },
     {
-      title: 'Số lượng',
-      dataIndex: 'quantity',
-      key: 'quantity',
-    },
-    {
-      title: 'Tổng giá',
+      title: 'Tổng tiền',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       render: (text) => formatCurrency(text),
@@ -104,77 +117,127 @@ const OrderTracking = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
-        let color = status === 'HoanThanh' ? 'green' : 'volcano';
-        return <Tag color={color}>{status.toUpperCase()}</Tag>;
+        let color = '';
+        switch (status) {
+          case 'DangXuLy':
+          case 'KiemHang':
+            color = 'gold'; // Màu vàng cho Đang xử lý và Kiểm tra hàng
+            break;
+          case 'Canceled':
+            color = 'red'; // Màu đỏ cho Từ chối trả hàng
+            break;
+          case 'HoanThanh':
+            color = 'green'; // Màu xanh cho Đã thanh toán
+            break;
+          case 'HoanTra':
+            color = 'blue'; // Màu xanh dương cho Hoàn trả
+            break;
+          default:
+            color = 'default'; // Mặc định
+        }
+        return <Tag color={color}>{statusMap[status] || status}</Tag>;
       },
     },
     {
-      title: 'Hành động',
-      key: 'action',
+      title: 'Yêu cầu hoàn trả',
+      key: 'returnRequests',
       render: (_, record) => (
-        <Space size="middle">
-          <a onClick={() => handleUpdate(record)}>Thay đổi</a>
+        <Space>
+          {['DangXuLy', 'KiemHang'].includes(record.status) && (
+            <>
+              <Tooltip title="Chấp nhận">
+                <CheckOutlined
+                  style={{ color: 'green', fontSize: '24px', cursor: 'pointer' }}
+                  onClick={() => handleAcceptReturn(record)}
+                />
+              </Tooltip>
+              <Tooltip title="Từ chối">
+                <CloseOutlined
+                  style={{ color: 'red', fontSize: '24px', cursor: 'pointer' }}
+                  onClick={() => handleRejectReturn(record)}
+                />
+              </Tooltip>
+            </>
+          )}
         </Space>
       ),
     },
   ];
 
   return (
-    <>
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      <Table columns={columns} dataSource={cartData} />
-      
-      {/* Modal cập nhật trạng thái */}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Theo dõi đơn hàng</h1>
+      <Table
+        columns={columns}
+        dataSource={orders}
+        rowKey="_id"
+        loading={loading}
+      />
       <Modal
-        title="Cập nhật trạng thái giỏ hàng"
-        visible={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-      >
-        <Select
-          value={newStatus}
-          onChange={value => setNewStatus(value)}
-          style={{ width: '100%' }}
-          placeholder="Chọn trạng thái mới"
-        >
-          <Option value="DaMua">Đã giao hàng</Option>
-          <Option value="HoanTra">Hoàn Trả</Option>
-        </Select>
-      </Modal>
-
-      {/* Modal chi tiết giỏ hàng */}
-      <Modal
-        title="Chi tiết giỏ hàng"
-        visible={isDetailModalVisible}
-        onOk={closeDetailModal}
+        title="Chi tiết đơn hàng"
+        visible={detailModalVisible}
         onCancel={closeDetailModal}
         footer={null}
+        width={800}
       >
-        {selectedCart ? (
+        {selectedOrder && (
           <div>
-            <p><strong>Mã hóa đơn:</strong> {selectedCart.key}</p>
-            <p><strong>Khách hàng:</strong> {selectedCart.userName}</p>
-            <p><strong>Trạng thái:</strong> {selectedCart.status}</p>
-            <p><strong>Tổng giá:</strong> {selectedCart.totalPrice}</p>
-            <p><strong>Số lượng sản phẩm:</strong> {selectedCart.quantity}</p>
-            <h4>Chi tiết sản phẩm:</h4>
+            <p><strong>Mã hóa đơn:</strong> {selectedOrder.billCode}</p>
+            <p>
+              <strong>Ngày tạo:</strong>{' '}
+              {dayjs(selectedOrder.createdAt).format('DD/MM/YYYY HH:mm')}
+            </p>
+            <p><strong>Tổng tiền:</strong> {formatCurrency(selectedOrder.totalAmount)}</p>
+            <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
+            <p><strong>Phương thức thanh toán:</strong> {selectedOrder.paymentMethod}</p>
+
+            <h3 className="font-bold mt-4 mb-2">Sản phẩm:</h3>
             <List
-              dataSource={selectedCart.items}
-              renderItem={item => (
+              dataSource={selectedOrder.items}
+              renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
-                    title={item.product.name}
-                    description={`Số lượng: ${item.quantity} | Giá: ${item.currentPrice} | Tổng: ${item.totalAmount}`}
+                    title={`${item.productName} - ${item.quantity} ${item.unit}`}
+                    description={`Giá: ${formatCurrency(item.currentPrice)}`}
                   />
                 </List.Item>
               )}
             />
+
+            <h3 className="font-bold mt-4 mb-2">Yêu cầu hoàn trả:</h3>
+            {selectedOrder.returnRequests.length > 0 ? (
+              <List
+                dataSource={selectedOrder.returnRequests}
+                renderItem={(request) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={`Lý do: ${request.reason}`}
+                      description={
+                        <>
+                          <p>Trạng thái: {request.status}</p>
+                          <p>
+                            Ngày tạo: {dayjs(request.createdAt).format('DD/MM/YYYY HH:mm')}
+                          </p>
+                          {request.images && request.images.length > 0 && (
+                            <Image
+                              src={request.images[0]}
+                              alt="Return request image"
+                              width={200}
+                            />
+                          )}
+                        </>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            ) : (
+              <p>Không có yêu cầu hoàn trả</p>
+            )}
           </div>
-        ) : (
-          <p>Không có thông tin chi tiết.</p>
         )}
       </Modal>
-    </>
+    </div>
   );
 };
 

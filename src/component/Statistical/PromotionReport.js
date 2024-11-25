@@ -21,16 +21,17 @@ function PromotionReport() {
   const today = dayjs();
   const yesterday = dayjs().subtract(1, "day");
 
+
   const [dateRange, setDateRange] = useState([yesterday, today]);
   const [buyXGetYData, setBuyXGetYData] = useState([]);
   const [otherVoucherData, setOtherVoucherData] = useState([]);
-  console.log('checkk', otherVoucherData);
+  console.log('checkk', buyXGetYData);
   const voucherTypeTranslations = {
     BuyXGetY: "Mua hàng tặng hàng",
     FixedDiscount: "Giảm Giá Cố Định",
     PercentageDiscount: "Giảm Giá Phần Trăm",
   };
-
+  console.log("2",otherVoucherData);
   useEffect(() => {
     fetchVoucherStatistics();
   }, []);
@@ -148,8 +149,9 @@ function PromotionReport() {
       "Ngày Kết Thúc",
       "Mã SP Tặng",
       "Tên SP Tặng",
-      "SL Tặng",
-      "ĐVT Tặng",
+      "SL Sử Dụng",
+      "Số Lượng Tặng",
+      "Đon Vị Tính",
     ];
     
     const buyXGetYHeaderRow = worksheet.addRow(buyXGetYHeaders);
@@ -159,31 +161,34 @@ function PromotionReport() {
       cell.fill = {
         type: "pattern",
         pattern: "solid",
-        fgColor: { argb: "FFD700" },
+        fgColor: { argb: "FFD700" } 
       };
     });
-
+    
     buyXGetYData.forEach((item, index) => {
       const row = worksheet.addRow([
         index + 1,
         item.voucherCode,
-        item.voucherName,
+        "Mua hàng Tặng hàng",
         item.conditions
           ?.map(
             (cond) =>
-              `Mua ${cond.quantityX} ${cond.unitX} ${cond.productXName || cond.productXId} ${cond.unitX}`
+              `Mua ${cond.quantityX} ${cond.unitX} ${cond.productXName || cond.productXId}`
           )
-          .join("; "), 
+          .join("; "),
         dayjs(item.startDate).format("DD/MM/YYYY"),
         dayjs(item.endDate).format("DD/MM/YYYY"),
-        item.productYId,
-        item.productYName,
-        item.quantityY,
-        item.unitY,
+        item.giftProducts[0]?.productYId,
+        item.giftProducts[0]?.productYName,
+        item.usageCount,
+        item.giftProducts[0]?.quantityY,
+        item.giftProducts[0]?.unitY,
+       
       ]);
       row.font = { name: "Times New Roman", size: 12 };
       row.height = 20;
     });
+
 
     // Add an empty row between two sections
     worksheet.addRow([]);
@@ -317,7 +322,12 @@ function PromotionReport() {
 
   const buyXGetYColumns = [
     { title: "Mã Khuyến mãi", dataIndex: "voucherCode", key: "voucherCode" },
-    { title: "Loại Khuyến mãi", dataIndex: "voucherName", key: "voucherName" },
+    { 
+      title: "Loại Khuyến mãi", 
+      dataIndex: "voucherName", 
+      key: "voucherName",
+      render: () => "Mua hàng Tặng hàng"
+    },
     {
       title: "Điều Kiện",
       dataIndex: "conditions",
@@ -326,39 +336,61 @@ function PromotionReport() {
         <div>
           {conditions?.map((cond, index) => (
             <div key={index} style={{ marginBottom: "8px" }}>
-              <div
-                color="blue"
-                style={{ fontSize: "14px", padding: "5px 10px" }}
-              >
-              Mua {cond.quantityX} {cond.unitX} {cond.productXName || cond.productXId}
-                {/* {cond.quantityX} - {cond.unitX} */}
+              <div style={{ fontSize: "14px", padding: "5px 10px" }}>
+                Mua {cond.quantityX} {cond.unitX} {cond.productXName || cond.productXId}
               </div>
             </div>
           ))}
           <div>
-            <div
-              color="green"
-              style={{ fontSize: "14px", padding: "5px 10px" }}
-            >
-              {/* Tặng   {record.quantityY1}  {record.unitY} {record.productYName || record.productYId} */}
-              {/* {record.quantityY1} - {record.unitY} */}
-            </div>
+            {record.giftProducts?.map((gift, index) => (
+              <div key={index} style={{ fontSize: "14px", padding: "5px 10px", color: "green" }}>
+               
+              </div>
+            ))}
           </div>
         </div>
       ),
     },
-    { title: "Ngày Bắt Đầu ", dataIndex: "startDate", key: "startDate" },
-    { title: "Ngày Kết Thúc", dataIndex: "endDate", key: "endDate" },
-    { title: "Mã Sản Phẩm Tặng", dataIndex: "productYId", key: "productYId" },
-    {
-      title: "Tên Sản Phẩm Tặng",
-      dataIndex: "productYName",
-      key: "productYName",
+    { 
+      title: "Ngày Bắt Đầu", 
+      dataIndex: "startDate", 
+      key: "startDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY")
     },
-    { title: "Số Lượng Tặng", dataIndex: "quantityY", key: "quantityY" },
-    { title: "Đơn Vị Tính", dataIndex: "unitY", key: "unitY" },
-
+    { 
+      title: "Ngày Kết Thúc", 
+      dataIndex: "endDate", 
+      key: "endDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY")
+    },
+    { 
+      title: "Mã Sản Phẩm Tặng", 
+      dataIndex: "giftProducts", 
+      key: "giftProducts",
+      render: (giftProducts) => giftProducts?.map(gift => `${gift.productYId}`).join(", ")
+    },
+    { 
+      title: "Sản Phẩm Tặng", 
+      dataIndex: "giftProducts", 
+      key: "giftProducts",
+      render: (giftProducts) => giftProducts?.map(gift => `${gift.productYName} `).join(", ")
+    },
+,
+    { title: "Số Lần Sử Dụng", dataIndex: "usageCount", key: "usageCount" },
+    { 
+      title: "Số Lượng Tặng", 
+      dataIndex: "giftProducts", 
+      key: "quantityY",
+      render: (giftProducts) => giftProducts?.map(gift => `${gift.quantityY} `).join(", ")
+    },
+    { 
+      title: "Đơn Vị Tính", 
+      dataIndex: "giftProducts", 
+      key: "quantityY",
+      render: (giftProducts) => giftProducts?.map(gift => ` ${gift.unitY}`).join(", ")
+    }
   ];
+
   const otherVoucherColumns = [
     { title: "Mã Khuyến Mãi", dataIndex: "voucherCode", key: "voucherCode" },
     {
@@ -440,8 +472,8 @@ function PromotionReport() {
           dataSource={buyXGetYData.map((item, index) => ({
             ...item,
             key: index,
-            startDate: dayjs(item.startDate).format("DD/MM/YYYY"),
-            endDate: dayjs(item.endDate).format("DD/MM/YYYY"),
+            render: (date) => dayjs(date).format("DD/MM/YYYY")
+            // render: (date) => dayjs(date).format("DD/MM/YYYY")
           }))}
           pagination={{ pageSize: 5 }}
           style={{ marginTop: 20 }}
@@ -466,3 +498,4 @@ function PromotionReport() {
 }
 
 export default PromotionReport;
+

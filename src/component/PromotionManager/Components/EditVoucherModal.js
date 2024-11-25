@@ -83,13 +83,13 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "productXId"]}
                       fieldKey={[fieldKey, "productXId"]}
-                      label="Sản phẩm X"
+                      label="Sản phẩm mua"
                       rules={[
-                        { required: true, message: "Vui lòng chọn sản phẩm X" },
+                        { required: true, message: "Vui lòng chọn sản phẩm" },
                       ]}
                     >
                       <Select
-                        placeholder="Chọn sản phẩm X"
+                        placeholder="Chọn sản phẩm"
                         onChange={(value) => {
                           handleProductXChange(value);
                           form.setFieldValue(
@@ -109,12 +109,12 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "unitX"]}
                       fieldKey={[fieldKey, "unitX"]}
-                      label="Đơn vị sản phẩm X"
+                      label="Đơn vị sản phẩm mua"
                       rules={[
-                        { required: true, message: "Vui lòng chọn đơn vị X" },
+                        { required: true, message: "Vui lòng chọn đơn vị mua" },
                       ]}
                     >
-                      <Select placeholder="Chọn đơn vị sản phẩm X">
+                      <Select placeholder="Chọn đơn vị sản phẩm mua">
                         {unitsX.map((unit) => (
                           <Select.Option key={unit._id} value={unit._id}>
                             {unit.name}
@@ -126,9 +126,9 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "quantityX"]}
                       fieldKey={[fieldKey, "quantityX"]}
-                      label="Số lượng X"
+                      label="Số lượng "
                       rules={[
-                        { required: true, message: "Vui lòng nhập số lượng X" },
+                        { required: true, message: "Vui lòng nhập số lượng" },
                       ]}
                     >
                       <Input type="number" />
@@ -137,13 +137,13 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "productYId"]}
                       fieldKey={[fieldKey, "productYId"]}
-                      label="Sản phẩm Y"
+                      label="Sản phẩm tặng"
                       rules={[
-                        { required: true, message: "Vui lòng chọn sản phẩm Y" },
+                        { required: true, message: "Vui lòng chọn sản phẩm" },
                       ]}
                     >
                       <Select
-                        placeholder="Chọn sản phẩm Y"
+                        placeholder="Chọn sản phẩm"
                         onChange={(value) => {
                           handleProductYChange(value);
                           form.setFieldValue(
@@ -163,12 +163,12 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "unitY"]}
                       fieldKey={[fieldKey, "unitY"]}
-                      label="Đơn vị sản phẩm Y"
+                      label="Đơn vị sản phẩm"
                       rules={[
-                        { required: true, message: "Vui lòng chọn đơn vị Y" },
+                        { required: true, message: "Vui lòng chọn đơn vị" },
                       ]}
                     >
-                      <Select placeholder="Chọn đơn vị sản phẩm Y">
+                      <Select placeholder="Chọn đơn vị sản phẩm">
                         {unitsY.map((unit) => (
                           <Select.Option key={unit._id} value={unit._id}>
                             {unit.name}
@@ -180,9 +180,9 @@ const EditVoucherModal = ({ visible, onCancel, onSubmit, editingVoucher }) => {
                       {...restField}
                       name={[name, "quantityY"]}
                       fieldKey={[fieldKey, "quantityY"]}
-                      label="Số lượng Y"
+                      label="Số lượng"
                       rules={[
-                        { required: true, message: "Vui lòng nhập số lượng Y" },
+                        { required: true, message: "Vui lòng nhập số lượng" },
                       ]}
                     >
                       <Input type="number" />

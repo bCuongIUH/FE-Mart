@@ -261,8 +261,9 @@ console.log(dailyRevenue);
           employee.employeeCode,
           employee.employeeName,
           "",
+         
+          employee.totalAmount,
           employee.discountAmount,
-          employee.totalAmount ,
           employee.revenueAfterDiscount,
         ]);
         empRow.font = { name: "Times New Roman", size: 12 };

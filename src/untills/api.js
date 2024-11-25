@@ -455,7 +455,27 @@ export const createBill = async (userId, paymentMethod) => {
     throw error;
   }
 };
-
+export const gettAllBillReturnOnline = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/return`, config);
+    return response.data;
+  } catch (error) {
+    console.error('Lỗi khi tạo hóa đơn:', error);
+    throw error;
+  }
+};
+export const updateBillStatusOnl = async (billId, action) => {
+  try {
+    const response = await axios.post(`${API_URL}/return/update-status`, {
+      billId,
+      action,
+    });
+    return response.data; // Phản hồi thành công từ Backend
+  } catch (error) {
+    console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error.response?.data || error.message);
+    throw error; 
+  }
+};
 
 //tạo hóa đơn trực tiếp
 // export const createDirectSaleBill = async (paymentMethod, items) => {
@@ -467,12 +487,66 @@ export const createBill = async (userId, paymentMethod) => {
 //     throw error;
 //   }
 // };
-export const createDirectSaleBill = async ({ paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy }) => {
+// export const createDirectSaleBill = async ({ paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy }) => {
+//   try {
+//     console.log("Sending payload:", { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy });
+//     const response = await axios.post(
+//       `${API_URL}/bill/create-buy-directly`,
+//       { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy },
+//       {
+//         withCredentials: true,
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem("token")}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+//     console.log("Response from server:", response.data);
+//     return response.data;
+//   } catch (error) {
+//     console.error("Detailed error from createDirectSaleBill:", {
+//       message: error.message,
+//       responseData: error.response?.data,
+//       status: error.response?.status,
+//       headers: error.response?.headers,
+//     });
+//     throw error;
+//   }
+// };
+
+export const createDirectSaleBill = async ({
+  paymentMethod,
+  items,
+  customerId,
+  phoneNumber,
+  voucherCodes,
+  createBy,
+  status,
+  orderCode,
+}) => {
   try {
-    console.log("Sending payload:", { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy });
+    console.log("Sending payload:", {
+      paymentMethod,
+      items,
+      customerId,
+      phoneNumber,
+      voucherCodes,
+      createBy,
+      status,
+      orderCode,
+    });
     const response = await axios.post(
       `${API_URL}/bill/create-buy-directly`,
-      { paymentMethod, items, customerId,phoneNumber, voucherCodes, createBy },
+      {
+        paymentMethod,
+        items,
+        customerId,
+        phoneNumber,
+        voucherCodes,
+        createBy,
+        status,
+        orderCode,
+      },
       {
         withCredentials: true,
         headers: {
@@ -493,8 +567,6 @@ export const createDirectSaleBill = async ({ paymentMethod, items, customerId,ph
     throw error;
   }
 };
-
-
 
 
 //lấy toàn bộ bill của người dùng
@@ -707,3 +779,15 @@ export const deletePromotion = async (promotionId) => {
     throw error;
   }
 };
+export const updateBillStatusByCode = async (orderCode, status) => {
+  try {
+    const response = await axios.put(`${API_URL}/bill/update-status-by-code`, {
+      orderCode,
+      status,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi cập nhật trạng thái hóa đơn:", error);
+    throw error;
+  }
+}
