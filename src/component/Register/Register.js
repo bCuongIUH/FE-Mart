@@ -19,6 +19,9 @@ function Register({ onClose, onSwitchToLogin }) {
 
   // Regex để kiểm tra tên tiếng Việt
   const vietnameseNameRegex = /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểễếìỉịọỏốồổỗộớờởỡợụủứừửữựỳỵỷỹỶ\s]+$/;
+  
+  const passwordRegex = /^[\s\S]{8,32}$/;
+
 
   const handleSubmit = async () => {
     if (password !== confirmPassword) {
@@ -31,6 +34,10 @@ function Register({ onClose, onSwitchToLogin }) {
     }
     if (!vietnameseNameRegex.test(fullName)) {
       setErrorMessage('Tên không hợp lệ. Vui lòng nhập tên bằng tiếng Việt.');
+      return;
+    }
+    if (!passwordRegex.test(password)) {
+      setErrorMessage('Mật khẩu không hợp lệ. Mật khẩu phải có độ dài từ 8 đến 32 ký tự.');
       return;
     }
 

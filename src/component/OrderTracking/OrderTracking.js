@@ -130,7 +130,7 @@ const statusMap = {
             color = 'green'; // Màu xanh cho Đã thanh toán
             break;
           case 'HoanTra':
-            color = 'blue'; // Màu xanh dương cho Hoàn trả
+            color = 'green'; // Màu xanh dương cho Hoàn trả
             break;
           default:
             color = 'default'; // Mặc định

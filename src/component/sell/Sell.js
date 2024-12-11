@@ -2290,7 +2290,7 @@ const Sell = () => {
                   ? "Tiền mặt"
                   : paymentMethod === "Card"
                   ? "Thẻ"
-                  : "Chuyển khoản"}
+                  : "Thẻ"}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
@@ -2299,15 +2299,15 @@ const Sell = () => {
                 >
                   Tiền mặt
                 </Dropdown.Item>
-                <Dropdown.Item
+                {/* <Dropdown.Item
                   onClick={() => handlePaymentMethodChange("Card")}
                 >
                   Thẻ
-                </Dropdown.Item>
+                </Dropdown.Item> */}
                 <Dropdown.Item
                   onClick={() => handlePaymentMethodChange("BankTransfer")}
                 >
-                  Chuyển khoản
+                  Thẻ
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -2328,7 +2328,7 @@ const Sell = () => {
                 ? "Tiền mặt"
                 : paymentMethod === "Card"
                 ? "Thẻ"
-                : "Chuyển khoản"}
+                : "Thẻ"}
               )
             </Button>
           </div>

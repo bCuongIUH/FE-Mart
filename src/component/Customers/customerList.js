@@ -35,6 +35,7 @@ const CustomerList = () => {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      render: (text) => text ? text : 'Chưa cập nhật',
     },
     {
       title: 'Số Điện Thoại',

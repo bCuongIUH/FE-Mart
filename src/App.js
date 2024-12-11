@@ -22,6 +22,7 @@ import StatisticsChart from "./component/Statistical/Statistical";
 import ProductPage from "./component/products/ProductPage";
 import HomePageDemo from "./component/HomePage/HomePageDemo";
 import SupermarketLanding from "./component/HomePage/HomePageDemo";
+import UIpageDemo from "./component/HomePage/UIpagedemo";
 
 
 // import CreateUnitList from "./component/units/CreateUnitList";
@@ -38,7 +39,7 @@ function App() {
       <SignupContext>
   
           <Routes>
-            <Route path="/" element={<HomePage />} /> 
+            <Route path="/" element={<SupermarketLanding />} /> 
             <Route path="/register" element={<Register />} />
             <Route path="/otp-verification" element={<OTPVerification />} />
             <Route path="/login" element={<Login />} />
@@ -67,7 +68,7 @@ function App() {
               }
             />
              <Route path="/ManagerPage" element={<ProductPage />} />
-           
+             <Route path="/UIpageDemo" element={<UIpageDemo />} />
     
              <Route path="/change-password" element={<ChangePassword />} /> 
              <Route path="/ManageEmployees" element={<ManageEmployees />} />
@@ -76,7 +77,7 @@ function App() {
          
              <Route path="/ManagerSales" element={<SellPage />} />
              <Route path="/statistics" element={<StatisticsChart />} />
-             <Route path="/HomePageDemo" element={<SupermarketLanding />} />
+             {/* <Route path="/HomePageDemo" element={<SupermarketLanding />} /> */}
        
              
                   

@@ -35,7 +35,7 @@ function Login({ onClose, onSwitchToRegister }) {
       );
     }
   };
-  ;
+  
 
   return (
     <Modal

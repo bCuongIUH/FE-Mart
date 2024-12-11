@@ -69,3 +69,24 @@ export const getVoucherStatistics = async (startDate, endDate, voucherType) => {
     throw error;
   }
 };
+//top 5
+export const getTop5CustomerSpending = async () => {
+  try {
+    const url = `${STATISTICS_API_URL}/top5customer`;
+    const response = await axios.get(url);  
+    return response.data;
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi lấy danh sách top 5 khách hàng:", error);
+    throw error;
+  }
+};
+export const getTop5ProductSpending = async () => {
+  try {
+    const url = `${STATISTICS_API_URL}/top5product`;
+    const response = await axios.get(url);  
+    return response.data;
+  } catch (error) {
+    console.error("Có lỗi xảy ra khi lấy danh sách top 5 khách hàng:", error);
+    throw error;
+  }
+};
