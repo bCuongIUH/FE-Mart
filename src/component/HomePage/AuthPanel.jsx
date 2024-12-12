@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
-import { postLogin, postRegister, verifyOTP, resendOTP, forgotPassword } from '../../untills/api';
+import { postLogin, postRegister, verifyOTP, resendOTP } from '../../untills/api';
 import { notification } from 'antd';
 
 function InputField({ label, type, value, onChange, onFocus, placeholder, required }) {
@@ -36,7 +36,7 @@ export default function AuthPanel({ isOpen, onClose, onLoginSuccess }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOtpInputDisabled, setIsOtpInputDisabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
@@ -205,20 +205,7 @@ export default function AuthPanel({ isOpen, onClose, onLoginSuccess }) {
     resetAllInputs();
     onClose();
   };
-  const handleSendOTP = async () => {
-    setErrorMessage('');
-    setIsLoading(true);
-    try {
-      // Giả sử gửi OTP qua API
-      await resendOTP({ email });
-      setOtpStep(true);
-      notification.success({ message: 'OTP đã được gửi đến email của bạn.' });
-    } catch (error) {
-      setErrorMessage('Không thể gửi OTP, vui lòng thử lại.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+
   return (
     <div
       className={`fixed top-0 right-0 w-full md:w-1/3 h-full bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-50 ${
@@ -352,29 +339,6 @@ export default function AuthPanel({ isOpen, onClose, onLoginSuccess }) {
               </form>
             )}
           </>
-              ) : forgotPasswordStep === 1 ? (
-                <div>
-                  <h3 className="text-lg font-bold text-gray-700">Nhập email để lấy lại mật khẩu</h3>
-                  {errorMessage && (
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                      <span className="block sm:inline">{errorMessage}</span>
-                    </div>
-                  )}
-                  <InputField
-                    label="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Nhập địa chỉ email"
-                    required
-                  />
-                  <button
-                    onClick={handleSendOTP}
-                    className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Xác nhận
-                  </button>
-                </div>
         ) : otpStep && (
           <div>
             <h3 className="text-lg font-bold text-gray-700">Nhập mã OTP từ email của bạn</h3>
