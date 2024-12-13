@@ -1762,7 +1762,7 @@ const Sell = () => {
   };
   const handleBankTransferPayment = async (orderCode) => {
     try {
-      const VNPAY_URL = "http://localhost:3000/UIManager";
+      const VNPAY_URL = "https://fe-mart-ten.vercel.app/UIManager";
       // Gọi API createOrder từ service
       const paymentUrl = await createVNPayPayment(
         totalDiscounted, // Tổng tiền cần thanh toán

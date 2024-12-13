@@ -8,8 +8,8 @@ const config = {
   },
 };
 
-// const API_URL = "http://172.28.117.95:5000/api"; 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://cmartshopbe.onrender.com/api"; 
+// const API_URL = "http://localhost:5000/api";
 
 //thêm bảng giá header
 export const createPriceList = async (data) => {

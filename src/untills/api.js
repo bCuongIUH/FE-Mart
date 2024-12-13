@@ -8,7 +8,7 @@ const config = {
   },
 };
 
-const API_URL = "https://be-mart-ikw0uytk4-bachcuong27-gmailcoms-projects.vercel.app/api"; 
+const API_URL = "https://cmartshopbe.onrender.com/api"; 
 // const API_URL = "http://localhost:5000/api";
 // đăng nhập / đăng ký / xác thực người dùng
 
