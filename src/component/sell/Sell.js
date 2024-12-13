@@ -1750,7 +1750,7 @@ const Sell = () => {
         )
         .join("\n");
 
-      message.error(`Lỗi trong giỏ hàng:\n${errorMessages}`);
+      message.error(`Lỗi trong giỏ hàng :\n${errorMessages}`);
       return false;
     }
 
