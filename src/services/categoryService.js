@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/categories"; // URL API cho categories
-
+// const API_URL = "http://localhost:5000/api/categories"; 
+const API_URL = "https://cmartshopbe.onrender.com/categories"; 
 // Cấu hình cho axios với token từ localStorage
 const config = {
   withCredentials: true,
