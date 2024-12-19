@@ -1762,7 +1762,7 @@ const Sell = () => {
   };
   const handleBankTransferPayment = async (orderCode) => {
     try {
-      const VNPAY_URL = "fe-mart-4e3l.vercel.app/UIManager";
+      const VNPAY_URL = "http://localhost:3000/UIManager";
       // Gọi API createOrder từ service
       const paymentUrl = await createVNPayPayment(
         totalDiscounted, // Tổng tiền cần thanh toán
@@ -2005,12 +2005,14 @@ const Sell = () => {
               </tbody>
             </table>
             <div class="total-section">
-              <div><span><strong>Thành tiền:</strong></span> <span>${total.toLocaleString()}đ</span></div>
+              <div><span><strong>Tổng tiền:</strong></span> <span>${total.toLocaleString()}đ</span></div>
               <div><span><strong>Chiết khấu:</strong></span> <span>${discountAmount.toLocaleString()}đ</span></div>
-              <div><span><strong>Tổng cộng:</strong></span> <span>${(
+
+              <div><span><strong>Tiền phải trả:</strong></span> <span>${(
                 total - discountAmount
               ).toLocaleString()}đ</span></div>
             </div>
+            <div><span><strong>Tiền thừa:</strong></span> <span>${0}đ</span></div>
             <div class="footer">
               <p>Cảm ơn quý khách, hẹn gặp lại!</p>
             </div>
@@ -2432,14 +2434,17 @@ const Sell = () => {
               style={{ padding: "10px", marginTop: "10px", textAlign: "right" }}
             >
               <p>
-                <strong>Thành tiền:</strong> {total.toLocaleString()}đ
+                <strong>Tổng tiền:</strong> {total.toLocaleString()}đ
               </p>
               <p>
                 <strong>Chiết khấu:</strong> {discountAmount.toLocaleString()}đ
               </p>
               <p>
-                <strong>Tổng tiền:</strong>{" "}
+                <strong>Tiền phải trả:</strong>{" "}
                 {(total - discountAmount).toLocaleString()}đ
+              </p>
+              <p>
+                <strong>Tiền thừa:</strong> {0}đ
               </p>
             </div>
           </div>

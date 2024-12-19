@@ -18,6 +18,14 @@ const VoucherModal = ({ vouchers, isModalVisible, onCancel }) => {
     }
   };
 
+  // Hàm format tiền tệ VNĐ
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
+
   return (
     <Modal
       title="Danh sách Khuyến mãi"
@@ -42,11 +50,10 @@ const VoucherModal = ({ vouchers, isModalVisible, onCancel }) => {
                 {voucher.type === "FixedDiscount" && voucher.conditions && (
                   <div style={{ marginTop: "5px" }}>
                     <Text type="secondary">
-                      Mức giảm giá: {voucher.conditions?.discountAmount ?? 0}{" "}
-                      VND
+                      Mức giảm giá: {formatCurrency(voucher.conditions?.discountAmount ?? 0)}
                       <br />
-                      Yêu cầu đơn tối thiểu: {" "}
-                      {voucher.conditions?.minOrderValue ?? 0} VND
+                      Yêu cầu đơn tối thiểu:{" "}
+                      {formatCurrency(voucher.conditions?.minOrderValue ?? 0)}
                     </Text>
                   </div>
                 )}
@@ -54,16 +61,15 @@ const VoucherModal = ({ vouchers, isModalVisible, onCancel }) => {
                   voucher.conditions && (
                     <div style={{ marginTop: "5px" }}>
                       <Text type="secondary">
-                        Mức giảm giá: {" "}
-                        {voucher.conditions?.discountPercentage ?? 0}%
+                        Mức giảm giá: {voucher.conditions?.discountPercentage ?? 0}%
                         <br />
-                        Yêu cầu đơn tối thiểu: {" "}
-                        {voucher.conditions?.minOrderValue ?? 0} VND
+                        Yêu cầu đơn tối thiểu:{" "}
+                        {formatCurrency(voucher.conditions?.minOrderValue ?? 0)}
                         <br />
                         {voucher.conditions?.maxDiscountAmount && (
                           <>
-                            Mức giảm tối đa: {" "}
-                            {voucher.conditions?.maxDiscountAmount} VND
+                            Mức giảm tối đa:{" "}
+                            {formatCurrency(voucher.conditions?.maxDiscountAmount)}
                           </>
                         )}
                       </Text>

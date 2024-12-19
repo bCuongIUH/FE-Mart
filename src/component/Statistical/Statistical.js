@@ -27,6 +27,10 @@ import {
 import { getAllEmployee } from "../../untills/employeesApi";
 import { formatCurrency } from "../../untills/formatCurrency";
 import dayjs from "dayjs";
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -36,6 +40,32 @@ function StatisticsChart() {
   const yesterday = dayjs().subtract(1, "day");
 
   const [dateRange, setDateRange] = useState([yesterday, today]);
+  const [statistics, setStatistics] = useState({
+    totalProducts: 0,
+    totalBills: 0,
+    totalCustomers: 0,
+    todayRevenue: 0,
+    yesterdayRevenue: 0,
+    todayGrowth: 0,
+    currentMonthRevenue: 0,
+    lastMonthRevenue: 0,
+    monthlyGrowth: 0,
+    currentYearRevenue: 0,
+    lastYearRevenue: 0,
+    yearlyGrowth: 0,
+  });
+
+  const [dailyRevenue, setDailyRevenue] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [employees, setEmployees] = useState([]);
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [{
+      label: 'Doanh thu',
+      data: [],
+      backgroundColor: 'rgba(54, 162, 235, 0.6)',
+    }]
+  });
 
   const handleDateChange = (dates) => {
     if (dates && dates.length === 2) {
@@ -44,26 +74,6 @@ function StatisticsChart() {
       setDateRange([yesterday, today]);
     }
   };
-
-  const [statistics, setStatistics] = useState({
-    totalProducts: 0,
-    totalBills: 0,
-    totalCustomers: 0,
-    todayRevenue: 0,
-    yesterdayRevenue: 0, // Added yesterday's revenue
-    todayGrowth: 0,
-    currentMonthRevenue: 0,
-    lastMonthRevenue: 0, // Added last month's revenue
-    monthlyGrowth: 0,
-    currentYearRevenue: 0,
-    lastYearRevenue: 0, // Added last year's revenue
-    yearlyGrowth: 0,
-  });
-
-  const [dailyRevenue, setDailyRevenue] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [employees, setEmployees] = useState([]);
-console.log(dailyRevenue);
 
   useEffect(() => {
     const fetchStatistics = async () => {
@@ -104,6 +114,20 @@ console.log(dailyRevenue);
         selectedUser
       );
       setDailyRevenue(data);
+
+      // Prepare chart data
+      const labels = data.map(item => item.date);
+      const revenueData = data.map(item => item.revenueAfterDiscount);
+      setChartData({
+        labels: labels,
+        datasets: [
+          {
+            label: 'Doanh thu',
+            data: revenueData,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          },
+        ],
+      });
     } catch (error) {
       console.error("Error fetching daily revenue:", error);
       message.error("Lỗi khi lấy doanh thu!");
@@ -245,7 +269,7 @@ console.log(dailyRevenue);
         "",
         "",
         dayData.date,
-        dayData.totalAmount ,
+        dayData.totalAmount,
         dayData.discountAmount,
         dayData.revenueAfterDiscount,
       ]);
@@ -261,7 +285,6 @@ console.log(dailyRevenue);
           employee.employeeCode,
           employee.employeeName,
           "",
-         
           employee.totalAmount,
           employee.discountAmount,
           employee.revenueAfterDiscount,
@@ -282,7 +305,7 @@ console.log(dailyRevenue);
       "",
       "",
       "",
-      dailyRevenue.reduce((sum, item) => sum + item.totalAmount , 0),
+      dailyRevenue.reduce((sum, item) => sum + item.totalAmount, 0),
       dailyRevenue.reduce((sum, item) => sum + item.discountAmount, 0),
       dailyRevenue.reduce((sum, item) => sum + item.revenueAfterDiscount, 0),
     ]);
@@ -297,12 +320,10 @@ console.log(dailyRevenue);
     message.success("Xuất dữ liệu ra Excel thành công!");
   };
 
-
   const columns = [
     { title: "Ngày", dataIndex: "date", key: "date" },
     { title: "Mã Nhân Viên", dataIndex: "employeeCode", key: "employeeCode" },
     { title: "Tên Nhân Viên", dataIndex: "employeeName", key: "employeeName" },
-    
     {
       title: "Doanh Thu Trước CK",
       dataIndex: "totalAmount",
@@ -343,6 +364,7 @@ console.log(dailyRevenue);
     }));
     return [dayTotal, ...employeeRows];
   });
+
   const renderGrowthIcon = (growth) => {
     if (growth > 0) {
       return <ArrowUpOutlined style={{ color: "green" }} />;
@@ -351,6 +373,7 @@ console.log(dailyRevenue);
     }
     return null;
   };
+
   return (
     <div style={{ paddingTop: "50px" }}>
       <div className="statistics-container">
@@ -505,7 +528,7 @@ console.log(dailyRevenue);
                 <Option
                   key={employee._id}
                   value={employee._id}
-                  label={employee.fullName} // Display the name as the label
+                  label={employee.fullName}
                 >
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <span style={{ fontWeight: "bold" }}>
@@ -534,6 +557,41 @@ console.log(dailyRevenue);
             </Button>
           </Col>
         </Row>
+        <div style={{ marginTop: 20, marginBottom: 20, height: 400 }}>
+          {chartData.labels.length > 0 && (
+            <Bar
+              data={chartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Doanh thu (VNĐ)'
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Ngày'
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    position: 'top',
+                  },
+                  title: {
+                    display: true,
+                    text: 'Biểu đồ doanh thu',
+                  },
+                },
+              }}
+            />
+          )}
+        </div>
         <Table
           columns={columns}
           dataSource={dataSource}
@@ -547,3 +605,4 @@ console.log(dailyRevenue);
 }
 
 export default StatisticsChart;
+

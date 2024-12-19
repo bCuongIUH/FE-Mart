@@ -14,6 +14,10 @@ import dayjs from "dayjs";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import { formatCurrency } from "../../untills/formatCurrency";
+import { Bar, ResponsiveContainer } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, ChartTooltip, Legend);
 
 const { RangePicker } = DatePicker;
 
@@ -21,17 +25,32 @@ function PromotionReport() {
   const today = dayjs();
   const yesterday = dayjs().subtract(1, "day");
 
-
   const [dateRange, setDateRange] = useState([yesterday, today]);
   const [buyXGetYData, setBuyXGetYData] = useState([]);
   const [otherVoucherData, setOtherVoucherData] = useState([]);
-  console.log('checkk', buyXGetYData);
+  const [buyXGetYChartData, setBuyXGetYChartData] = useState({
+    labels: [],
+    datasets: [{
+      label: 'Số lượng tặng',
+      data: [],
+      backgroundColor: 'rgba(75, 192, 192, 0.6)',
+    }]
+  });
+  const [otherVoucherChartData, setOtherVoucherChartData] = useState({
+    labels: [],
+    datasets: [{
+      label: 'Tổng tiền đã chiết khấu',
+      data: [],
+      backgroundColor: 'rgba(255, 99, 132, 0.6)',
+    }]
+  });
+
   const voucherTypeTranslations = {
     BuyXGetY: "Mua hàng tặng hàng",
     FixedDiscount: "Giảm Giá Cố Định",
     PercentageDiscount: "Giảm Giá Phần Trăm",
   };
-  console.log("2",otherVoucherData);
+
   useEffect(() => {
     fetchVoucherStatistics();
   }, []);
@@ -58,6 +77,30 @@ function PromotionReport() {
 
       setBuyXGetYData(buyXGetY);
       setOtherVoucherData(others);
+
+      // Prepare data for Buy X Get Y chart
+      const buyXGetYChartLabels = buyXGetY.map(item => item.voucherCode);
+      const buyXGetYChartValues = buyXGetY.map(item => item.giftProducts[0]?.quantityY || 0);
+      setBuyXGetYChartData({
+        labels: buyXGetYChartLabels,
+        datasets: [{
+          label: 'Số lượng tặng',
+          data: buyXGetYChartValues,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        }]
+      });
+
+      // Prepare data for Other Vouchers chart
+      const otherVoucherChartLabels = others.map(item => item.voucherCode);
+      const otherVoucherChartValues = others.map(item => item.totalDiscountAmount);
+      setOtherVoucherChartData({
+        labels: otherVoucherChartLabels,
+        datasets: [{
+          label: 'Tổng tiền đã chiết khấu',
+          data: otherVoucherChartValues,
+          backgroundColor: 'rgba(255, 99, 132, 0.6)',
+        }]
+      });
     } catch (error) {
       console.error("Error fetching voucher statistics:", error);
       message.error("Lỗi khi lấy thống kê voucher!");
@@ -189,7 +232,6 @@ function PromotionReport() {
       row.height = 20;
     });
 
-
     // Add an empty row between two sections
     worksheet.addRow([]);
     worksheet.mergeCells(
@@ -221,7 +263,7 @@ function PromotionReport() {
       "STT",
       "Mã Khuyến Mãi",
       "Loại Khuyến Mãi",
-      "Điều Kiện", // Đưa cột Điều Kiện lên thứ 4
+      "Điều Kiện",
       "Ngày Bắt Đầu",
       "Ngày Kết Thúc",
       "Số Lần Sử Dụng",
@@ -281,7 +323,6 @@ function PromotionReport() {
       row.height = 20;
     });
     
-
     const totalRow = worksheet.addRow([
       "",
       "",
@@ -294,7 +335,6 @@ function PromotionReport() {
     totalRow.getCell(5).numFmt = "#,##0";
     totalRow.height = 20;
 
- 
     worksheet.columns.forEach((column, index) => {
       if (index === 4) { 
         column.width = 20;
@@ -375,7 +415,6 @@ function PromotionReport() {
       key: "giftProducts",
       render: (giftProducts) => giftProducts?.map(gift => `${gift.productYName} `).join(", ")
     },
-,
     { title: "Số Lần Sử Dụng", dataIndex: "usageCount", key: "usageCount" },
     { 
       title: "Số Lượng Tặng", 
@@ -411,9 +450,9 @@ function PromotionReport() {
                 color={cond.discountAmount ? "red" : "purple"}
                 key={`${groupIndex}-${index}`}
                 style={{
-                  fontSize: "14px", // Tăng kích thước chữ
-                  padding: "5px 10px", // Tăng khoảng cách padding
-                  borderRadius: "5px", // Bo góc thẻ Tag
+                  fontSize: "14px",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
                 }}
               >
                 {cond.discountAmount
@@ -436,11 +475,8 @@ function PromotionReport() {
       title: "Tổng Tiền Đã Chiết Khấu",
       dataIndex: "totalDiscountAmount",
       key: "totalDiscountAmount",
-      render: (text) =>
-        `${formatCurrency(text)}`, 
+      render: (text) => `${formatCurrency(text)}`,
     },
-    
-
   ];
 
   return (
@@ -466,19 +502,92 @@ function PromotionReport() {
             </Button>
           </Col>
         </Row>
-        <h3 style={{ marginTop: "20px" }}>Khuyến mãi mua hàng tặng  hàng</h3>
+        <div className="charts-container" style={{ display: 'flex', marginBottom: '20px' , marginTop:10}}>
+          <div style={{ width: '50%', paddingRight: '10px' }}>
+            <h3 style={{fontWeight: 'bold'}}>Biểu đồ Khuyến mãi mua hàng tặng hàng</h3>
+            <div style={{ height: "300px" }}>
+              <Bar
+                data={buyXGetYChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Số lượng tặng'
+                      }
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Mã khuyến mãi'
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Biểu đồ số lượng sản phẩm tặng theo mã khuyến mãi',
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
+          <div style={{ width: '50%', paddingLeft: '10px' }}>
+            <h3 style={{fontWeight: 'bold'}}>Biểu đồ Khuyến mãi Giảm Giá</h3>
+            <div style={{ height: "300px" }}>
+              <Bar
+                data={otherVoucherChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: {
+                        display: true,
+                        text: 'Tổng tiền đã chiết khấu (VNĐ)'
+                      }
+                    },
+                    x: {
+                      title: {
+                        display: true,
+                        text: 'Mã khuyến mãi'
+                      }
+                    }
+                  },
+                  plugins: {
+                    legend: {
+                      position: 'top',
+                    },
+                    title: {
+                      display: true,
+                      text: 'Biểu đồ tổng tiền đã chiết khấu theo mã khuyến mãi',
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
+        </div>
+        <h3 style={{ marginTop: "20px" ,fontWeight: 'bold'}}>Khuyến mãi mua hàng tặng hàng</h3>
         <Table
           columns={buyXGetYColumns}
           dataSource={buyXGetYData.map((item, index) => ({
             ...item,
             key: index,
             render: (date) => dayjs(date).format("DD/MM/YYYY")
-            // render: (date) => dayjs(date).format("DD/MM/YYYY")
           }))}
           pagination={{ pageSize: 5 }}
           style={{ marginTop: 20 }}
         />
-        <h3 style={{ marginTop: "20px" }}>
+        <h3 style={{ marginTop: "20px", fontWeight: 'bold' }}>
           Khuyến mãi Giảm Giá Cố Định & Giảm Giá Phần Trăm
         </h3>
         <Table
@@ -486,8 +595,8 @@ function PromotionReport() {
           dataSource={otherVoucherData.map((item, index) => ({
             ...item,
             key: index,
-            startDate: dayjs(item.startDate).format("DD/MM/YYYY"), // Chuyển đổi ngày bắt đầu
-            endDate: dayjs(item.endDate).format("DD/MM/YYYY"),     // Chuyển đổi ngày kết thúc
+            startDate: dayjs(item.startDate).format("DD/MM/YYYY"),
+            endDate: dayjs(item.endDate).format("DD/MM/YYYY"),
           }))}
           pagination={{ pageSize: 5 }}
           style={{ marginTop: 20 }}

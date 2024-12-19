@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const STATISTICS_API_URL = "http://localhost:5000/api/statistics"; 
-const STATISTICS_API_URL = "https://cmartshopbe.onrender.com/api/statistics";
+const STATISTICS_API_URL = "http://localhost:5000/api/statistics"; 
+// const STATISTICS_API_URL = "https://cmartshopbe.onrender.com/api/statistics";
 
 // Cấu hình cho axios với token từ localStorage
 const config = {

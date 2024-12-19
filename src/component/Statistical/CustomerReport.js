@@ -7,6 +7,10 @@ import { getCustomerStatistics } from "../../services/statisticsService";
 import { getAllCustomers } from "../../untills/customersApi";
 import { formatCurrency } from "../../untills/formatCurrency";
 import dayjs from "dayjs";
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -19,9 +23,19 @@ function CustomerReport() {
   const [customerStatistics, setCustomerStatistics] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customers, setCustomers] = useState([]);
-
-  console.log("Processed data for table:", customerStatistics);
-
+  const [totalSummary, setTotalSummary] = useState({
+    totalBeforeDiscount: 0,
+    totalDiscount: 0,
+    totalAfterDiscount: 0,
+  });
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [{
+      label: 'Doanh thu sau chiết khấu',
+      data: [],
+      backgroundColor: 'rgba(54, 162, 235, 0.6)',
+    }]
+  });
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -59,15 +73,56 @@ function CustomerReport() {
         selectedCustomer
       );
 
-      // Sort data first by customer phone number, then by date in ascending order
+      // Sort data first by customer phone number, then by date
       data = data.sort((a, b) => {
         if (a.phoneNumber === b.phoneNumber) {
           return new Date(a.date) - new Date(b.date);
         }
-        return a.phoneNumber > b.phoneNumber ? 1 : -1;
+        return a.phoneNumber.localeCompare(b.phoneNumber);
       });
 
-      setCustomerStatistics(processDataForRowSpan(data));
+      const processedData = processDataForRowSpan(data);
+      setCustomerStatistics(processedData);
+
+      // Calculate totals
+      const totals = data.reduce((acc, item) => {
+        acc.totalBeforeDiscount += item.actualTotalAmount;
+        acc.totalDiscount += item.discountAmount;
+        acc.totalAfterDiscount += item.totalAmount;
+        return acc;
+      }, { totalBeforeDiscount: 0, totalDiscount: 0, totalAfterDiscount: 0 });
+
+      setTotalSummary(totals);
+
+      // Prepare chart data
+      const aggregatedData = data.reduce((acc, item) => {
+        if (!acc[item.phoneNumber]) {
+          acc[item.phoneNumber] = {
+            totalAmount: 0,
+            firstDate: item.date
+          };
+        }
+        acc[item.phoneNumber].totalAmount += item.totalAmount;
+        return acc;
+      }, {});
+
+      const sortedPhoneNumbers = Object.keys(aggregatedData).sort((a, b) => 
+        new Date(aggregatedData[a].firstDate) - new Date(aggregatedData[b].firstDate)
+      );
+
+      const labels = sortedPhoneNumbers;
+      const revenueData = sortedPhoneNumbers.map(phone => aggregatedData[phone].totalAmount);
+
+      setChartData({
+        labels: labels,
+        datasets: [
+          {
+            label: 'Tổng doanh thu sau chiết khấu',
+            data: revenueData,
+            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+          },
+        ],
+      });
     } catch (error) {
       console.error("Error fetching customer statistics:", error);
       message.error("Lỗi khi lấy thống kê khách hàng!");
@@ -78,6 +133,7 @@ function CustomerReport() {
     let lastPhoneNumber = null;
     let lastDate = null;
     let customerIndex = 1;
+    let dateIndex = 1;
 
     return data.map((stat, index) => {
       if (stat.phoneNumber !== lastPhoneNumber) {
@@ -86,7 +142,8 @@ function CustomerReport() {
         ).length;
         stat.stt = customerIndex++;
         lastPhoneNumber = stat.phoneNumber;
-        lastDate = null; // Reset lastDate for new customer
+        lastDate = null;
+        dateIndex = 1;
       } else {
         stat.rowSpanCustomer = 0;
       }
@@ -96,9 +153,11 @@ function CustomerReport() {
           (item) =>
             item.date === stat.date && item.phoneNumber === stat.phoneNumber
         ).length;
+        stat.dateIndex = dateIndex++;
         lastDate = stat.date;
       } else {
         stat.rowSpanDate = 0;
+        stat.dateIndex = 0;
       }
 
       return stat;
@@ -212,6 +271,30 @@ function CustomerReport() {
       (width, i) => (worksheet.getColumn(i + 1).width = width)
     );
 
+    // Add total summary row
+    const summaryRow = worksheet.addRow([
+      "Tổng cộng",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      totalSummary.totalBeforeDiscount,
+      totalSummary.totalDiscount,
+      totalSummary.totalAfterDiscount,
+    ]);
+    summaryRow.font = { name: "Times New Roman", bold: true, size: 14 };
+    summaryRow.alignment = { horizontal: "center", vertical: "middle" };
+    summaryRow.eachCell((cell, number) => {
+      if (number > 9) {
+        cell.numFmt = "#,##0";
+      }
+    });
+    worksheet.getRow(summaryRow.number).height = 30;
+
     // Data rows with conditional STT and Ngày display
     let customerCounter = 1;
     let lastPhoneNumber = null;
@@ -260,9 +343,19 @@ function CustomerReport() {
   const columns = [
     {
       title: "STT",
+      dataIndex: "stt",
       key: "stt",
+      width: 50,
       render: (_, record) => (record.rowSpanCustomer ? record.stt : ""),
-      align: "center",
+      onCell: (record) => ({
+        rowSpan: record.rowSpanCustomer,
+      }),
+    },
+    {
+      title: "Số điện thoại",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+      width: 150,
       onCell: (record) => ({
         rowSpan: record.rowSpanCustomer,
       }),
@@ -271,12 +364,11 @@ function CustomerReport() {
       title: "Ngày",
       dataIndex: "date",
       key: "date",
-      render: (_, record) => (record.rowSpanDate ? record.date : ""),
+      render: (_, record) => (record.dateIndex ? record.date : ""),
       onCell: (record) => ({
         rowSpan: record.rowSpanDate,
       }),
     },
-    { title: "Số điện thoại", dataIndex: "phoneNumber", key: "phoneNumber" },
     { title: "Tên Khách Hàng", dataIndex: "customerName", key: "customerName" },
     {
       title: "Số nhà",
@@ -326,7 +418,7 @@ function CustomerReport() {
   return (
     <div style={{ paddingTop: "50px" }}>
       <div className="statistics-container">
-      <h2 style={{fontWeight: "bold", padding: "5px" }}>Thống kê doanh thu khách hàng</h2>
+        <h2 style={{fontWeight: "bold", padding: "5px" }}>Báo cáo doanh thu khách hàng</h2>
         <Row gutter={16} style={{ marginTop: 20 }}>
           <Col>
             <RangePicker
@@ -377,12 +469,74 @@ function CustomerReport() {
             </Button>
           </Col>
         </Row>
+        <div style={{ marginTop: 20, marginBottom: 20, height: 400 }}>
+          {chartData.labels.length > 0 && (
+            <Bar
+              data={chartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  y: {
+                    beginAtZero: true,
+                    title: {
+                      display: true,
+                      text: 'Tổng doanh thu sau chiết khấu (VNĐ)'
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Số điện thoại khách hàng'
+                    },
+                    ticks: {
+                      maxRotation: 90,
+                      minRotation: 90
+                    }
+                  }
+                },
+                plugins: {
+                  legend: {
+                    position: 'top',
+                  },
+                  title: {
+                    display: true,
+                    text: 'Biểu đồ tổng doanh thu theo khách hàng',
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                          label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                          label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                        }
+                        return label;
+                      }
+                    }
+                  }
+                },
+              }}
+            />
+          )}
+        </div>
         <Table
           columns={columns}
-          dataSource={customerStatistics.map((stat, index) => ({
-            ...stat,
-            key: index,
-          }))}
+          dataSource={[
+            {
+              key: 'total',
+              stt: 'Tổng cộng',
+              actualTotalAmount: totalSummary.totalBeforeDiscount,
+              discountAmount: totalSummary.totalDiscount,
+              totalAmount: totalSummary.totalAfterDiscount,
+            },
+            ...customerStatistics.map((stat, index) => ({
+              ...stat,
+              key: index,
+            }))
+          ]}
           style={{ marginTop: 20 }}
           pagination={{ pageSize: 1000 }}
         />
@@ -392,3 +546,4 @@ function CustomerReport() {
 }
 
 export default CustomerReport;
+

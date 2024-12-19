@@ -6,8 +6,8 @@ const config = {
   },
 };
 
-const API_URL = "https://cmartshopbe.onrender.com/api"; 
-// const API_URL = "http://localhost:5000/api";
+// const API_URL = "https://cmartshopbe.onrender.com/api"; 
+const API_URL = "http://localhost:5000/api";
 //lấy tồn kho
 export const getAllStocks = async () => {
     try {

@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const API_URL = "http://localhost:5000/api/voucher"; 
-const API_URL = "https://cmartshopbe.onrender.com/api/voucher"; 
+const API_URL = "http://localhost:5000/api/voucher"; 
+// const API_URL = "https://cmartshopbe.onrender.com/api/voucher"; 
 // Cấu hình cho axios với token từ localStorage
 const config = {
   withCredentials: true,
